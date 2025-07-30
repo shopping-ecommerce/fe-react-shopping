@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Header from './components/common/Header';
 import Footer from './components/common/Footer';
 import Login from './pages/auth/Login';
-import Signup from './pages/auth/Signup';
+import Signup from './pages/auth/Signup'; // Giữ nếu cần cho người dùng thông thường
 import OTPVerification from './components/auth/OTPVerification';
 import ForgotPassword from './pages/auth/ForgotPassword';
 import Home from './pages/buyer/Home';
@@ -20,10 +20,11 @@ import CategoryManagement from './pages/admin/CategoryManagement';
 import Sidebar from './components/common/Sidebar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLeaf } from '@fortawesome/free-solid-svg-icons';
+import SignupSeller from './pages/seller/SignupSeller'; // Import SignupSeller
 
 function AppContent() {
   const location = useLocation();
-  const isAuthPage = location.pathname === '/login' || location.pathname === '/signup' || location.pathname === '/otp-verification' || location.pathname === '/forgot-password';
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/signup' || location.pathname === '/otp-verification' || location.pathname === '/forgot-password' || location.pathname === '/seller/signup'; // Cập nhật isAuthPage
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const toggleSidebar = () => {
@@ -34,6 +35,7 @@ function AppContent() {
     <div className="app-container">
       {!isAuthPage && <Header onToggleSidebar={toggleSidebar} />}
       <div className={`main-content ${location.pathname === '/signup' ? 'signup-page' : location.pathname === '/login' ? 'login-page' : location.pathname === '/otp-verification' ? 'otp-page' : location.pathname === '/forgot-password' ? 'login-page' : ''}`}>
+        {/* Loại bỏ 'signup-page' cho /seller/signup */}
         <div className="content-layout">
           {!isAuthPage && (
             <>
@@ -51,7 +53,7 @@ function AppContent() {
               <Route path="/products" element={<ProductList />} />
               <Route path="/product/:id" element={<ProductDetail />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
+              <Route path="/signup" element={<Signup />} /> {/* Giữ nếu cần */}
               <Route path="/otp-verification" element={<OTPVerification />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route
@@ -93,6 +95,10 @@ function AppContent() {
                     <Analytics />
                   </ProtectedRoute>
                 }
+              />
+              <Route
+                path="/seller/signup" // Route cho SignupSeller không áp dụng signup-page
+                element={<SignupSeller />}
               />
               <Route
                 path="/admin"

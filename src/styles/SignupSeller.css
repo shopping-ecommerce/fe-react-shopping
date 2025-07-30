@@ -1,0 +1,400 @@
+/* Container chính */
+.seller-signup-page {
+  min-height: 150vh;
+  background-color: #f5f5fa;
+  font-family: -apple-system, BlinkMacMacFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.seller-signup-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+}
+
+/* Left Banner */
+.seller-signup-banner {
+  background-color: #329494; /* Màu cam của Shopee */
+  display: flex;
+  flex-direction: column; /* Đặt các phần tử theo cột */
+  align-items: flex-start; /* Căn lề trái theo chiều ngang */
+  justify-content: flex-start; /* Căn lề trên theo chiều dọc */
+  padding: 40px;
+  color: white;
+  position: relative; /* Để định vị logo tuyệt đối */
+  overflow: hidden; /* Đảm bảo các hình nền bên dưới không tràn ra */
+}
+
+/* Background shapes for the banner - Optional, but helps match the image more closely */
+.seller-signup-banner::before {
+  content: '';
+  position: absolute;
+  bottom: -50px; /* Adjust to move shapes up/down */
+  left: 0;
+  width: 100%;
+  height: 200px; /* Height of the shape area */
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path fill="%23e74c3c" opacity="0.2" d="M0,100 L0,70 Q25,50 50,70 T100,70 L100,100 Z" /></svg>'),
+              url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path fill="%23f1c40f" opacity="0.1" d="M0,100 L0,80 Q25,60 50,80 T100,80 L100,100 Z" /></svg>');
+  background-repeat: no-repeat;
+  background-size: 150% 100px, 120% 80px; /* Size of each shape */
+  background-position: left bottom, right bottom; /* Position of each shape */
+  transform: scaleY(-1); /* Flip vertically if needed */
+}
+
+
+/* Logo styling */
+.seller-signup-banner .logo {
+  position: absolute; /* Đặt logo tuyệt đối */
+  top: 30px; /* Cách lề trên 40px */
+  left: 40px; /* Cách lề trái 40px */
+  z-index: 10; /* Đảm bảo logo nằm trên cùng */
+}
+
+.seller-signup-banner .logo-img {
+  width: 120px; /* Kích thước logo */
+  height: auto;
+}
+
+.seller-banner-content {
+  max-width: 400px;
+  text-align: left; /* Căn trái toàn bộ nội dung */
+  margin-top: 80px; /* Đẩy nội dung xuống dưới logo */
+  margin-left: 40px; /* Căn lề trái cho nội dung */
+  position: relative;
+  z-index: 5;
+}
+
+.seller-banner-heading {
+  font-size: 1.8rem;
+  font-weight: 600; /* Đậm hơn */
+  margin-bottom: 0.5rem; /* Giảm khoảng cách */
+  line-height: 1.2;
+  margin-top: 2rem;
+}
+
+.seller-banner-subheading {
+  font-size: 2.5rem; /* To hơn */
+  font-weight: 400; /* Không quá đậm */
+  margin-bottom: 2rem;
+  opacity: 1; /* Đảm bảo hiện rõ */
+}
+
+.seller-features {
+  list-style: none; /* Bỏ dấu chấm mặc định của ul/li */
+  padding: 0;
+  margin: 0;
+}
+
+.seller-feature-item {
+  display: flex;
+  align-items: flex-start; /* Căn trên đầu icon và text */
+  margin-bottom: 1.5rem; /* Khoảng cách giữa các mục */
+  font-size: 1.1rem;
+  line-height: 1.4;
+  font-weight: 300; /* Nhẹ hơn */
+}
+
+.seller-feature-icon {
+  margin-right: 15px; /* Khoảng cách giữa icon và text */
+  color: white; /* Màu icon */
+  flex-shrink: 0; /* Ngăn icon bị co lại */
+}
+
+.seller-feature-icon svg {
+  width: 28px; /* Kích thước icon */
+  height: 28px;
+  stroke-width: 2.5; /* Độ dày nét vẽ của icon */
+}
+
+.seller-brand-name {
+  color: #fff; /* Vẫn giữ màu trắng cho tên thương hiệu nếu có */
+  font-weight: 600;
+}
+
+.seller-banner-image { /* Xóa hoặc ẩn nếu không dùng */
+  display: none;
+}
+
+/* Right Form - Giữ nguyên các phần này hoặc điều chỉnh nếu cần */
+.seller-signup-form-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px 80px;
+  background: white;
+}
+
+.seller-form-header h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 2rem;
+}
+
+/* Form Styles */
+.seller-signup-form {
+  max-width: 500px; /* Tăng chiều ngang từ 400px lên 500px */
+}
+
+.seller-form-group {
+  margin-bottom: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.seller-form-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.seller-form-group-half {
+  flex: 1;
+  font-weight: 600;
+  color: #333;
+  font-size: 1.2rem;
+}
+
+.seller-form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #333;
+  font-size: 1.1rem; /* Tăng từ 0.9rem lên 1.1rem để to hơn */
+  line-height: 1.4; /* Điều chỉnh line-height để đẹp hơn */
+}
+
+.seller-required {
+  color: #ff4757;
+}
+
+.seller-tooltip {
+  color: #74b9ff;
+  margin-left: 0.25rem;
+  cursor: help;
+}
+
+.seller-field-description {
+  font-size: 0.8rem;
+  color: #666;
+  margin: 0.25rem 0 0.5rem 0;
+}
+
+/* Input Styles */
+.seller-form-group input,
+.seller-select-wrapper select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  background: white;
+  box-sizing: border-box;
+}
+
+.seller-form-group input:focus,
+.seller-select-wrapper select:focus {
+  outline: none;
+  border-color: #1a91da;
+  box-shadow: 0 0 0 3px rgba(26, 145, 218, 0.1);
+}
+
+.seller-form-group input::placeholder {
+  color: #a0aec0;
+}
+
+/* Select Wrapper */
+.seller-select-wrapper {
+  position: relative;
+}
+
+.seller-select-wrapper select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 12px center;
+  background-repeat: no-repeat;
+  background-size: 16px;
+  padding-right: 40px;
+}
+
+/* Phone Input */
+.seller-phone-input {
+  display: flex;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.seller-phone-input:focus-within {
+  border-color: #1a91da;
+  box-shadow: 0 0 0 3px rgba(26, 145, 218, 0.1);
+}
+
+.seller-country-code {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 12px 16px;
+  background: #f8fafc;
+  border-right: 1px solid #e2e8f0;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.seller-phone-input input {
+  border: none;
+  flex: 1;
+  padding: 12px 16px;
+}
+
+.seller-phone-input input:focus {
+  box-shadow: none;
+}
+
+/* Name Input */
+.seller-name-input {
+  display: flex;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.seller-name-input input {
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  font-size: 1rem;
+  background: white;
+}
+
+.seller-name-input input:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px #1a91da;
+}
+
+/* Password Container */
+.seller-password-container {
+  position: relative;
+}
+
+.seller-password-container input {
+  padding-right: 50px;
+}
+
+.seller-password-toggle {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #74b9ff;
+  transition: color 0.2s ease;
+}
+
+.seller-password-toggle:hover {
+  color: #1a91da;
+}
+
+/* Submit Button */
+.seller-signup-button {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #1a91da 0%, #0066cc 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 1rem;
+  width: 100%; /* Đảm bảo nút chiếm toàn bộ chiều ngang của form */
+}
+
+.seller-signup-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(26, 145, 218, 0.3);
+}
+
+.seller-signup-button:active {
+  transform: translateY(0);
+}
+
+/* Login Link */
+.seller-login-link {
+  text-align: center;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e2e8f0;
+  color: #666;
+}
+
+.seller-login-link a {
+  color: #1a91da;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.seller-login-link a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .seller-signup-content {
+    grid-template-columns: 1fr;
+  }
+
+  .seller-signup-banner {
+    display: none;
+  }
+
+  .seller-signup-form-container {
+    padding: 40px;
+    justify-content: flex-start;
+    padding-top: 80px;
+  }
+}
+
+@media (max-width: 768px) {
+  .seller-signup-form-container {
+    padding: 20px;
+    padding-top: 40px;
+  }
+
+  .seller-form-row {
+    flex-direction: column;
+  }
+
+  .seller-phone-input {
+    flex-direction: column;
+  }
+
+  .seller-country-code {
+    border-right: none;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .seller-name-input {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .seller-signup-form-container {
+    padding: 15px;
+  }
+
+  .seller-form-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .seller-signup-form {
+    max-width: 100%; /* Đảm bảo form chiếm toàn bộ chiều ngang trên mobile */
+  }
+
+  .seller-form-group label {
+    font-size: 1rem; /* Giảm một chút trên mobile để không quá lớn */
+  }
+}
