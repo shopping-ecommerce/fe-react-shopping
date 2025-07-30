@@ -1,0 +1,367 @@
+/* Đảm bảo .main-content trong App.jsx được định nghĩa */
+.main-content {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  min-height: calc(100vh - 200px);
+  padding-right: 10px;
+  width: 100%;
+}
+
+/* Áp dụng hình ảnh nền chỉ cho trang đăng nhập */
+.main-content.login-page {
+  background: #f5f0ea url('/img/forrmdangnhap.jpg') no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+/* Form chính với thiết kế glass morphism */
+.login-form {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  padding: 2rem;
+  width: 450px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  margin: 25px 60px 15px 10px;
+  margin-left: 150px;
+}
+
+.login-form h2 {
+  text-align: center;
+  margin-bottom: 1.2rem;
+  font-size: 1.6rem;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 1px;
+  margin-top: -8px;
+}
+
+/* QR Option */
+.qr-option {
+  background: rgba(255, 229, 127, 0.2);
+  border: 1px solid rgba(255, 229, 127, 0.4);
+  padding: 0.6rem;
+  text-align: center;
+  margin-bottom: 1.2rem;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+}
+
+.qr-option:hover {
+  background: rgba(255, 229, 127, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Form Groups */
+.form-group {
+  margin-bottom: 1.2rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.85rem;
+}
+
+.input-container,
+.password-container {
+  position: relative;
+  width: 100%;
+}
+
+.form-group input,
+.password-container input {
+  width: 100%;
+  padding: 0.9rem 0.9rem 0.9rem 2.8rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.95rem;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.form-group input::placeholder,
+.password-container input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.form-group input:focus,
+.password-container input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+/* Input Icons */
+.input-icon {
+  position: absolute;
+  left: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.password-container input {
+  padding-right: 3.8rem;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.7);
+  transition: color 0.3s ease;
+}
+
+.password-toggle:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Submit Button */
+.login-form button[type="submit"] {
+  width: 100%;
+  padding: 0.9rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+  color: rgba(255, 255, 255, 0.9);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  letter-spacing: 0.5px;
+}
+
+.login-form button[type="submit"]:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.2));
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Forgot Password */
+.forgot-password {
+  text-align: left;
+  margin-top: 0.8rem;
+  margin-bottom: 1.2rem;
+  margin-left: 10px;
+}
+
+.forgot-password a {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: color 0.3s ease;
+}
+
+.forgot-password a:hover {
+  color: rgba(255, 255, 255, 1);
+  text-decoration: underline;
+}
+
+/* OR Divider */
+.or-divider {
+  text-align: center;
+  margin: 1.2rem 0;
+  color: rgba(255, 255, 255, 0.7);
+  position: relative;
+}
+
+.or-divider span {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0 0.8rem;
+  position: relative;
+  z-index: 1;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border-radius: 20px;
+  font-weight: 500;
+}
+
+.or-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.3);
+  z-index: 0;
+}
+
+/* Social Login */
+.social-login {
+  display: flex;
+  gap: 0.8rem;
+  margin-bottom: 1.2rem;
+}
+
+.social-button {
+  flex: 1;
+  padding: 0.6rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.social-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.social-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Signup Prompt */
+.signup-prompt {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.85rem;
+}
+
+.signup-prompt a {
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.signup-prompt a:hover {
+  color: white;
+  text-decoration: underline;
+}
+
+/* Back Button */
+.back-button {
+  display: block;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  padding: 0.3rem 0.5rem;
+  border: 2px solid rgba(255, 255, 255, 1); /* Đường viền trắng */
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  line-height: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.back-button:hover {
+  color: rgba(255, 255, 255, 1);
+  border-color: rgba(255, 255, 255, 0.7);
+  transform: translateY(-2px);
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .login-container {
+    margin-left: 600px;
+  }
+}
+
+@media (max-width: 992px) {
+  .login-container {
+    margin-left: 300px;
+  }
+  
+  .login-form {
+    width: 320px;
+    margin: 15px 40px 15px 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    justify-content: center;
+    padding: 15px;
+  }
+  
+  .login-container {
+    margin-left: 0;
+    justify-content: center;
+  }
+  
+  .login-form {
+    width: 100%;
+    max-width: 360px;
+    margin: 15px 0;
+    padding: 1.5rem 1.2rem;
+  }
+  
+  .social-login {
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-form {
+    padding: 1.2rem 0.8rem;
+  }
+  
+  .login-form h2 {
+    font-size: 1.4rem;
+  }
+  
+  .form-group input,
+  .password-container input {
+    padding: 0.75rem 0.75rem 0.75rem 2.2rem;
+    font-size: 0.85rem;
+  }
+  
+  .input-icon {
+    left: 0.6rem;
+    font-size: 0.9rem;
+  }
+  
+  .password-toggle {
+    right: 0.6rem;
+    font-size: 0.9rem;
+  }
+}

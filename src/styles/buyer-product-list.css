@@ -1,0 +1,42 @@
+/* src/styles/buyer-product-list.css */
+.product-list-container {
+  padding: 2rem;
+  background-color: #f9f9f9;
+}
+
+.product-list-title {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.product-list-items {
+  display: grid;
+  gap: 1rem;
+}
+
+.product-item {
+  background-color: white;
+  padding: 1rem;
+  border-radius: 4px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.product-item h3 {
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.product-item p {
+  margin-bottom: 0.5rem;
+  color: #666;
+}
+
+.product-item a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.product-item a:hover {
+  text-decoration: underline;
+}

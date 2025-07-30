@@ -1,0 +1,96 @@
+.back-button-wrapper {
+  margin-top: 40px;
+  margin-left: 80px;
+}
+
+.left-position {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 10;
+}
+
+.curved-back-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 2px solid #FFFFFF; /* Đường viền trắng */
+  border-radius: 50%; /* Hình tròn hoàn toàn */
+  cursor: pointer;
+  padding: 5px;
+  color: #FFFFFF;
+  text-decoration: none;
+  width: 50px;
+  height: 50px;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.back-button-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.back-text {
+  font-size: 10px;
+  color: #FFFFFF;
+  margin-top: -5px;
+}
+
+/* Hiệu ứng hover */
+.curved-back-button:hover {
+  opacity: 0.8;
+  transform: scale(1.1);
+}
+
+.curved-back-button:active {
+  opacity: 0.6;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .left-position {
+    top: 10px;
+    left: 10px;
+  }
+
+  .curved-back-button {
+    width: 40px;
+    height: 40px;
+  }
+
+  .back-text {
+    font-size: 8px;
+  }
+
+  svg {
+    width: 30px;
+    height: 22.5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .left-position {
+    top: 5px;
+    left: 5px;
+  }
+
+  .curved-back-button {
+    width: 30px;
+    height: 30px;
+  }
+
+  .back-text {
+    font-size: 6px;
+  }
+
+  svg {
+    width: 20px;
+    height: 15px;
+  }
+}
