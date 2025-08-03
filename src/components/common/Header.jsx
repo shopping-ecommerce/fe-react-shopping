@@ -25,16 +25,6 @@ function Header() {
             <Link to="/seller" className="header-link">Kênh Người Bán</Link>
             <div className="divider">|</div>
             <Link to="/seller/signup" className="header-link">Trở thành Người bán Shopping</Link>
-            <div className="divider">|</div>
-            <Link to="/app" className="header-link">Tải ứng dụng</Link>
-            <div className="divider">|</div>
-            <Link to="/connect" className="header-link">Kết nối</Link>
-            <Link to="/facebook" className="social-icon">
-              <FontAwesomeIcon icon={faFacebookF} />
-            </Link>
-            <Link to="/instagram" className="social-icon">
-              <FontAwesomeIcon icon={faInstagram} />
-            </Link>
           </div>
           <div className="header-top-right">
             <Link to="/notifications" className="header-link">

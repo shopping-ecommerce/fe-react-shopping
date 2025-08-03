@@ -112,9 +112,6 @@ function SignupForm() {
             </div>
             <button type="submit">Tiếp tục</button>
           </form>
-          <div className="forgot-password">
-            <a href="/login">Đã có tài khoản? Đăng nhập</a>
-          </div>
           <div className="or-divider">
             <span>HOẶC</span>
           </div>

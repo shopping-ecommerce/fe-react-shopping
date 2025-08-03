@@ -1,0 +1,217 @@
+.eotp-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f9f1e7 0%, #e8e2d9 100%);
+  padding: 20px;
+  font-family: 'Inter', sans-serif;
+}
+
+.eotp-form {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 40px;
+  width: 100%;
+  max-width: 450px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.eotp-form h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #1a1a1a;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.eotp-instruction {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.eotp-email-display {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #329494;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.form-group {
+  margin-bottom: 24px;
+}
+
+.eotp-input-wrapper {
+  display: flex;
+  align-items: center;
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+  transition: border-color 0.3s ease;
+  margin-bottom: 12px;
+}
+
+.eotp-input-wrapper:focus-within {
+  border-color: #329494;
+  box-shadow: 0 0 0 3px rgba(50, 148, 148, 0.1);
+}
+
+.eotp-input-wrapper .eotp-input-icon {
+  margin: 0 12px;
+  font-size: 24px;
+  color: #555;
+}
+
+.eotp-input-wrapper input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  background: transparent;
+  color: #1a1a1a;
+  padding: 12px 0;
+}
+
+.eotp-code-container {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 30px;
+}
+
+.eotp-digit-input {
+  width: 50px;
+  height: 60px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 600;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: #f8f9fa;
+  color: #1a1a1a;
+  transition: all 0.3s ease;
+}
+
+.eotp-digit-input:focus {
+  border-color: #329494;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(50, 148, 148, 0.1);
+  outline: none;
+}
+
+.eotp-digit-input:not(:placeholder-shown) {
+  border-color: #329494;
+  background: #fff;
+}
+
+.eotp-send-button,
+.eotp-verify-button {
+  width: 100%;
+  padding: 14px;
+  background: #329494;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.eotp-send-button:hover,
+.eotp-verify-button:hover {
+  background: #2a7b7b;
+  transform: translateY(-2px);
+}
+
+.eotp-actions {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin: 20px 0;
+}
+
+.eotp-link-button {
+  background: none;
+  border: none;
+  color: #329494;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.eotp-link-button:hover:not(:disabled) {
+  color: #2a7b7b;
+  text-decoration: underline;
+}
+
+.eotp-link-button:disabled {
+  color: #b0b0b0;
+  cursor: not-allowed;
+}
+
+.eotp-error-message {
+  color: #e53e3e;
+  font-size: 14px;
+  margin-top: 8px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.eotp-signup-prompt {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 15px;
+  color: #555;
+}
+
+.eotp-signup-prompt a {
+  color: #329494;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.eotp-signup-prompt a:hover {
+  color: #2a7b7b;
+  text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+  .eotp-container {
+    padding: 15px;
+  }
+
+  .eotp-form {
+    padding: 24px;
+    max-width: 95%;
+  }
+
+  .eotp-form h2 {
+    font-size: 24px;
+  }
+
+  .eotp-digit-input {
+    width: 40px;
+    height: 50px;
+    font-size: 20px;
+  }
+
+  .eotp-code-container {
+    gap: 8px;
+  }
+
+  .eotp-actions {
+    flex-direction: column;
+    gap: 15px;
+  }
+}

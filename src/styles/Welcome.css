@@ -1,0 +1,515 @@
+.wk-container {
+  min-height: 100vh;
+  background: #f8f9fa;
+  padding: 20px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Étape 1 - Sélection du type de compte */
+.wk-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.wk-title {
+  text-align: center;
+  font-size: 32px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 16px;
+}
+
+.wk-subtitle {
+  text-align: center;
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 40px;
+}
+
+.wk-account-types {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  max-width: 800px;
+  margin: 0 auto 40px;
+}
+
+.wk-account-card {
+  background: white;
+  border-radius: 12px;
+  width: 400px;
+  height: 480px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 2px solid #329494;
+  flex: none;
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.wk-account-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+}
+
+.wk-account-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  border: 2px solid #e91e63;
+}
+
+.wk-account-icon.personal {
+  background: #e91e63;
+}
+
+.wk-account-card h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 20px;
+}
+
+.wk-requirements {
+  text-align: left;
+  margin-bottom: auto;
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.wk-requirement-item {
+  color: #329494;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.wk-requirements ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.wk-requirements li {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 8px;
+  padding-left: 16px;
+  position: relative;
+}
+
+.wk-requirements li:before {
+  content: "•";
+  color: #329494;
+  position: absolute;
+  left: 0;
+}
+
+.wk-requirements .warning {
+  color: #d32f2f;
+  background: #fff3e0;
+  padding: 12px;
+  border-radius: 6px;
+  border-left: 4px solid #ff9800;
+  margin-top: 12px;
+}
+
+.wk-link {
+  color: #329494;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.wk-link:hover {
+  text-decoration: underline;
+}
+
+.wk-select-button {
+  width: 100%;
+  padding: 12px 24px;
+  background: #329494;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 20px;
+}
+
+.wk-select-button:hover {
+  background: #2a7b7b;
+  transform: translateY(-2px);
+}
+
+/* Étape 2 - Configuration du magasin */
+.wk-store-setup-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 12px;
+  padding: 40px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: grid;
+  grid-template-columns: 1fr 400px; /* Tăng cột bên phải từ 320px lên 400px */
+  gap: 40px;
+  align-items: flex-start;
+  min-height: 600px;
+  position: relative;
+}
+
+.wk-form-section {
+  flex: 1;
+}
+
+.wk-form-group {
+  margin-bottom: 32px;
+}
+
+.wk-form-label {
+  display: block;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.wk-required {
+  color: #e53e3e;
+  margin-right: 4px;
+}
+
+.wk-form-description {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.wk-input-wrapper {
+  position: relative;
+}
+
+.wk-store-name-input {
+  width: 100%;
+  padding: 12px 60px 12px 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 16px;
+  background: #f8f9fa;
+  transition: border-color 0.3s ease;
+}
+
+.wk-store-name-input:focus {
+  outline: none;
+  border-color: #329494;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(50, 148, 148, 0.1);
+}
+
+.wk-char-count {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  color: #888;
+  font-weight: 600;
+}
+
+.wk-warning-box {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
+}
+
+.wk-warning-box p {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  color: #856404;
+}
+
+.wk-warning-box ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.wk-warning-box li {
+  font-size: 14px;
+  color: #856404;
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.wk-logo-upload-section {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.wk-logo-upload-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.wk-logo-placeholder, .wk-logo-preview {
+  width: 100px;
+  height: 100px;
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+}
+
+.wk-logo-preview {
+  border: 2px solid #329494;
+  object-fit: cover;
+}
+
+.wk-upload-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #f0f8ff;
+  color: #329494;
+  border: 1px solid #329494;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.wk-upload-button:hover {
+  background: #329494;
+  color: white;
+}
+
+/* Aperçu mobile */
+.wk-mobile-preview-section {
+  position: sticky;
+  top: 75px;
+  height: 500px;
+  margin-left: 0; /* Điều chỉnh để căn chỉnh với cột 400px */
+}
+
+.wk-preview-label {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.wk-mobile-preview {
+  width: 400px; /* Tăng chiều rộng từ 280px lên 400px */
+  height: 100%;
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.wk-mobile-header {
+  padding: 12px 16px 8px;
+  color: white;
+}
+
+.wk-mobile-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.wk-mobile-icons {
+  display: flex;
+  gap: 4px;
+}
+
+.wk-mobile-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 18px;
+}
+
+.wk-search-bar {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.wk-store-info {
+  background: white;
+  padding: 20px 16px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.wk-store-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wk-store-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.default-avatar {
+  font-size: 24px;
+}
+
+.wk-store-details h4 {
+  margin: 0 0 4px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.wk-store-details p {
+  margin: 0 0 12px 0;
+  font-size: 12px;
+  color: #666;
+}
+
+.wk-action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.wk-chat-btn, .wk-follow-btn {
+  padding: 6px 12px;
+  border-radius: 4px;
+  border: none;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.wk-chat-btn {
+  background: #333;
+  color: white;
+}
+
+.wk-follow-btn {
+  background: #329494;
+  color: white;
+}
+
+.wk-mobile-tabs {
+  background: white;
+  padding: 12px 16px;
+  display: flex;
+  gap: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.wk-mobile-tabs span {
+  font-size: 14px;
+  color: #666;
+  padding-bottom: 8px;
+  cursor: pointer;
+}
+
+.wk-mobile-tabs .active {
+  color: #329494;
+  border-bottom: 2px solid #329494;
+  font-weight: 600;
+}
+
+/* Footer du formulaire */
+.wk-form-footer {
+  grid-column: 1 / -1;
+  margin-top: 40px;
+  text-align: center;
+}
+
+.wk-checkbox-container {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 24px;
+  font-size: 16px;
+  color: #666;
+  cursor: pointer;
+}
+
+.wk-checkbox-container input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: #329494;
+  margin-right: 5px;
+}
+
+.wk-finish-button {
+  padding: 14px 48px;
+  background: #329494;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-left: 5px;
+}
+
+.wk-finish-button:hover {
+  background: #2a7b7b;
+  transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .wk-account-types {
+    flex-direction: column;
+    max-width: 315px;
+  }
+  
+  .wk-store-setup-content {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  .wk-mobile-preview-section {
+    position: static;
+    display: flex;
+    justify-content: center;
+    height: auto;
+    margin-left: 0;
+  }
+  
+  .wk-mobile-preview {
+    width: 100%; /* Tự động điều chỉnh chiều rộng trên mobile */
+  }
+}
