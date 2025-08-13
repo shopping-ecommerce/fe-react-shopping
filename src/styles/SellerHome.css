@@ -1,0 +1,64 @@
+.seller-home-container {
+  padding: 20px;
+  background: #f9fafb;
+}
+
+.seller-progress h2 {
+  font-size: 20px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.progress-badge {
+  background: #1a73e8;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-left: 8px;
+}
+
+.seller-steps {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.seller-step-card {
+  flex: 1 1 180px;
+  background: #fff;
+  padding: 16px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  border: 1px solid transparent;
+  transition: 0.2s;
+}
+
+.seller-step-card.highlight {
+  border: 1px solid #1a73e8;
+}
+
+.seller-step-card.done .icon-circle {
+  background: #1a73e8;
+  color: #fff;
+}
+
+.icon-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 10px;
+  font-size: 20px;
+}
+
+.status-text {
+  font-size: 13px;
+  color: #555;
+  margin-top: 4px;
+}
