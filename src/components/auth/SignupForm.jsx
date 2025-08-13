@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { register as registerApi } from '../../services/api';
 import '../../styles/signup.css';
 import BackButton from './BackButton';
 
@@ -12,11 +13,40 @@ function SignupForm() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    navigate('/otp-verification');
+    setError('');
+    setLoading(true);
+
+    if (password !== confirmPassword) {
+      setError('Mật khẩu và mật khẩu xác nhận không khớp!');
+      setLoading(false);
+      return;
+    }
+
+    const registerData = {
+      email,
+      password,
+      first_name: firstName,
+      last_name: lastName,
+      address,
+    };
+
+    try {
+      const data = await registerApi(registerData);
+      if (data) {
+        alert('Đăng ký thành công! Mã OTP đã được gửi.');
+        navigate('/otp-verification', { state: { email } });
+      }
+    } catch (err) {
+      setError(err.message || 'Đăng ký thất bại. Vui lòng thử lại!');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -25,6 +55,8 @@ function SignupForm() {
       <div className="signup-container">
         <div className="signup-form">
           <h2>Đăng ký</h2>
+          {error && <div className="error-message">{error}</div>}
+          {loading && <div className="loading-message">Đang xử lý...</div>}
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <div className="input-container">
@@ -110,7 +142,7 @@ function SignupForm() {
                 </span>
               </div>
             </div>
-            <button type="submit">Tiếp tục</button>
+            <button type="submit" disabled={loading}>Đăng ký</button>
           </form>
           <div className="or-divider">
             <span>HOẶC</span>

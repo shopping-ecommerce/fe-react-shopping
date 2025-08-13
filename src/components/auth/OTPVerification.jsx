@@ -1,64 +1,88 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef, useContext } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
+import { verifyOtp as verifyOtpApi } from '../../services/api';
 import '../../styles/otp.css';
 import BackButton from './BackButton';
 
 function OTPVerification() {
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [otp, setOtp] = useState('');
-  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [email, setEmail] = useState('');
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [timer, setTimer] = useState(60);
-  const [isResendDisabled, setIsResendDisabled] = useState(false);
+  const [isResendDisabled, setIsResendDisabled] = useState(true); // Bắt đầu với disabled
   const [sendCount, setSendCount] = useState(0);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const { register } = useContext(AuthContext);
   const navigate = useNavigate();
+  const location = useLocation();
+  const emailFromSignup = location.state?.email || '';
+  const otpRefs = useRef([]);
 
   useEffect(() => {
+    if (emailFromSignup) {
+      setEmail(emailFromSignup);
+      setIsResendDisabled(true); // Khởi động timer ngay khi vào trang
+    }
     let interval;
-    if (isOtpSent && timer > 0 && isResendDisabled && sendCount < 2) {
+    if (timer > 0 && isResendDisabled && sendCount === 0) { // Chỉ chạy timer lần đầu
       interval = setInterval(() => {
         setTimer((prev) => prev - 1);
       }, 1000);
-    } else if (timer === 0 && sendCount < 2) {
+    } else if (timer === 0 && sendCount === 0) { // Khi timer hết, kích hoạt nút gửi lại
       setIsResendDisabled(false);
-      setTimer(60);
+      setTimer(0); // Giữ timer ở 0, không đếm tiếp
+      clearInterval(interval); // Dừng interval
     }
-    return () => clearInterval(interval);
-  }, [isOtpSent, timer, isResendDisabled, sendCount]);
-
-  const handleSendOtp = () => {
-    if (!phoneNumber || errorMessage) {
-      alert('Vui lòng nhập số điện thoại hợp lệ!');
-      return;
-    }
-    if (sendCount >= 2) {
-      alert('Bạn đã hết số lần gửi OTP!');
-      return;
-    }
-    setIsOtpSent(true);
-    setIsResendDisabled(true);
-    setSendCount((prev) => prev + 1);
-    alert('Mã OTP đã được gửi! (Giả lập: 123456)');
-  };
+    return () => clearInterval(interval); // Dọn dẹp interval
+  }, [timer, isResendDisabled, sendCount, emailFromSignup]);
 
   const handleResendOtp = () => {
-    if (!isResendDisabled && sendCount < 2) {
-      setIsOtpSent(true);
+    if (!isResendDisabled && sendCount === 0) { // Chỉ cho phép gửi lại khi sendCount = 0
       setIsResendDisabled(true);
-      setSendCount((prev) => prev + 1);
-      setTimer(60); // Reset timer cho cả lần gửi lại
-      alert('Mã OTP đã được gửi lại! (Giả lập: 123456)');
-    } else if (sendCount >= 2) {
+      setSendCount(1); // Tăng lên 1 và khóa luôn
+      alert(`Mã OTP đã được gửi lại đến ${email}! (Kiểm tra email của bạn)`);
+    } else if (sendCount >= 1) {
       alert('Bạn đã hết số lần gửi OTP!');
     }
   };
 
-  const handleVerifyOtp = () => {
-    if (otp === '123456') {
-      const userData = { email: 'user@example.com', role: 'buyer' };
-      const authToken = 'sample-token';
+  const handleOtpChange = (index, value) => {
+    if (!/^\d*$/.test(value)) return;
+    
+    const newOtp = [...otp];
+    newOtp[index] = value.slice(-1);
+    setOtp(newOtp);
+
+    if (value && index < 5) {
+      otpRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleOtpKeyDown = (index, e) => {
+    if (e.key === 'Backspace' && !otp[index] && index > 0) {
+      otpRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    const otpString = otp.join('');
+    if (otpString.length !== 6) {
+      setError('Vui lòng nhập đầy đủ 6 chữ số!');
+      return;
+    }
+    setError('');
+    setLoading(true);
+
+    const verifyData = {
+      email,
+      otp: otpString,
+    };
+
+    try {
+      const data = await verifyOtpApi(verifyData);
+      const userData = { email, role: 'buyer' };
+      const authToken = data.result?.token || 'sample-token'; // Giả định token từ backend
       if (register) {
         register(userData, authToken);
         navigate('/login');
@@ -66,98 +90,60 @@ function OTPVerification() {
         console.error('register function is not available');
         navigate('/login');
       }
-    } else {
-      alert('Mã OTP không đúng!');
-    }
-  };
-
-  const handleInputChange = (e) => {
-    const value = e.target.value;
-    // Giới hạn độ dài tối đa 10 số
-    if (value.length > 10) return;
-
-    // Chỉ giữ lại các ký tự số
-    const numericValue = value.replace(/[^0-9]/g, '');
-    setPhoneNumber(numericValue);
-
-    // Validation: bắt đầu bằng 0 hoặc +84, chỉ chứa số, độ dài 10
-    if (numericValue && !/^(0|\+84)\d*$/.test(numericValue)) {
-      setErrorMessage('Số điện thoại phải bắt đầu bằng 0 hoặc +84!');
-    } else if (numericValue && numericValue.length < 10) {
-      setErrorMessage('Số điện thoại phải đủ 10 số!');
-    } else {
-      setErrorMessage('');
-    }
-  };
-
-  const handleKeyPress = (e) => {
-    // Ngăn chặn các ký tự không phải số
-    if (!/[0-9]/.test(e.key)) {
-      e.preventDefault();
+    } catch (err) {
+      setError(err.message || 'Mã OTP không đúng!');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <>
       <BackButton to="/signup" position="left" />
-      <div className="otp-container">
-        <div className="otp-form">
+      <div className="otp-wrapper">
+        <div className="otp-card">
           <h2>Xác thực OTP</h2>
-          <div className="form-group">
+          <div className="otp-field">
             <div className="phone-row">
               <div className="phone-input-wrapper">
-                <span className="input-icon">📞</span>
+                <span className="otp-icon">📧</span>
                 <input
-                  type="tel"
-                  value={phoneNumber}
-                  onChange={handleInputChange}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Nhập số điện thoại"
-                  maxLength={10}
-                  disabled={isOtpSent} // Lock input sau khi gửi OTP
+                  type="email"
+                  value={email}
+                  readOnly
+                  placeholder="Nhập email"
                 />
               </div>
-              {!isOtpSent ? (
-                <button type="button" className="send-otp-button" onClick={handleSendOtp}>
-                  Gửi
-                </button>
-              ) : sendCount >= 2 ? (
-                <button type="button" className="send-otp-button disabled" disabled>
-                  Gửi lại
-                </button>
-              ) : isResendDisabled ? (
-                <button type="button" className="send-otp-button disabled" disabled>
-                  Gửi lại ({timer}s)
-                </button>
-              ) : (
-                <button type="button" className="send-otp-button" onClick={handleResendOtp}>
-                  Gửi lại
+              {sendCount < 1 && (
+                <button type="button" className={`otp-send-btn ${isResendDisabled ? 'disabled' : ''}`} onClick={handleResendOtp} disabled={isResendDisabled}>
+                  {isResendDisabled && timer > 0 ? `Gửi lại (${timer}s)` : 'Gửi lại'}
                 </button>
               )}
             </div>
-            {errorMessage && <div className="error-message">{errorMessage}</div>}
           </div>
 
-          {isOtpSent && (
-            <>
-              <div className="form-group">
-                <div className="input-container">
-                  <input
-                    type="text"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                    placeholder="Nhập mã OTP"
-                  />
-                  <span className="input-icon">🔑</span>
-                </div>
-              </div>
-              <button type="button" onClick={handleVerifyOtp}>
-                Xác thực
-              </button>
-            </>
-          )}
-
-          <div className="signup-prompt">
+          <div className="otp-field">
+            <div className="otp-code-container">
+              {otp.map((digit, index) => (
+                <input
+                  key={index}
+                  ref={(el) => (otpRefs.current[index] = el)}
+                  type="text"
+                  value={digit}
+                  onChange={(e) => handleOtpChange(index, e.target.value)}
+                  onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                  className="otp-digit-input"
+                  maxLength="1"
+                />
+              ))}
+            </div>
+            {error && <div className="error-message">{error}</div>}
+            {loading && <div className="loading-message">Đang xác thực...</div>}
+          </div>
+          <button type="button" onClick={handleVerifyOtp} disabled={loading}>
+            Xác thực
+          </button>
+          <div className="otp-signup-link">
             <span>Quay lại? <a href="/signup">Đăng ký</a></span>
           </div>
         </div>

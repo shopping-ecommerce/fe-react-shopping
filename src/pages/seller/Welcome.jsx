@@ -44,25 +44,28 @@ function Welcome() {
   };
 
   const handleFinish = () => {
-    if (!storeName.trim()) {
-      alert('Vui lòng nhập tên cửa hàng!');
-      return;
-    }
+  if (!storeName.trim()) {
+    alert('Vui lòng nhập tên cửa hàng!');
+    return;
+  }
+  if (!agreedToTerms) {
+    alert('Vui lòng đồng ý với điều khoản và chính sách!');
+    return;
+  }
 
-    if (!agreedToTerms) {
-      alert('Vui lòng đồng ý với điều khoản và chính sách!');
-      return;
-    }
+  // Gắn tạm role "seller" cho phép vào ProtectedRoute
+  const roles = JSON.parse(localStorage.getItem('roles') || '[]');
+  if (!roles.includes('seller')) {
+    roles.push('seller');
+    localStorage.setItem('roles', JSON.stringify(roles));
+  }
 
-    const storeData = {
-      name: storeName,
-      logo: logoFile,
-      email: email
-    };
+  // (tuỳ chọn) lưu tên cửa hàng, để header/sidebar seller dùng
+  localStorage.setItem('seller_store_name', storeName);
 
-    console.log('Store setup completed:', storeData);
-    navigate('/seller');
-  };
+  // Điều hướng sang trang seller
+  navigate('/seller/home', { replace: true });
+};
 
   return (
     <div className="wk-container">
