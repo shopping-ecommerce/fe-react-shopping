@@ -10,6 +10,7 @@ import Login from './pages/auth/Login';
 import Signup from './pages/auth/Signup';
 import EmailOTPVerification from './components/auth/EmailOTPVerification';
 import ForgotPassword from './pages/auth/ForgotPassword';
+import OTPVerification from './components/auth/OTPVerification';
 
 import Home from './pages/buyer/Home';
 import ProductList from './pages/buyer/ProductList';
@@ -17,20 +18,18 @@ import ProductDetail from './pages/buyer/ProductDetail';
 import Cart from './pages/buyer/Cart';
 import OrderHistory from './pages/buyer/OrderHistory';
 
-import Dashboard from './pages/seller/Dashboard';
 import OrderManagement from './pages/seller/OrderManagement';
 import Analytics from './pages/seller/Analytics';
 import SignupSeller from './pages/seller/SignupSeller';
 import Welcome from './pages/seller/Welcome';
+import HomeSeller from './pages/seller/HomeSeller';
+import SellerLayout from './layouts/SellerLayout';
 
 import AdminDashboard from './pages/admin/Dashboard';
 import CategoryManagement from './pages/admin/CategoryManagement';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLeaf } from '@fortawesome/free-solid-svg-icons';
-import HomeSeller from './pages/seller/HomeSeller';
-import OTPVerification from './components/auth/OTPVerification';
-import SellerLayout from './layouts/SellerLayout';
 
 /** Layout không header/footer/sidebar: dùng cho các trang auth */
 function AuthLayout() {
@@ -43,7 +42,7 @@ function AuthLayout() {
   ].join(' ');
 
   return (
-    <div className={`app-container`}>
+    <div className="app-container">
       <div className={`main-content ${classNameForPage}`}>
         <div className="content-layout">
           <div className="page-content">
@@ -61,7 +60,6 @@ function MainLayout({ hideFooterOn = [] }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const location = useLocation();
   const toggleSidebar = () => setIsSidebarOpen((s) => !s);
-
   const shouldHideFooter = hideFooterOn.includes(location.pathname);
 
   return (
@@ -84,7 +82,6 @@ function MainLayout({ hideFooterOn = [] }) {
     </div>
   );
 }
-
 
 /** Layout riêng cho Admin */
 function AdminLayout() {
@@ -112,12 +109,11 @@ function App() {
         <Route path="/seller/welcome" element={<Welcome />} />
       </Route>
 
-      {/* Nhóm Buyer + trang chung, ẩn footer ở /cart nếu bạn muốn */}
+      {/* Nhóm Buyer + trang chung */}
       <Route element={<MainLayout hideFooterOn={['/cart']} />}>
         <Route path="/" element={<Home />} />
         <Route path="/products" element={<ProductList />} />
         <Route path="/product/:id" element={<ProductDetail />} />
-
         <Route
           path="/cart"
           element={
@@ -136,14 +132,13 @@ function App() {
         />
       </Route>
 
-     {/* Nhóm Seller */}
-<Route element={<SellerLayout />}>
-  <Route path="/seller" element={<Navigate to="/seller/home" replace />} />
-  <Route path="/seller/home" element={<HomeSeller />} />
-  <Route path="/seller/orders" element={<OrderManagement />} />
-  <Route path="/seller/analytics" element={<Analytics />} />
-</Route>
-
+      {/* Nhóm Seller */}
+      <Route path="/seller" element={<SellerLayout />}>
+        <Route index element={<Navigate to="home" replace />} />  {/* /seller -> /seller/home */}
+        <Route path="home" element={<HomeSeller />} />
+        <Route path="orders" element={<OrderManagement />} />
+        <Route path="analytics" element={<Analytics />} />
+      </Route>
 
       {/* Nhóm Admin */}
       <Route element={<AdminLayout />}>

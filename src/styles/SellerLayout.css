@@ -1,0 +1,43 @@
+:root{
+  --header-h:72px;       /* đúng với header hiện tại */
+  --sbw-open:296px;      /* rộng sidebar khi mở */
+  --sbw-collapsed:76px;  /* rộng sidebar khi thu gọn */
+}
+
+/* khung tổng */
+.seller-app{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  background:#f9fafb;
+}
+
+/* Lưới 2 cột dưới header: Sidebar | Content */
+.seller-main{
+  display:grid;
+  grid-template-columns: var(--sbw-open) 1fr;  /* mặc định mở */
+  column-gap:0;
+  height: calc(100vh - var(--header-h));       /* nằm ngay dưới header */
+}
+
+/* khi thu gọn cột trái */
+.seller-main.collapsed{
+  grid-template-columns: var(--sbw-collapsed) 1fr;
+}
+
+/* Sidebar KHÔNG sticky/fixed; tự cao bằng lưới */
+.seller-sidebar{
+  height:100%;
+  background:#fff;
+  border-right:1px solid #eee;
+  overflow:hidden;         /* phần menu bên trong sẽ tự cuộn */
+}
+
+/* Content chiếm cột phải, cuộn nội dung */
+.seller-page{
+  height:100%;
+  overflow:auto;
+  padding:16px 20px;
+  background:#f9fafb;
+  box-sizing:border-box;
+}
