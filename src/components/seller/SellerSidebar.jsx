@@ -19,32 +19,35 @@ import {
   faFileInvoiceDollar,
   faFileLines,
   faClockRotateLeft,
-  faUpload
+  faUpload,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import "../../styles/sellersidebar.css"; 
+import "../../styles/sellersidebar.css";
 
 export default function SellerSidebar({ isOpen = true, onToggle }) {
   const { pathname } = useLocation();
   const [query, setQuery] = useState("");
 
-  // Cấu hình menu
+  // MENU GIỮ NGUYÊN THEO CODE CỦA BẠN
   const menu = useMemo(
     () => [
-      {
-        type: "item",
-        label: "Trang chủ",
-        icon: faHouse,
-        to: "/seller",
-      },
+      { type: "item", label: "Trang chủ", icon: faHouse, to: "/seller/home" },
       {
         type: "group",
         label: "Đơn hàng",
         icon: faBuilding,
         key: "orders",
         children: [
-          { label: "Danh sách đơn hàng", to: "/seller/orders", icon: faListCheck },
-          { label: "Quản lý hóa đơn", to: "/seller/invoices", icon: faFileInvoiceDollar },
+          {
+            label: "Danh sách đơn hàng",
+            to: "/seller/orders",
+            icon: faListCheck,
+          },
+          {
+            label: "Quản lý hóa đơn",
+            to: "/seller/invoices",
+            icon: faFileInvoiceDollar,
+          },
         ],
       },
       {
@@ -53,12 +56,42 @@ export default function SellerSidebar({ isOpen = true, onToggle }) {
         icon: faBoxArchive,
         key: "products",
         children: [
-          { label: "Danh sách sản phẩm", to: "/seller/products", icon: faListCheck },
+          {
+            label: "Danh sách sản phẩm",
+            to: "/seller/products",
+            icon: faListCheck,
+          },
           { label: "Tạo sản phẩm", to: "/seller/products/new", icon: faUpload },
-          { label: "Quản lý đánh giá", to: "/seller/reviews", icon: faFileLines },
-          { label: "Xuất sản phẩm", to: "/seller/products/export", icon: faReceipt },
-          { label: "Lịch sử thay đổi", to: "/seller/products/history", icon: faClockRotateLeft },
-          { label: "Tạo mới/ cập nhật hàng loạt", to: "/seller/products/bulk", icon: faUpload },
+          {
+            label: "Quản lý đánh giá",
+            to: "/seller/reviews",
+            icon: faFileLines,
+          },
+          {
+            label: "Xuất sản phẩm",
+            to: "/seller/products/export",
+            icon: faReceipt,
+          },
+          {
+            label: "Lịch sử thay đổi",
+            to: "/seller/products/history",
+            icon: faClockRotateLeft,
+          },
+          {
+            label: "Tạo mới/ cập nhật hàng loạt",
+            to: "/seller/products/bulk",
+            icon: faUpload,
+          },
+        ],
+      },
+      {
+        type: "group",
+        label: "Kho & hàng tồn",
+        icon: faWarehouse,
+        key: "inventory",
+        children: [
+          { label: "Tồn kho", to: "/seller/inventory" },
+          { label: "Phiếu nhập/xuất", to: "/seller/stock-moves" },
         ],
       },
       {
@@ -67,8 +100,26 @@ export default function SellerSidebar({ isOpen = true, onToggle }) {
         icon: faChartLine,
         key: "growth",
         children: [
-          { label: "Hiệu quả kinh doanh", to: "/seller/performance", icon: faChartLine },
-          { label: "Chỉ số lượt truy cập", to: "/seller/traffic", icon: faChartLine },
+          {
+            label: "Hiệu quả kinh doanh",
+            to: "/seller/performance",
+            icon: faChartLine,
+          },
+          {
+            label: "Chỉ số lượt truy cập",
+            to: "/seller/traffic",
+            icon: faChartLine,
+          },
+        ],
+      },
+      {
+        type: "group",
+        label: "Trung tâm marketing",
+        icon: faBullhorn,
+        key: "marketing",
+        children: [
+          { label: "Chiến dịch", to: "/seller/campaigns" },
+          { label: "Mã giảm giá", to: "/seller/vouchers" },
         ],
       },
       {
@@ -77,23 +128,29 @@ export default function SellerSidebar({ isOpen = true, onToggle }) {
         icon: faPalette,
         key: "design",
         children: [
-          { label: "Trang trí gian hàng", to: "/seller/storefront", icon: faPalette },
+          {
+            label: "Trang trí gian hàng",
+            to: "/seller/storefront",
+            icon: faPalette,
+          },
         ],
       },
       {
         type: "item",
-        label: "Thông tin nhà bán",
+        label: "Quản lý tài chính",
         icon: faStore,
-        to: "/seller/profile",
+        to: "/seller/finance",
       },
     ],
     []
   );
 
-  // Nhóm nào đang mở
-  const [openKeys, setOpenKeys] = useState(() => new Set(["orders", "products"]));
+  const [openKeys, setOpenKeys] = useState(
+    () => new Set(["orders", "products"])
+  );
 
   const toggleGroup = (key) => {
+    if (!isOpen) return; // đang thu gọn thì không xổ
     setOpenKeys((prev) => {
       const next = new Set(prev);
       next.has(key) ? next.delete(key) : next.add(key);
@@ -101,60 +158,79 @@ export default function SellerSidebar({ isOpen = true, onToggle }) {
     });
   };
 
-  // Lọc theo ô tìm kiếm
   const showItem = (label = "") =>
     label.toLowerCase().includes(query.trim().toLowerCase());
 
   return (
     <aside className={`seller-sidebar ${isOpen ? "open" : "collapsed"}`}>
-      {/* Search */}
+      {/* Top: Search (fixed) */}
       <div className="ssb-search">
         <FontAwesomeIcon icon={faMagnifyingGlass} />
         <input
           placeholder="Tìm kiếm"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          disabled={!isOpen}
         />
       </div>
 
-      {/* Menu */}
+      {/* Middle: Scrollable menu */}
       <nav className="ssb-nav">
         {menu.map((m) => {
+          // ===== ITEM (Trang chủ, Quản lý tài chính) =====
           if (m.type === "item") {
-            if (!showItem(m.label)) return null;
-            return (
+            return showItem(m.label) ? (
               <NavLink
                 key={m.label}
                 to={m.to}
+                end={m.to === "/seller/home"} // << chỉ active khi đúng /seller
                 className={({ isActive }) =>
-                  `ssb-item ${isActive ? "active" : ""}`
+                  `ssb-item headlike ${isActive ? "active" : ""}`
                 }
+                title={!isOpen ? m.label : undefined}
               >
-                <FontAwesomeIcon icon={m.icon} />
-                <span>{m.label}</span>
+                <div className="left">
+                  <FontAwesomeIcon className="ssb-icon" icon={m.icon} />
+                  {isOpen && <span className="label">{m.label}</span>}
+                </div>
+                {isOpen && <span className="chev-spacer" />}
               </NavLink>
-            );
+            ) : null;
           }
 
-          // group
+          // ===== GROUP =====
           const filteredChildren =
             m.children?.filter((c) => showItem(m.label) || showItem(c.label)) ??
             [];
           if (filteredChildren.length === 0) return null;
 
           const open = openKeys.has(m.key);
-          const groupActive = filteredChildren.some((c) => pathname.startsWith(c.to));
+          const groupActive = filteredChildren.some((c) =>
+            pathname.startsWith(c.to)
+          );
 
           return (
-            <div key={m.key} className={`ssb-group ${groupActive ? "active" : ""}`}>
-              <button className="ssb-group-head" onClick={() => toggleGroup(m.key)}>
+            <div
+              key={m.key}
+              className={`ssb-group ${groupActive ? "active" : ""}`}
+            >
+              <button
+                className="ssb-group-head"
+                onClick={() => toggleGroup(m.key)}
+                title={!isOpen ? m.label : undefined}
+              >
                 <div className="left">
-                  <FontAwesomeIcon icon={m.icon} />
-                  <span>{m.label}</span>
+                  <FontAwesomeIcon className="ssb-icon" icon={m.icon} />
+                  {isOpen && <span className="label">{m.label}</span>}
                 </div>
-                <FontAwesomeIcon icon={open ? faChevronDown : faChevronRight} />
+                {isOpen && (
+                  <FontAwesomeIcon
+                    icon={open ? faChevronDown : faChevronRight}
+                  />
+                )}
               </button>
-              {open && (
+
+              {isOpen && open && (
                 <div className="ssb-group-body">
                   {filteredChildren.map((c) => (
                     <NavLink
@@ -164,7 +240,7 @@ export default function SellerSidebar({ isOpen = true, onToggle }) {
                         `ssb-subitem ${isActive ? "active" : ""}`
                       }
                     >
-                      <FontAwesomeIcon icon={c.icon} />
+                      <span className="dot" />
                       <span>{c.label}</span>
                     </NavLink>
                   ))}
@@ -175,20 +251,24 @@ export default function SellerSidebar({ isOpen = true, onToggle }) {
         })}
       </nav>
 
-      {/* Support */}
-      <div className="ssb-support">
-        <button className="ssb-support-btn">
-          <FontAwesomeIcon icon={faHeadphones} />
-          <span>Support</span>
-        </button>
-      </div>
+      {/* Bottom fixed: Support + Collapse */}
+      <div className="ssb-bottom">
+        <div className="ssb-support">
+          <button
+            className={`ssb-support-btn ${!isOpen ? "circle" : ""}`}
+            title={!isOpen ? "Support" : undefined}
+          >
+            <FontAwesomeIcon className="ssb-icon" icon={faHeadphones} />
+            {isOpen && <span>Support</span>}
+          </button>
+        </div>
 
-      {/* Thu gọn */}
-      <div className="ssb-collapse">
-        <button onClick={onToggle}>
-          <FontAwesomeIcon icon={faChevronLeft} />
-          <span>Thu gọn</span>
-        </button>
+        <div className="ssb-collapse">
+          <button onClick={onToggle} title={isOpen ? "Thu gọn" : "Mở rộng"}>
+            <FontAwesomeIcon className="ssb-icon" icon={faChevronLeft} />
+            {isOpen && <span>Thu gọn</span>}
+          </button>
+        </div>
       </div>
     </aside>
   );

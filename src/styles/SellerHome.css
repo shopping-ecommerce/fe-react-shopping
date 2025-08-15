@@ -1,64 +1,102 @@
-.seller-home-container {
-  padding: 20px;
-  background: #f9fafb;
+/* vùng nội dung gọn hơn */
+.seller-home-container{
+  max-width: 1100px;     /* nhỏ hơn nữa */
+  margin: 0 auto;
 }
 
-.seller-progress h2 {
-  font-size: 20px;
-  margin-bottom: 20px;
+/* tiêu đề + badge: cùng 1 hàng */
+.seller-progress h2{
   display: flex;
   align-items: center;
+  gap: 10px;
+  margin: 0 0 14px;
+  font-size: 24px;       /* nhỏ lại */
+  line-height: 1.2;
+  font-weight: 800;
 }
-
-.progress-badge {
+.progress-badge{
+  padding: 2px 8px;
+  font-size: 16px;       /* nhỏ lại */
   background: #1a73e8;
   color: #fff;
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 14px;
-  margin-left: 8px;
+  border-radius: 8px;
 }
 
-.seller-steps {
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
+/* lưới bước: 5 cột, có đường line nền nối các thẻ */
+.seller-steps{
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(160px,1fr));
+  gap: 18px;
+  z-index: 0;            /* để line nằm sau các thẻ */
 }
 
-.seller-step-card {
-  flex: 1 1 180px;
+/* đường line */
+.seller-steps::before{
+  content: "";
+  position: absolute;
+  left: 0; right: 0;
+  top: 62px;             /* canh qua tâm icon (điểm giữa) */
+  height: 2px;
+  background: #e6ebf2;
+  z-index: 0;
+}
+
+/* thẻ nhỏ gọn */
+.seller-step-card{
+  position: relative;
+  z-index: 1;            /* nằm trên line */
   background: #fff;
-  padding: 16px;
-  border-radius: 10px;
+  border: 1px solid #e6ebf2;
+  border-radius: 12px;
+  padding: 14px;         /* nhỏ lại */
   text-align: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  border: 1px solid transparent;
-  transition: 0.2s;
+  box-shadow: 0 2px 6px rgba(17,24,39,.04);
 }
-
-.seller-step-card.highlight {
-  border: 1px solid #1a73e8;
+.seller-step-card.highlight{
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 2px rgba(26,115,232,.14) inset;
 }
-
-.seller-step-card.done .icon-circle {
+.seller-step-card.done .icon-circle{
   background: #1a73e8;
   color: #fff;
 }
 
-.icon-circle {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: #e5e7eb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 10px;
-  font-size: 20px;
+/* icon nhỏ lại */
+.icon-circle{
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: #eef3ff;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 8px;
+  font-size: 18px;
 }
 
-.status-text {
+/* chữ trên thẻ nhỏ lại */
+.seller-step-card h4{
+  font-size: 16px;
+  margin: 4px 0 6px;
+  font-weight: 800;
+}
+.status-text{
   font-size: 13px;
-  color: #555;
-  margin-top: 4px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.35;
+}
+
+/* responsive nhẹ */
+@media (max-width: 1200px){
+  .seller-steps{ grid-template-columns: repeat(4, minmax(160px,1fr)); }
+}
+@media (max-width: 992px){
+  .seller-steps{ grid-template-columns: repeat(3, minmax(160px,1fr)); }
+}
+@media (max-width: 768px){
+  .seller-steps{ grid-template-columns: repeat(2, minmax(150px,1fr)); }
+}
+@media (max-width: 480px){
+  .seller-steps{ grid-template-columns: 1fr; }
 }

@@ -1,26 +1,149 @@
-.seller-sidebar { width: 260px; background: #fff; border-right: 1px solid #eee; display: flex; flex-direction: column; height: 100vh; position: sticky; top: 0; }
-.seller-sidebar.collapsed { width: 72px; }
-.ssb-search { display: flex; align-items: center; gap: 8px; padding: 12px; border-bottom: 1px solid #f0f0f0; }
-.ssb-search input { width: 100%; border: none; outline: none; background: #f7f7f7; padding: 8px 10px; border-radius: 8px; }
+/* ===== Khung tổng ===== */
+.seller-sidebar {
+  width: 296px;
+  background: #fff;
+  border-right: 1px solid #eee;
+  height: calc(100vh - 72px);
+  position: relative;      /* không sticky */
+  top: auto;
+  display: flex;
+  flex-direction: column;
+}
 
-.ssb-nav { padding: 8px; overflow: auto; flex: 1; }
-.ssb-item, .ssb-subitem { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; text-decoration: none; color: #222; }
-.ssb-item:hover, .ssb-subitem:hover { background: #f5f7ff; }
-.ssb-item.active { background: #eaf1ff; color: #1750ff; }
+.seller-sidebar.collapsed { width: 76px; }
 
-.ssb-group { margin-top: 4px; }
-.ssb-group-head { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border: none; background: transparent; border-radius: 8px; cursor: pointer; }
-.ssb-group-head:hover { background: #f5f7ff; }
-.ssb-group-head .left { display: flex; align-items: center; gap: 10px; }
-.ssb-group.active .ssb-group-head { background: #eef3ff; color: #1750ff; }
+/* ===== Search (cố định) ===== */
+.ssb-search {
+  padding: 12px;
+  display: flex; align-items: center; gap: 10px;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fff;
+}
+.ssb-search svg { font-size: 18px; opacity: .8; }
+.ssb-search input {
+  flex: 1;
+  border: none; outline: none;
+  background: #f7f7f9;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 14.5px;
+}
+.seller-sidebar.collapsed .ssb-search input { display: none; }
 
-.ssb-group-body { padding-left: 8px; display: grid; gap: 4px; margin: 6px 0 8px; }
-.ssb-subitem { color: #333; }
-.ssb-subitem.active { background: #eaf1ff; color: #1750ff; }
+/* ===== Phần cuộn ===== */
+.ssb-nav {
+  flex: 1;
+  overflow: auto;
+  padding: 10px 8px 8px;
+}
 
-.ssb-support { padding: 12px; border-top: 1px solid #f0f0f0; }
-.ssb-support-btn { width: 100%; padding: 10px 12px; border-radius: 999px; border: 1px solid #e5e7eb; background: #fff; display: flex; gap: 10px; align-items: center; justify-content: center; cursor: pointer; }
+/* ===== Item level-1 & group head ===== */
+.ssb-item, .ssb-group-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px;
+  padding: 12px 12px;
+  border-radius: 12px;
+  color: #111827;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  width: 100%;
+  cursor: pointer;
+  min-height: 48px;
+}
+.ssb-item:hover, .ssb-group-head:hover { background: #f5f7ff; }
+.ssb-item.active {
+  background: #eef4ff;
+  color: #1750ff;
+  font-weight: 600;
+}
+
+/* icon to hơn */
+.ssb-icon { font-size: 20px; }
+.seller-sidebar.collapsed .ssb-icon { font-size: 22px; }
+
+/* label ẩn khi collapsed */
+.seller-sidebar.collapsed .label { display: none; }
+
+/* group-left block & state active */
+.ssb-group .left { display: flex; align-items: center; gap: 12px; }
+.ssb-group.active > .ssb-group-head {
+  background: #eef4ff; color: #1750ff; font-weight: 600;
+}
+
+/* ===== Submenu (không icon) ===== */
+.ssb-group-body {
+  display: grid; gap: 6px;
+  padding: 6px 0 6px 10px;
+}
+.ssb-subitem {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px 9px 18px;
+  border-radius: 10px;
+  color: #333; text-decoration: none;
+  min-height: 40px;
+}
+.ssb-subitem:hover { background: #f7f9ff; }
+.ssb-subitem.active { background: #eaf1ff; color: #1750ff; font-weight: 600; }
+.ssb-subitem .dot { width: 6px; height: 6px; border-radius: 50%; background: #cbd5e1; }
+.ssb-subitem.active .dot { background: #1750ff; }
+
+/* ===== đường kẻ mảnh ===== */
+.ssb-nav::after {
+  content: ""; display: block; height: 1px; background: #f0f0f0; margin: 10px 6px 0 6px;
+}
+
+/* ===== Bottom cố định ===== */
+.ssb-bottom {
+  border-top: 1px solid #f0f0f0;
+  background: #fff;
+  padding: 10px 12px 12px;
+}
+.ssb-support { padding: 4px 0 10px; }
+.ssb-support-btn {
+  width: 100%; height: 44px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  display: flex; align-items: center; justify-content: center;
+  gap: 10px; cursor: pointer; font-weight: 600;
+}
 .ssb-support-btn:hover { background: #f9fafb; }
+.ssb-support-btn.circle { width: 44px; height: 44px; border-radius: 999px; padding: 0; }
+.seller-sidebar.collapsed .ssb-support-btn span { display: none; }
 
-.ssb-collapse { padding: 8px 12px 14px; }
-.ssb-collapse button { width: 100%; display: flex; gap: 10px; align-items: center; border: none; background: transparent; color: #444; cursor: pointer; }
+.ssb-collapse { padding: 2px 2px; }
+.ssb-collapse button {
+  width: 100%;
+  display: flex; align-items: center; gap: 8px;
+  border: none; background: transparent;
+  color: #6b7280; cursor: pointer; padding: 10px 4px;
+}
+.seller-sidebar.collapsed .ssb-collapse button { justify-content: center; }
+.seller-sidebar.collapsed .ssb-collapse button span { display: none; }
+
+/* ===== Collapsed: active icon có ô xanh tròn ===== */
+.seller-sidebar.collapsed .ssb-item.active,
+.seller-sidebar.collapsed .ssb-group.active > .ssb-group-head {
+  background: transparent; color: inherit; font-weight: 600;
+}
+.seller-sidebar.collapsed .ssb-item.active .ssb-icon,
+.seller-sidebar.collapsed .ssb-group.active .ssb-icon {
+  background: linear-gradient(180deg, #2a6cea 0%, #0a58ff 100%);
+  color: #fff;
+  border-radius: 18px;
+  width: 36px; height: 36px;
+  display: grid; place-items: center;
+  padding: 6px;
+}
+
+/* ===== Item thường hiển thị giống group-head (trái + phải) ===== */
+.ssb-item.headlike { justify-content: space-between; }
+.ssb-item.headlike .left {
+  display: flex; align-items: center; gap: 12px;
+}
+.chev-spacer { width: 16px; opacity: 0; }
+
+/* ===== Scrollbar ===== */
+.ssb-nav::-webkit-scrollbar { width: 8px; }
+.ssb-nav::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 999px; }
