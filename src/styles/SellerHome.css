@@ -100,3 +100,135 @@
 @media (max-width: 480px){
   .seller-steps{ grid-template-columns: 1fr; }
 }
+
+/* ===== Carousel / Banner giống ảnh ===== */
+.seller-carousel{
+  position: relative;
+  margin-top: 50px;
+  border-radius: 12px;
+  overflow: hidden;
+  height: 160px;
+  background: linear-gradient(135deg, #1a73e8 0%, #0066cc 100%);
+  box-shadow: 0 4px 12px rgba(0,0,0,.08);
+}
+.sc-viewport{ height:100%; overflow:hidden; }
+.sc-track{
+  display:flex; height:100%; width:100%;
+  transition: transform .5s ease;
+}
+
+/* Slide = 3 phần: art trái (cố định), content 2 cột (trái/phải) */
+.sc-slide{
+  min-width:100%;
+  height:100%;
+  display:grid;
+  grid-template-columns: 320px 1fr; /* art | content */
+  align-items:center;
+  color:#fff;
+  padding: 0 18px 0 22px;
+}
+
+/* art bên trái: giả lập ảnh bằng gradient */
+.sc-art{
+  height:100%;
+  border-radius:10px;
+  background:
+    radial-gradient(200px 110px at 35% 35%, rgba(255,255,255,.25), transparent 65%),
+    radial-gradient(280px 160px at 45% 75%, rgba(255,255,255,.12), transparent 60%),
+    linear-gradient(90deg, rgba(255,255,255,.10), rgba(255,255,255,0));
+}
+
+/* khối content (2 cột) */
+.sc-content{
+  display:grid;
+  grid-template-columns: 1.2fr 1fr;   /* trái to hơn */
+  column-gap: 24px;
+  align-items:center;
+}
+
+/* tag + headline bên trái */
+.sc-tag{
+  display:inline-block;
+  margin-bottom: 6px;
+  padding: 2px 8px;
+  background: rgba(255,255,255,.16);
+  border-radius: 999px;
+  font-weight:700;
+  letter-spacing:.2px;
+  font-size: 18px;                  /* “Cung cấp” */
+}
+.sc-headline{
+  margin:0;
+  font-weight:800;
+  line-height:1.05;
+  font-size: 34px;                   /* dòng xanh */
+}
+.sc-headline .line2{
+  display:block;
+  color:#ffd23f;                     /* dòng vàng */
+  font-size: 40px;
+  font-weight:900;
+  margin-top: 2px;
+}
+
+/* mô tả + CTA bên phải */
+.sc-right{ display:grid; row-gap: 10px; justify-items: center; }
+.sc-sub{
+  margin:0;
+  font-size:14px;
+  line-height:1.4;
+  color: rgba(255,255,255,.96);
+  text-align: left;
+  max-width: 520px;
+}
+.sc-cta{
+  padding: 12px 28px;
+  border:none; border-radius: 8px;
+  background:#ffd23f; color:#1f2937;
+  font-weight:800; font-size:14px;
+  cursor:pointer;
+  box-shadow: 0 3px 10px rgba(255,210,63,.35);
+}
+
+/* màu nền khác cho slide create (nếu dùng) */
+.sc-create{ background: linear-gradient(135deg, #0089ff 0%, #1976ff 100%); }
+
+/* Mũi tên kiểu nền xanh đậm trong suốt + icon trắng */
+.sc-arrow{
+  position:absolute; top:50%;
+  transform: translateY(-50%);
+  width: 44px; height: 44px;
+  border:none; border-radius: 12px;
+  background: rgba(7,41,94,.35);
+  color:#fff; font-size: 28px; line-height:1;
+  display:grid; place-items:center;
+  cursor:pointer; z-index:10;
+}
+.sc-arrow--left{ left: 10px; }
+.sc-arrow--right{ right: 10px; }
+.sc-arrow:hover{ background: rgba(7,41,94,.5); }
+
+/* Dots */
+.sc-dots{
+  position:absolute; bottom:8px; left:50%;
+  transform:translateX(-50%);
+  display:flex; gap:8px; z-index:10;
+}
+.sc-dots .dot{
+  width:26px; height:4px; border:none;
+  border-radius:999px; background: rgba(255,255,255,.45);
+  cursor:pointer;
+}
+.sc-dots .dot.active{ background:#fff; }
+
+/* Responsive: xếp một cột khi hẹp */
+@media (max-width: 1024px){
+  .seller-carousel{ height: 180px; }
+  .sc-slide{ grid-template-columns: 220px 1fr; }
+  .sc-content{ grid-template-columns: 1fr; row-gap: 10px; }
+  .sc-headline{ font-size: 30px; }
+  .sc-headline .line2{ font-size: 34px; }
+  .sc-right{ justify-items: start; }
+}
+.seller-step-card.clickable { cursor: pointer; }
+.seller-step-card.clickable:hover { box-shadow: 0 0 0 2px rgba(37,99,235,.22) inset; }
