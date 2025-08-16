@@ -1,0 +1,358 @@
+/* ===============================
+   GLOBAL PAGE
+   =============================== */
+.sp-page{
+  background:#f5f6f8;
+  min-height:100vh;
+  padding:0 20px 28px;
+  box-sizing:border-box;
+  font-family:"Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.sp-header,.sp-alert,.sp-card,.sp-side,.sp-panel,.sp-section,.sp-btn,.avatar{border-radius:0}
+
+/* ===============================
+   HEADER
+   =============================== */
+.sp-header{
+  background:#fff;
+  padding:16px 24px 12px;
+  border-bottom:1px solid #e5e7eb;
+  margin:0 -20px 14px;
+}
+.sp-breadcrumb{
+  display:flex;align-items:center;gap:8px;
+  font-size:15px;color:#6b7280;margin-bottom:8px;
+}
+.sp-crumb-link{color:#2563eb;text-decoration:none;font-weight:500}
+.sp-crumb-link:hover{text-decoration:underline}
+.sp-crumb-sep{color:#9ca3af}
+.sp-crumb-current{color:#111827;font-weight:500}
+
+.sp-head-row{
+  display:flex;align-items:center;justify-content:space-between;margin-top:25px;
+}
+.sp-title{margin:0;font-size:28px;font-weight:600;color:#111827}
+
+.sp-btn{
+  height:36px;padding:0 14px;border:1px solid #e5e7eb;background:#fff;
+  cursor:pointer;font-size:14px;font-weight:500;color:#111827;
+}
+.sp-btn.primary{
+  border:1px solid #1d4ed8;background:#1d4ed8;color:#fff
+}
+.sp-btn.primary:hover{filter:brightness(0.95)}
+
+/* ===============================
+   ALERT
+   =============================== */
+.sp-alert{
+  display:flex;justify-content:space-between;align-items:center;
+  background:#fff8e1;border:1px solid #fde68a;
+  padding:12px 14px;margin-bottom:14px;font-size:14px;
+}
+.sp-alert .left{display:flex;align-items:center;gap:8px}
+
+/* ===============================
+   SHOP CARD
+   =============================== */
+.sp-card{
+  background:#fff;border:1px solid #e5e7eb;padding:16px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.shop-left{display:flex;align-items:center;gap:12px}
+.avatar{
+  width:48px;height:48px;background:#e0f2fe;
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+}
+.shop-name{font-size:18px;font-weight:600;color:#111827}
+.shop-meta{display:flex;gap:10px;font-size:13px;margin-top:4px}
+.badge{display:inline-flex;align-items:center;gap:6px;font-weight:500}
+.badge.warn{background:#fff7ed;color:#c2410c;border:1px solid #fdba74;padding:2px 8px}
+.muted{color:#6b7280}
+
+.shop-right{display:flex;align-items:center;gap:10px}
+.toggle{display:flex;align-items:center;gap:8px}
+.toggle input[type="checkbox"]{width:36px;height:20px}
+
+/* ===============================
+   BODY LAYOUT
+   =============================== */
+.sp-body{
+  display:flex;gap:16px;margin-top:16px;
+}
+
+/* Sidebar trái (sticky + highlight active) */
+.sp-side{
+  width:320px;min-width:260px;background:#fff;
+  height:fit-content;
+  position:sticky;top:20px; /* luôn neo khi cuộn */
+  align-self:flex-start;
+}
+.sp-side-item{
+  width:100%;text-align:left;background:#fff;border:none;cursor:pointer;
+  padding:14px 16px;display:flex;align-items:center;gap:12px;
+  border-bottom:1px solid #f3f4f6;color:#111827;
+  transition:all 0.2s ease;
+}
+.sp-side-item:last-child{border-bottom:none}
+.sp-side-item .state{
+  width:22px;height:22px;display:inline-grid;place-items:center;
+  font-size:13px;border:1px solid #e5e7eb;background:#fff;color:#6b7280;
+}
+.sp-side-item.done .state{border-color:#86efac;background:#ecfdf5;color:#16a34a}
+.sp-side-item.pending .state{border-color:#fde68a;background:#fff8e1;color:#a16207}
+.sp-side-item .t1{font-weight:600}
+
+/* Active item highlight */
+.sp-side-item.active{
+  background:#f0f7ff;
+  color:#1890FF;
+  border-right:4px solid #1890FF;
+}
+
+/* Panel phải */
+.sp-panel{
+  flex:1;background:transparent;border:none;
+}
+
+/* ===============================
+   SECTION
+   =============================== */
+.sp-section{
+  background:#fff;border:1px solid #e5e7eb;margin-bottom:24px; /* giãn cách rõ hơn */
+}
+.sp-section-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px;border-bottom:1px solid #e5e7eb;
+}
+.sp-section-head h2{margin:0;font-size:18px;font-weight:600;color:#111827}
+.sp-link{border:none;background:transparent;color:#2563eb;cursor:pointer;font-weight:500}
+
+.sp-subdesc{
+  padding:10px 16px;color:#6b7280;border-bottom:1px solid #f3f4f6
+}
+
+.sp-table{font-size:14px}
+.sp-table .row{
+  display:flex;justify-content:space-between;gap:16px;
+  padding:12px 16px;border-bottom:1px solid #f3f4f6
+}
+.sp-table .row:last-child{border-bottom:none}
+.sp-table .label{color:#111827;font-weight:600;flex:0 0 38%}
+.sp-table .value{flex:1}
+
+.value-group{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.text-strong{font-weight:600}
+.text-mute{color:#9ca3af}
+
+.sp-pill{
+  display:inline-block;padding:6px 10px;font-size:13px;
+  border:1px solid #facc15;background:#fff8e1;color:#a16207
+}
+
+/* ===============================
+   RESPONSIVE
+   =============================== */
+@media (max-width: 1024px){
+  .sp-side{width:280px}
+  .sp-table .label{flex-basis:42%}
+}
+@media (max-width: 768px){
+  .sp-body{flex-direction:column}
+  .sp-side{width:100%;position:relative;top:0;border-right:none}
+  .sp-table .row{flex-direction:column;gap:6px}
+  .sp-table .label{flex-basis:auto}
+}
+/* =============================== 
+   SIDEBAR STYLING - Design basé sur l'image
+=============================== */
+
+.sp-side {
+    width: 320px;
+    min-width: 280px;
+    background: #fff; /* Fond gris clair comme dans l'image */
+    border: 1px solid #e5e7eb;
+    height: fit-content;
+    position: sticky;
+    top: 20px;
+    align-self: flex-start;
+    padding: 16px 0; /* Padding interne */
+}
+
+.sp-side-item {
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #374151; /* Texte gris foncé */
+    transition: all 0.2s ease;
+    border-bottom: none; /* Supprime les bordures entre éléments */
+    margin-bottom: 8px; /* Espacement entre les éléments */
+}
+
+.sp-side-item:last-child {
+    margin-bottom: 0;
+}
+
+.sp-side-item .state {
+    width: 24px;
+    height: 24px;
+    display: inline-grid;
+    place-items: center;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 50%; /* Cercle parfait */
+    flex-shrink: 0; /* Empêche la réduction de taille */
+}
+
+/* État "done" avec coche verte */
+.sp-side-item.done .state {
+    border: 2px solid #10b981; /* Bordure verte */
+    background: #10b981; /* Fond vert */
+    color: #ffffff; /* Texte blanc */
+}
+
+/* État "pending" avec point d'interrogation gris */
+.sp-side-item.pending .state {
+    border: 2px solid #9ca3af; /* Bordure grise */
+    background: #9ca3af; /* Fond gris */
+    color: #ffffff; /* Texte blanc */
+}
+
+.sp-side-item .t1 {
+    font-weight: 400; /* Poids normal comme dans l'image */
+    font-size: 15px; /* Taille de police plus grande */
+    line-height: 1.4;
+    color: #374151; /* Texte gris foncé */
+}
+
+/* État actif/hover (optionnel) */
+.sp-side-item:hover {
+    background: rgba(59, 130, 246, 0.05);
+}
+
+/* État actif - Garde la bordure bleue à gauche + texte bleu */
+.sp-side-item.is-active {
+    background: transparent; /* Garde le fond transparent */
+    border-left: 3px solid #3b82f6; /* GARDE la bordure bleue à gauche */
+    margin-left: -1px; /* Compense la bordure pour éviter le décalage */
+}
+
+.sp-side-item.is-active .t1 {
+    color: #1d4ed8; /* Texte bleu */
+    font-weight: 500;
+}
+
+/* =============================== 
+   RESPONSIVE ADJUSTMENTS
+=============================== */
+
+@media (max-width: 1024px) {
+    .sp-side {
+        width: 280px;
+    }
+}
+
+@media (max-width: 768px) {
+    .sp-body {
+        flex-direction: column;
+    }
+    
+    .sp-side {
+        width: 100%;
+        position: relative;
+        top: 0;
+        border-right: none;
+    }
+    
+    .sp-side-item {
+        padding: 14px 16px;
+    }
+    
+    .sp-side-item .t1 {
+        font-size: 14px; /* Taille légèrement réduite sur mobile */
+    }
+}
+/* ===============================
+   TOGGLE SWITCH (On/Off)
+   =============================== */
+.tk-switch{
+  position: relative;
+  width: 86px;              /* dài pill */
+  height: 32px;             /* cao pill */
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+}
+
+.tk-track{
+  position: absolute;
+  inset: 0;
+  background: #e5e7eb;      /* xám nhạt khi OFF */
+  border-radius: 9999px;
+  box-shadow: inset 0 0 0 1px #e5e7eb;
+  transition: background .2s ease;
+}
+
+.tk-thumb{
+  position: absolute;
+  left: 4px;
+  top: 4px;
+  width: 24px;
+  height: 24px;
+  background: #fff;
+  border-radius: 9999px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.12);
+  transition: transform .2s ease;
+}
+
+/* chữ “Tắt/Bật” giữa pill */
+.tk-text{
+  position: relative;
+  z-index: 1;
+  font-size: 14px;
+  line-height: 1;
+  color: #fff;               /* chữ trắng như ảnh */
+  user-select: none;
+}
+
+/* chấm “i” nằm bên phải trong pill */
+.tk-info{
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.8);
+  color: rgba(255,255,255,.95);
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  line-height: 1;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* ON state */
+.tk-switch.is-on .tk-track{
+  background: #1890FF;       /* xanh theo yêu cầu */
+  box-shadow: inset 0 0 0 1px #1890FF;
+}
+.tk-switch.is-on .tk-thumb{
+  transform: translateX(54px);  /* đẩy bi sang phải */
+}
+
+/* nhỏ chỉnh khoảng cách cạnh phải */
+.shop-right .tk-switch{ margin-right: 8px; }
