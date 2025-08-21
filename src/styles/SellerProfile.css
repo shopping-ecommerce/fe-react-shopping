@@ -122,6 +122,7 @@
 .sp-section{
   background:#fff;border:1px solid #e5e7eb;margin-bottom:24px; /* giãn cách rõ hơn */
 }
+.sp-section{ scroll-margin-top: 96px; } 
 .sp-section-head{
   display:flex;align-items:center;justify-content:space-between;
   padding:14px 16px;border-bottom:1px solid #e5e7eb;
@@ -356,3 +357,7 @@
 
 /* nhỏ chỉnh khoảng cách cạnh phải */
 .shop-right .tk-switch{ margin-right: 8px; }
+@media (prefers-reduced-motion: reduce){
+  html:focus-within { scroll-behavior: auto; }
+  .tk-thumb, .tk-track { transition: none; }
+}

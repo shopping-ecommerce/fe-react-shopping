@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import '../../styles/SignupSeller.css';
+import '../../../styles/SignupSeller.css'; // Import your styles
 
 function SignupSeller() {
   const [formData, setFormData] = useState({

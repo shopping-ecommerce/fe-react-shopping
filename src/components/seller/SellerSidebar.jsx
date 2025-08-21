@@ -61,7 +61,7 @@ export default function SellerSidebar({ isOpen = true, onToggle }) {
             to: "/seller/products",
             icon: faListCheck,
           },
-          { label: "Tạo sản phẩm", to: "/seller/products/new", icon: faUpload },
+          { label: "Tạo sản phẩm", to: "/seller/create-products", icon: faUpload },
           {
             label: "Quản lý đánh giá",
             to: "/seller/reviews",

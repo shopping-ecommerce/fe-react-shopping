@@ -18,9 +18,9 @@ import ProductDetail from "./pages/buyer/ProductDetail";
 import Cart from "./pages/buyer/Cart";
 import OrderHistory from "./pages/buyer/OrderHistory";
 
-import OrderManagement from "./pages/seller/OrderManagement";
+import OrderManagement from "./pages/seller/order/OrderManagement";
 import Analytics from "./pages/seller/Analytics";
-import SignupSeller from "./pages/seller/SignupSeller";
+import SignupSeller from "./pages/seller/SignUp/SignupSeller";
 import Welcome from "./pages/seller/Welcome";
 import HomeSeller from "./pages/seller/HomeSeller";
 import SellerLayout from "./layouts/SellerLayout";
@@ -30,7 +30,11 @@ import CategoryManagement from "./pages/admin/CategoryManagement";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLeaf } from "@fortawesome/free-solid-svg-icons";
-import ProfileSeller from "./pages/seller/ProfileSeller";
+import ProfileSeller from "./pages/seller/Updateinformation/ProfileSeller";
+import ProfileLegal from "./pages/seller/Updateinformation/ProfileLegal";
+import BankAccount from "./pages/seller/Updateinformation/BankAccount";
+import InvoiceList from "./pages/seller/order/InvoiceList";
+import CreateProductPage from "./pages/seller/product/createproducts";
 
 /** Layout không header/footer/sidebar: dùng cho các trang auth */
 function AuthLayout() {
@@ -141,9 +145,14 @@ function App() {
         <Route path="home" element={<HomeSeller />} />
         <Route path="orders" element={<OrderManagement />} />
         <Route path="analytics" element={<Analytics />} />
-        <Route path="profile" element={<ProfileSeller />} />{" "}
-        {/* <- thêm dòng này */}
+        <Route path="profile" element={<ProfileSeller />} />
+        <Route path="legal" element={<ProfileLegal />} /> {/* thêm dòng này */}
+        <Route path="bank-account" element={<BankAccount />} />{" "}
+        <Route path="invoices" element={<InvoiceList />} />
+        <Route path="create-products" element={<CreateProductPage />} />
+        {/* thêm dòng này */}
       </Route>
+
       {/* Nhóm Admin */}
       <Route element={<AdminLayout />}>
         <Route path="/admin" element={<AdminDashboard />} />
