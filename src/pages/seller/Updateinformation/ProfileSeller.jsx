@@ -1,7 +1,7 @@
 // ProfileSeller.jsx
 import React, { useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
-import "../../styles/SellerProfile.css";
+import "../../../styles/SellerProfile.css";
 
 export default function ProfileSeller() {
   function ToggleSwitch() {

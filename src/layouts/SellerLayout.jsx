@@ -19,7 +19,6 @@ export default function SellerLayout() {
           <Outlet />
         </main>
       </div>
-      <Footer />
     </div>
   );
 }

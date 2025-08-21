@@ -19,9 +19,19 @@ export default function HomeSeller() {
         done: false,
         highlight: true,
       },
-      { title: "Giấy tờ pháp lý", status: "Hoàn thành!", done: true },
-      { title: "Kích hoạt hồ sơ", status: "Hoàn thành!", done: true },
-      { title: "Tài khoản ngân hàng", status: "", done: false },
+      { 
+        title: "Giấy tờ pháp lý",
+        status: "Hoàn thành!",
+        done: true,
+        go: "/seller/legal", },
+      { title: "Kích hoạt hồ sơ", 
+        status: "Hoàn thành!", 
+        done: true, 
+         },
+      { title: "Tài khoản ngân hàng", 
+        status: "", 
+        done: false, 
+        go: "/seller/bank-account", },
     ],
     []
   );

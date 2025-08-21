@@ -1,0 +1,122 @@
+/* src/styles/SellerBank.css */
+
+/* dùng lại nền & font chung của .sp-page đã có */
+.sp-header,
+.sp-section,
+.sp-btn {
+  border-radius: 0;
+}
+
+/* Sub text nhỏ dưới header */
+.bkp-sub {
+  margin: 6px 0 0 0;
+  color: #6b7280;
+}
+
+/* pill “Kỳ thanh toán …” bên phải header */
+.bkp-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #eaf3ff;
+  border: 1px solid #bfdbfe;
+  color: #1f2a44;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+.bkp-pill .i {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid #1d4ed8;
+  color: #1d4ed8;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+}
+
+/* Section chứa form */
+.bkp-section {
+  margin-top: 14px;
+  padding-bottom: 16px;
+}
+
+/* Lưới form 1 cột (đúng ảnh) nhưng có thể nới spacing */
+.bkp-grid {
+  padding: 16px;
+}
+
+/* Hàng form chung – dùng lại style form-row như các trang trước */
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.form-row label {
+  font-weight: 600;
+  color: #111827;
+}
+
+.form-row .control select,
+.form-row .control input {
+  width: 100%;
+  height: 44px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  padding: 0 12px;
+  outline: none;
+  font-size: 14px;
+}
+.form-row .control select:focus,
+.form-row .control input:focus {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.35);
+}
+
+/* Nút hành động ở góc phải dưới section */
+.bkp-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 10px 16px 6px;
+  border-top: 1px dashed #e5e7eb;
+}
+
+/* Tái sử dụng style nút đã có */
+.sp-btn {
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #111827;
+}
+.sp-btn.ghost {
+  background: #fff;
+}
+.sp-btn.outline {
+  background: #fff;
+  border: 1px solid #d1d5db;
+}
+.sp-btn.primary {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  color: #fff;
+}
+.sp-btn.primary:hover {
+  filter: brightness(0.95);
+}
+
+/* Responsive nhẹ */
+@media (max-width: 768px) {
+  .bkp-pill {
+    margin-top: 8px;
+  }
+}
+select {
+  direction: ltr;
+}
