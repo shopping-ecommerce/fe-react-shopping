@@ -1,0 +1,108 @@
+/* src/styles/Modal.css */
+
+/* Reset modal root */
+#modal-root { position: relative; z-index: 9999; }
+
+/* Overlay */
+.m-overlay {
+  position: fixed; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  background-color: rgba(0,0,0,0.55);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  z-index: 9999; opacity: 0; visibility: hidden;
+  transition: opacity .25s ease, visibility .25s ease;
+}
+.m-overlay.m-open { opacity: 1; visibility: visible; }
+.m-overlay.m-closing { opacity: 0; visibility: hidden; }
+
+/* Content (đen–trắng) */
+.m-content {
+  position: relative; background: #ffffff; color: #0a0a0a;
+  border-radius: 14px;
+  box-shadow: 0 30px 40px -15px rgba(0,0,0,.25), 0 10px 20px -10px rgba(0,0,0,.15);
+  overflow: hidden; transform: translateY(16px) scale(.96); opacity: 0;
+  max-height: min(85vh, 900px);
+  display: flex; flex-direction: column; z-index: 10000;
+  border: 1px solid #e5e7eb;
+}
+
+.m-animate-in { animation: m-pop .3s cubic-bezier(.16,1,.3,1) forwards; }
+.m-animate-out { animation: m-pop-out .22s ease-in forwards; }
+
+@keyframes m-pop {
+  0% { transform: translateY(16px) scale(.96); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+@keyframes m-pop-out {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(16px) scale(.96); opacity: 0; }
+}
+
+/* Header */
+.m-header {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 16px 20px; border-bottom: 1px solid #e5e7eb; background: #fff;
+}
+.m-title { margin: 0; font-size: 18px; font-weight: 700; color: #111; letter-spacing: .2px; }
+
+/* Close */
+.m-icon-btn { border: none; background: transparent; cursor: pointer; padding: 4px; border-radius: 8px; }
+.m-close { font-size: 18px; line-height: 1; color: #6b7280; width: 36px; height: 36px; display: grid; place-items: center; }
+.m-close:hover { color: #111; background-color: #f3f4f6; }
+.m-close:active { background-color: #e5e7eb; }
+
+/* Body */
+.m-body { padding: 20px; overflow: auto; flex: 1 1 auto; scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent; }
+.m-body::-webkit-scrollbar { width: 8px; }
+.m-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+.m-body::-webkit-scrollbar-track { background: transparent; }
+
+/* Footer */
+.m-footer {
+  display: flex; justify-content: flex-end; gap: 10px;
+  padding: 14px 20px; border-top: 1px solid #e5e7eb; background: #fafafa;
+}
+
+/* Buttons (đen–trắng) */
+.m-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 16px; border-radius: 10px; font-size: 14px; font-weight: 600;
+  cursor: pointer; border: 1px solid #111; transition: transform .06s ease, background-color .18s ease, box-shadow .18s ease;
+  min-height: 40px;
+}
+.m-btn:disabled { opacity: .55; cursor: not-allowed; }
+
+.m-btn-primary {
+  background-color: #111; color: #fff; border-color: #111;
+  box-shadow: 0 8px 14px rgba(0,0,0,.18);
+}
+.m-btn-primary:hover:not(:disabled) { background-color: #000; border-color: #000; transform: translateY(-1px); }
+.m-btn-primary:active:not(:disabled) { transform: translateY(0); }
+
+.m-btn-outline {
+  background-color: #fff; color: #111; border-color: #d1d5db;
+}
+.m-btn-outline:hover:not(:disabled) { background-color: #f9fafb; border-color: #9ca3af; }
+.m-btn-outline:active:not(:disabled) { background-color: #f3f4f6; }
+
+/* Alert */
+.m-alert { padding: 12px 16px; border-radius: 10px; font-size: 14px; margin-bottom: 16px; border: 1px solid; }
+.m-alert-error { background-color: #fef2f2; color: #7f1d1d; border-color: #fecaca; }
+
+/* Prevent body scroll when modal is open */
+body:has(.m-overlay.m-open) { overflow: hidden !important; }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .m-overlay, .m-animate-in, .m-animate-out { animation: none !important; transition: opacity .15s ease !important; }
+  .m-content { transform: none !important; opacity: 1 !important; }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .m-overlay { padding: 16px; }
+  .m-content { width: 100% !important; max-height: 90vh; margin: 0; }
+  .m-header, .m-body, .m-footer { padding-left: 16px; padding-right: 16px; }
+}

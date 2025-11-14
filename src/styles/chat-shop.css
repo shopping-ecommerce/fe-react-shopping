@@ -1,0 +1,830 @@
+/* ===== Modern Black & White Chat Interface ===== */
+
+.cs-root {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  height: calc(100vh - 80px);
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.3s ease;
+}
+
+.cs-root:hover {
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.12);
+}
+
+/* ========== Sidebar ========== */
+.cs-sidebar {
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%);
+  transition: all 0.3s ease;
+}
+
+.cs-search {
+  padding: 16px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #ffffff;
+}
+
+.cs-search input {
+  width: 100%;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 14px;
+  outline: none;
+  background: #fafafa;
+  transition: all 0.3s ease;
+  color: #111827;
+}
+
+.cs-search input:focus {
+  border-color: #111827;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+}
+
+.cs-search input::placeholder {
+  color: #9ca3af;
+}
+
+.cs-filter {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #ffffff;
+}
+
+.cs-filter select {
+  width: 100%;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  background: #fafafa;
+  color: #111827;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.cs-filter select:hover {
+  border-color: #9ca3af;
+}
+
+.cs-filter select:focus {
+  border-color: #111827;
+  background: #ffffff;
+}
+
+/* Hidden scrollbar but keep functionality */
+.cs-conv-list {
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.cs-conv-list::-webkit-scrollbar {
+  display: none; /* Chrome/Safari/Opera */
+}
+
+.cs-conv-item {
+  width: 100%;
+  display: flex;
+  gap: 12px;
+  padding: 14px 16px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  border-bottom: 1px solid #f3f4f6;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+/* Smooth hover effect with scale */
+.cs-conv-item:hover {
+  background: #f9fafb;
+  transform: translateX(4px);
+}
+
+.cs-conv-item.active {
+  background: #111827;
+  color: #ffffff;
+}
+
+.cs-conv-item.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: #ffffff;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+.cs-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #111827 0%, #374151 100%);
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 16px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.cs-conv-item:hover .cs-avatar {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.cs-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cs-prod .thumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: #f3f4f6;
+  border: 2px solid #e5e7eb;
+  transition: all 0.3s ease;
+}
+
+.cs-prod .thumb:hover {
+  border-color: #111827;
+  transform: scale(1.05);
+}
+
+.cs-conv-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.cs-conv-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.cs-name {
+  font-weight: 600;
+  color: #111827;
+  font-size: 14px;
+  transition: color 0.3s ease;
+}
+
+.cs-conv-item.active .cs-name {
+  color: #ffffff;
+}
+
+.cs-time {
+  font-size: 11px;
+  color: #9ca3af;
+  transition: color 0.3s ease;
+}
+
+.cs-conv-item.active .cs-time {
+  color: #d1d5db;
+}
+
+.cs-last {
+  font-size: 13px;
+  color: #6b7280;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  transition: color 0.3s ease;
+}
+
+.cs-conv-item.active .cs-last {
+  color: #e5e7eb;
+}
+
+/* ========== Chat Area ========== */
+.cs-chat {
+  display: grid;
+  grid-template-rows: auto auto 1fr auto auto;
+  background: #ffffff;
+}
+
+.cs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 2px solid #f3f4f6;
+  background: linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
+  transition: all 0.3s ease;
+}
+
+.cs-prod {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  min-width: 0;
+}
+
+.cs-prod .meta {
+  min-width: 0;
+}
+
+.cs-prod .title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+
+.cs-prod .price {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.cs-buy {
+  background: #111827;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.cs-buy:hover {
+  background: #000000;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.cs-notice {
+  margin: 16px 20px 0;
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  border: 2px solid #e5e7eb;
+  color: #374151;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 13px;
+  line-height: 1.5;
+  transition: all 0.3s ease;
+}
+
+.cs-notice:hover {
+  border-color: #111827;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.cs-notice strong {
+  color: #111827;
+}
+
+.cs-notice a {
+  color: #111827;
+  text-decoration: underline;
+  font-weight: 600;
+  transition: opacity 0.3s ease;
+}
+
+.cs-notice a:hover {
+  opacity: 0.7;
+}
+
+/* Message area with hidden scrollbar */
+.cs-body {
+  padding: 20px;
+  overflow-y: auto;
+  background: #fafafa;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.cs-body::-webkit-scrollbar {
+  display: none; /* Chrome/Safari/Opera */
+}
+
+/* Smooth message bubble animations */
+.cs-bubble {
+  display: flex;
+  animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cs-bubble.me {
+  justify-content: flex-end;
+}
+
+.cs-bubble.them {
+  justify-content: flex-start;
+}
+
+.cs-bubble .bubble {
+  max-width: 70%;
+  padding: 12px 16px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.cs-bubble.them .bubble {
+  background: #ffffff;
+  color: #111827;
+  border: 2px solid #e5e7eb;
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.cs-bubble.me .bubble {
+  background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+  color: #ffffff;
+  border-bottom-right-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.cs-bubble .bubble:hover {
+  transform: scale(1.02);
+}
+
+.cs-bubble .files {
+  margin-top: 8px;
+  font-size: 12px;
+  opacity: 0.8;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.cs-bubble.them .files {
+  border-top-color: #e5e7eb;
+  color: #6b7280;
+}
+
+/* Animated typing indicator */
+.typing-dots {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  font-size: 20px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ========== Input Area ========== */
+.cs-input {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-top: 2px solid #f3f4f6;
+  background: #ffffff;
+  transition: all 0.3s ease;
+}
+
+.cs-emoji-popover {
+  position: absolute;
+  bottom: 64px;              /* nổi phía trên ô nhập */
+  left: 56px;                /* gần nút emoji, chỉnh theo layout của bạn */
+  z-index: 50;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.12);
+}
+@media (max-width:700px){
+  .cs-emoji-popover { left: 12px; right: 12px; }
+}
+
+.cs-input:focus-within {
+  border-top-color: #111827;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.cs-icons {
+  display: flex;
+  gap: 8px;
+}
+
+.cs-icons .ico {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: #f9fafb;
+  display: grid;
+  place-items: center;
+  border: 2px solid #e5e7eb;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cs-icons .ico:hover {
+  background: #111827;
+  border-color: #111827;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.cs-icons .ico:hover svg {
+  fill: #ffffff;
+}
+
+.cs-icons .ico input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.cs-icons .ico svg {
+  width: 18px;
+  height: 18px;
+  fill: #6b7280;
+  transition: fill 0.3s ease;
+}
+
+.cs-textarea {
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px 16px;
+  min-height: 44px;
+  max-height: 120px;
+  resize: vertical;
+  font-size: 14px;
+  outline: none;
+  background: #fafafa;
+  color: #111827;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+.cs-textarea:focus {
+  border-color: #111827;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+}
+
+.cs-textarea::placeholder {
+  color: #9ca3af;
+}
+
+/* Animated send button */
+.cs-send {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+  border: none;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cs-send:hover:not(:disabled) {
+  transform: scale(1.1) rotate(15deg);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.cs-send:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.cs-send:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #9ca3af;
+}
+
+.cs-send svg {
+  width: 20px;
+  height: 20px;
+  fill: #ffffff;
+  transition: transform 0.3s ease;
+}
+
+.cs-send:hover:not(:disabled) svg {
+  transform: translateX(2px);
+}
+
+.cs-attachments {
+  padding: 12px 20px;
+  border-top: 2px dashed #e5e7eb;
+  background: #fafafa;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 200px;
+  }
+}
+
+.cs-attachments .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 20px;
+  font-size: 12px;
+  background: #ffffff;
+  color: #111827;
+  transition: all 0.3s ease;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.cs-attachments .chip:hover {
+  border-color: #111827;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.cs-attachments .chip button {
+  border: none;
+  background: #111827;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  transition: all 0.3s ease;
+}
+
+.cs-attachments .chip button:hover {
+  background: #000000;
+  transform: rotate(90deg);
+}
+
+/* ========== Responsive Design ========== */
+@media (max-width: 900px) {
+  .cs-root {
+    grid-template-columns: 260px 1fr;
+  }
+  .cs-sidebar {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 700px) {
+  .cs-root {
+    grid-template-columns: 1fr;
+  }
+  .cs-sidebar {
+    display: none;
+  }
+}
+
+/* ========== Smooth Transitions ========== */
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+/* quan trọng: cho phép hàng 1fr co lại và cuộn bên trong */
+.cs-chat {
+  min-height: 0;           /* <-- fix chính */
+  height: 100%;            /* giúp Safari ổn định */
+  overflow: hidden;        /* chặn nội dung “tràn” ra ngoài grid */
+}
+
+/* khối scroll phải có min-height:0 để 1fr hoạt động đúng */
+.cs-body {
+  min-height: 0;           /* <-- fix chính */
+  overflow-y: auto;        /* đã có, giữ nguyên để khối này cuộn */
+}
+
+/* cột phải trong grid tổng cũng nên có min-height:0 */
+.cs-root {
+  /* giữ nguyên height: calc(100vh - 80px); */
+  min-height: 0;           /* đề phòng trình duyệt xử lý 1fr “cứng” */
+}
+
+/* nếu vẫn thấy textarea đẩy mọi thứ khi kéo cao,
+   bạn có thể khóa resize theo trục dọc (tuỳ chọn) */
+.cs-textarea {
+  /* đã có max-height: 120px; */
+  resize: none;            /* hoặc 'vertical' + max-height như hiện tại */
+}
+/* --- ICON STYLE: default black, hover white --- */
+.cs-icons .ico {
+  color: #111827;              /* icon = black by default */
+}
+
+/* ép SVG dùng currentColor để đổi màu theo .ico */
+.cs-icons .ico svg,
+.cs-icons .ico svg path,
+.cs-icons .ico svg circle,
+.cs-icons .ico svg rect,
+.cs-icons .ico svg line,
+.cs-icons .ico svg polyline,
+.cs-icons .ico svg polygon {
+  fill: currentColor;
+  stroke: currentColor;
+  transition: color .25s ease, fill .25s ease, stroke .25s ease;
+}
+
+/* hover: nền đen + icon trắng */
+.cs-icons .ico:hover {
+  background: #111827;
+  border-color: #111827;
+  color: #ffffff;              /* icon -> white */
+}
+
+/* (nếu file cũ có) bỏ luật fill màu xám cố định này đi hoặc ghi đè lại */
+.cs-icons .ico svg { fill: currentColor; }
+/* Emoji popover: bám ngay cụm icon, không phá layout cũ */
+.cs-icons { position: relative; }         /* để popover bám vào nhóm icon */
+
+.cs-emoji-popover {
+  position: absolute;
+  bottom: 52px;     /* nổi lên trên ô nhập */
+  left: 0;
+  z-index: 9999;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0,0,0,.18);
+}
+
+.cs-emoji-popover .cs-emoji-picker {
+  width: 320px;
+  height: 380px;
+}
+/* ==== FIX: giữ thanh nhập ở đáy ngay cả khi chưa có tin nhắn ==== */
+
+/* Container tổng đã có height: calc(100vh - 80px); chỉ cần đảm bảo min-height:0 */
+.cs-root {
+  min-height: 0; /* phòng ngừa 1fr cứng */
+}
+
+/* Dùng Flex thay vì Grid để body giãn ra, input dính đáy */
+.cs-chat {
+  display: flex !important;         /* override grid */
+  flex-direction: column !important;
+  height: 100%;
+  min-height: 0;                    /* quan trọng để .cs-body co giãn đúng */
+  overflow: hidden;                 /* tránh tràn */
+}
+
+/* Vùng cuộn tin nhắn: chiếm toàn bộ khoảng trống ở giữa */
+.cs-body {
+  flex: 1 1 auto;                   /* giãn chiếm chỗ trống */
+  min-height: 0;                    /* cho phép khối này co xuống và cuộn */
+  overflow-y: auto;                 /* đã có, giữ để chỉ khối body cuộn */
+  padding: 20px;
+  background: #fafafa;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.cs-body::-webkit-scrollbar { display: none; }
+
+/* Thanh nhập: luôn ở đáy do flex (không cần position: fixed/sticky) */
+.cs-input {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-top: 2px solid #f3f4f6;
+  background: #fff;
+}
+
+/* Khối đính kèm (nếu có) nằm dưới input, vẫn co tự nhiên */
+.cs-attachments {
+  flex: 0 0 auto;
+  padding: 12px 20px;
+  border-top: 2px dashed #e5e7eb;
+  background: #fafafa;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Emoji popover bám vào cụm icon, không ảnh hưởng layout */
+.cs-icons { position: relative; }
+.cs-emoji-popover {
+  position: absolute;
+  bottom: 52px;
+  left: 0;
+  z-index: 9999;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0,0,0,.18);
+}
+.cs-emoji-popover .cs-emoji-picker {
+  width: 320px;
+  height: 380px;
+}
+
+/* (tuỳ chọn) chống textarea kéo cao làm đội layout */
+.cs-textarea {
+  max-height: 120px;
+  resize: none; /* hoặc 'vertical' nếu bạn muốn kéo dọc nhưng đã giới hạn max-height */
+}
+
+/* Đảm bảo icon đổi màu đúng khi hover */
+.cs-icons .ico { color: #111827; }
+.cs-icons .ico svg,
+.cs-icons .ico svg * {
+  fill: currentColor;
+  stroke: currentColor;
+}
+.cs-icons .ico:hover {
+  background: #111827; border-color: #111827; color: #fff;
+}
+/* Emoji face trong nút emoji */
+.cs-icons .ico .emoji-face {
+  font-size: 18px;       /* đồng cỡ các icon khác */
+  line-height: 1;
+  display: inline-block;
+  transform: translateY(1px); /* căn dọc cho cân */
+  user-select: none;
+}
+
+/* Nếu muốn khi hover icon vẫn giữ màu emoji (không bị trắng theo currentColor) */
+.cs-icons .ico:hover .emoji-face {
+  filter: none;          /* đảm bảo không áp filter nào */
+  opacity: 1;
+}

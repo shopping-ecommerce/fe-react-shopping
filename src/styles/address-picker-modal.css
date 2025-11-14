@@ -1,0 +1,57 @@
+/* src/styles/address-picker-modal.css */
+.apm-overlay{
+  position: fixed; inset:0; background: rgba(0,0,0,.4);
+  display:flex; align-items:center; justify-content:center; z-index: 1000;
+}
+.apm-modal{
+  width: min(680px, 94vw); background:#fff; color:#111;
+  border:1px solid #000; border-radius:10px;
+  box-shadow: 0 12px 28px rgba(0,0,0,.25);
+  display:flex; flex-direction:column;
+}
+.apm-header{ padding:16px 20px; border-bottom:1px solid #000;}
+.apm-header h3{ margin:0; font-size:18px; font-weight:700; color:#000; }
+
+.apm-body{ padding:12px 20px; max-height:60vh; overflow:auto; }
+.apm-loading,.apm-empty{ padding:16px; color:#444; }
+.apm-error{ margin-top:12px; padding:10px; border:1px solid #000; background:#fff; color:#000; border-radius:8px; }
+
+.apm-list{
+  list-style:none; margin:0; padding:0;
+  display:grid; gap:12px;
+  max-height: 200px;         /* 👈 giới hạn ở danh sách */
+  overflow-y: auto;
+  padding-right: 4px;        /* chừa chỗ cho scrollbar */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+.apm-item{ border:1px solid #000; border-radius:10px; padding:12px; background:#fff; }
+.apm-row{ display:flex; gap:12px; align-items:flex-start; }
+.apm-row input[type="radio"]{ margin-top:4px; transform:scale(1.1); accent-color:#000; }
+
+.apm-info{ flex:1; }
+.apm-line{ font-size:14px; color:#000; }
+.apm-tags{ margin-top:6px; display:flex; gap:8px; }
+.apm-tag{ display:inline-block; border:1px solid #000; color:#000; padding:2px 8px; border-radius:999px; font-size:12px; }
+
+.apm-actions{ margin-top:10px; padding-left:28px; }
+.apm-btn-outline{
+  background:#fff; color:#000; border:1px solid #000; border-radius:8px;
+  padding:8px 12px; cursor:pointer; font-weight:600;
+}
+.apm-btn-outline:disabled{ opacity:.5; cursor:not-allowed; }
+
+.apm-footer{
+  padding:14px 20px; display:flex; justify-content:flex-end; gap:10px;
+  border-top:1px solid #000;
+}
+.apm-btn-primary{
+  background:#000; color:#fff; border:1px solid #000; border-radius:10px;
+  padding:10px 14px; cursor:pointer; font-weight:700;
+}
+.apm-btn-outline:hover{ background:#f2f2f2; }
+.apm-btn-primary:hover{ filter:brightness(0.95); }
+.addr-modal, .map-modal { font-family: inherit; }
+.addr-modal input, .addr-modal textarea, .addr-modal select, .addr-modal button,
+.map-modal input, .map-modal textarea, .map-modal select, .map-modal button { font: inherit; }

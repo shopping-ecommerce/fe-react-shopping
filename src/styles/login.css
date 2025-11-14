@@ -1,367 +1,243 @@
-/* Đảm bảo .main-content trong App.jsx được định nghĩa */
-.main-content {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  min-height: calc(100vh - 200px);
-  padding-right: 10px;
-  width: 100%;
-}
-
-/* Áp dụng hình ảnh nền chỉ cho trang đăng nhập */
 .main-content.login-page {
-  background: #f5f0ea url('/img/forrmdangnhap.jpg') no-repeat;
-  background-size: cover;
-  background-position: center;
+  background:
+    radial-gradient(1200px 600px at 65% 45%, rgba(255,255,255,.06), transparent 60%),
+    radial-gradient(900px 500px at 35% 60%, rgba(255,255,255,.04), transparent 55%),
+    radial-gradient(600px 600px at 28% 35%, rgba(255,255,255,.05), transparent 60%),
+    linear-gradient(135deg, #5b2be0 0%, #7a27d0 22%, #a225c9 48%, #c326b8 68%, #ee2ead 100%);
+  border-radius: 18px;
+  box-shadow: 0 18px 60px rgba(0,0,0,.15);
 }
 
-.login-container {
-  display: flex;
-  justify-content: center;
+/* ===== LỚP HIỆU ỨNG ===== */
+.weather-effect-layer{
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 8;
+  overflow: hidden;
+}
+
+/* ===== TUYẾT ===== */
+.snow-container{
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.snowflake{
+  position: absolute;
+  top: -10px;
+  color: rgba(255,255,255,.9);
+  user-select: none;
+  filter: drop-shadow(0 0 2px rgba(255,255,255,.35));
+  animation: snowFall 7s linear infinite;
+}
+@keyframes snowFall{
+  0%   { transform: translateY(-10px) translateX(0) rotate(0deg); opacity: 1; }
+  25%  { transform: translateY(25vh) translateX(30px) rotate(45deg); }
+  50%  { transform: translateY(50vh) translateX(0) rotate(90deg); }
+  75%  { transform: translateY(75vh) translateX(-30px) rotate(135deg); }
+  100% { transform: translateY(70vh) translateX(0) rotate(180deg); opacity: 0; }
+}
+
+/* ===== SHELL 2 CỘT ===== */
+.login-hero {
+  width: min(1200px, 96vw);
+  display: grid;
+  grid-template-columns: 1fr 480px;
+  gap: 36px;
   align-items: center;
-  height: 100%;
+  padding: 28px 36px;
 }
 
-/* Form chính với thiết kế glass morphism */
-.login-form {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 20px;
-  padding: 2rem;
-  width: 450px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  margin: 25px 60px 15px 10px;
-  margin-left: 150px;
-}
-
-.login-form h2 {
-  text-align: center;
-  margin-bottom: 1.2rem;
-  font-size: 1.6rem;
-  font-weight: 300;
-  color: rgba(255, 255, 255, 0.9);
-  letter-spacing: 1px;
-  margin-top: -8px;
-}
-
-/* QR Option */
-.qr-option {
-  background: rgba(255, 229, 127, 0.2);
-  border: 1px solid rgba(255, 229, 127, 0.4);
-  padding: 0.6rem;
-  text-align: center;
-  margin-bottom: 1.2rem;
-  border-radius: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: rgba(255, 255, 255, 0.9);
-  font-weight: 500;
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  transition: all 0.3s ease;
-}
-
-.qr-option:hover {
-  background: rgba(255, 229, 127, 0.3);
-  transform: translateY(-2px);
-}
-
-/* Form Groups */
-.form-group {
-  margin-bottom: 1.2rem;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 0.4rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 0.85rem;
-}
-
-.input-container,
-.password-container {
+/* ===== PANEL ĐĂNG NHẬP ===== */
+.login-panel{
   position: relative;
-  width: 100%;
-}
-
-.form-group input,
-.password-container input {
-  width: 100%;
-  padding: 0.9rem 0.9rem 0.9rem 2.8rem;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50px;
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 0.95rem;
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  transition: all 0.3s ease;
-  box-sizing: border-box;
-}
-
-.form-group input::placeholder,
-.password-container input::placeholder {
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.form-group input:focus,
-.password-container input:focus {
-  outline: none;
-  border-color: rgba(255, 255, 255, 0.6);
-  background: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
-}
-
-/* Input Icons */
-.input-icon {
-  position: absolute;
-  left: 0.9rem;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.password-container input {
-  padding-right: 3.8rem;
-}
-
-.password-toggle {
-  position: absolute;
-  right: 0.9rem;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
-  font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.7);
-  transition: color 0.3s ease;
-}
-
-.password-toggle:hover {
-  color: rgba(255, 255, 255, 0.9);
-}
-
-/* Submit Button */
-.login-form button[type="submit"] {
-  width: 100%;
-  padding: 0.9rem;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
-  color: rgba(255, 255, 255, 0.9);
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  letter-spacing: 0.5px;
-}
-
-.login-form button[type="submit"]:hover {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.2));
-  border-color: rgba(255, 255, 255, 0.5);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-/* Forgot Password */
-.forgot-password {
-  text-align: left;
-  margin-top: 0.8rem;
-  margin-bottom: 1.2rem;
-  margin-left: 10px;
-}
-
-.forgot-password a {
-  color: rgba(255, 255, 255, 0.8);
-  text-decoration: none;
-  font-size: 0.85rem;
-  transition: color 0.3s ease;
-}
-
-.forgot-password a:hover {
-  color: rgba(255, 255, 255, 1);
-  text-decoration: underline;
-}
-
-/* OR Divider */
-.or-divider {
-  text-align: center;
-  margin: 1.2rem 0;
-  color: rgba(255, 255, 255, 0.7);
-  position: relative;
-}
-
-.or-divider span {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 0 0.8rem;
-  position: relative;
-  z-index: 1;
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  border-radius: 20px;
-  font-weight: 500;
-}
-
-.or-divider::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 0;
-  width: 100%;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.3);
-  z-index: 0;
-}
-
-/* Social Login */
-.social-login {
-  display: flex;
-  gap: 0.8rem;
-  margin-bottom: 1.2rem;
-}
-
-.social-button {
-  flex: 1;
-  padding: 0.6rem;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50px;
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.9);
-  cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: 500;
+  z-index: 20;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.35);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius: 22px;
+  width: 460px;
+  height: 380px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
+  box-shadow: 0 18px 40px rgba(0,0,0,.18);
+  padding: 0 20px;
 }
 
-.social-button:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.5);
-  transform: translateY(-2px);
-}
+.login-form{ width: 100%; }
+.form-group{ margin-bottom: 14px; }
+.input-container,.password-container{ position: relative; }
 
-.social-button svg {
-  width: 16px;
-  height: 16px;
-}
-
-/* Signup Prompt */
-.signup-prompt {
+/* ===== TIÊU ĐỀ FORM (căn giữa) ===== */
+.form-title{
+  margin: 0 0 12px;
+  color: #fff;
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: .3px;
   text-align: center;
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 0.85rem;
+}
+.center{ text-align: center; }
+
+/* ===== INPUT ===== */
+.form-group input,.password-container input{
+  width:100%; height:46px; border-radius:999px;
+  border:1.5px solid rgba(255,255,255,.7);
+  background: rgba(255,255,255,.06); color:#fff;
+  padding:0 48px 0 44px; font-size:15px;
+  transition: box-shadow .15s ease, border-color .15s ease, background .15s ease;
+}
+.form-group input::placeholder,.password-container input::placeholder{ color:rgba(255,255,255,.8); }
+.form-group input:focus,.password-container input:focus{
+  outline:none; border-color:#fff; background:rgba(255,255,255,.12);
+  box-shadow:0 0 0 4px rgba(255,255,255,.18);
 }
 
-.signup-prompt a {
-  color: rgba(255, 255, 255, 0.9);
-  text-decoration: none;
-  font-weight: 600;
-  transition: color 0.3s ease;
+.input-icon{
+  position:absolute; left:16px; top:50%; transform:translateY(-50%); color:#fff; font-size:18px; opacity:.9;
+}
+.password-container .password-toggle{
+  position:absolute; right:16px; top:50%; transform:translateY(-50%); color:#fff; opacity:.9; cursor:pointer; font-size:16px;
 }
 
-.signup-prompt a:hover {
-  color: white;
-  text-decoration: underline;
+/* ===== HỖ TRỢ (chỉ còn link bên phải) ===== */
+.helper-row{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  margin:8px 2px 14px;
+  color:rgba(255,255,255,.9);
+  font-size:14px;
 }
+.helper-row.right-only label{ display:none; }
+.helper-row a{ color:#fff; text-decoration:none; opacity:.9; }
+.helper-row a:hover{ text-decoration:underline; opacity:1; }
 
-/* Back Button */
+/* ===== NÚT ===== */
+.login-form button[type="submit"]{
+  width:100%; height:48px; border-radius:999px; border:0; background:#fff; color:#c026d3;
+  font-weight:900; letter-spacing:.6px; font-size:15px; cursor:pointer; box-shadow: 0 10px 24px rgba(0,0,0,.18);
+  transition: transform .06s ease, box-shadow .18s ease, filter .15s ease;
+}
+.login-form button[type="submit"]:hover{ filter:brightness(1.02); box-shadow:0 16px 34px rgba(0,0,0,.22); }
+.login-form button[type="submit"]:active{ transform:translateY(1px); }
+.login-form button[disabled]{ opacity:.75; cursor:not-allowed; }
+
+/* ===== BACK BUTTON ===== */
 .back-button {
-  display: block;
-  text-decoration: none;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 0.9rem;
-  margin-bottom: 1rem;
-  padding: 0.3rem 0.5rem;
-  border: 2px solid rgba(255, 255, 255, 1); /* Đường viền trắng */
-  border-radius: 50%;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  color: #fff;
   width: 40px;
   height: 40px;
+  display: inline-grid;
+  place-items: center;
+  background: transparent;
+  transition: background .15s ease, transform .06s ease;
+}
+.back-button:hover { background: rgba(255,255,255,.12); transform: translateY(-1px); }
+.main-content.login-page .back-button { position: fixed; top: 28px; left: 8px; z-index: 50; }
+
+/* ===== WELCOME TEXT ===== */
+.welcome-row{ display:flex; align-items:center; justify-content:center; color:#fff; margin-bottom:50px; }
+.welcome-copy.center{ text-align:center; }
+.welcome-copy h1{
+  margin:0 0 2px; font-size: clamp(28px, 4.8vw, 56px);
+  font-weight:800; color:#fff; letter-spacing:-.02em;
+  text-shadow:0 6px 22px rgba(0,0,0,.25);
+}
+.welcome-copy p{ margin:0; color:rgba(255,255,255,.9); font-size:15px; }
+
+/* ===== SIGNUP PROMPT ===== */
+.signup-prompt{
   text-align: center;
-  line-height: 1.5rem;
-  transition: all 0.3s ease;
+  color: #fff;
+  margin-top: 20px;
+  line-height: 1.4;
+  font-size: 14px;
+}
+.signup-prompt a{
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+}
+.signup-prompt a:hover{
+  text-decoration: underline;
 }
 
-.back-button:hover {
-  color: rgba(255, 255, 255, 1);
-  border-color: rgba(255, 255, 255, 0.7);
-  transform: translateY(-2px);
+/* ===== LAYER KÉO-THẢ EMOJI (⛄ 🎄) ===== */
+.drag-layer{
+  position: fixed;
+  inset: 0;
+  z-index: 9;
+  pointer-events: none;
 }
 
-/* Responsive Design */
-@media (max-width: 1200px) {
-  .login-container {
-    margin-left: 600px;
-  }
+.draggable-emoji{
+  position: fixed;
+  display: grid;
+  place-items: center;
+  width: 48px; 
+  height: 48px;
+  user-select: none;
+  -webkit-user-drag: none;
+  touch-action: none;
+  pointer-events: auto;
+  cursor: grab;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,.25));
+  transform: translateZ(0);
+  transition: filter .15s ease;
+}
+.draggable-emoji.dragging{
+  cursor: grabbing;
+  filter: drop-shadow(0 6px 12px rgba(0,0,0,.4));
+  transform: translateZ(0) scale(1.05);
 }
 
-@media (max-width: 992px) {
-  .login-container {
-    margin-left: 300px;
-  }
-  
-  .login-form {
-    width: 320px;
-    margin: 15px 40px 15px 10px;
-  }
+/* Emoji char riêng để áp animation lắc lư khi idle */
+.emoji-char{
+  display: inline-block;
+  will-change: transform;
 }
 
-@media (max-width: 768px) {
-  .main-content {
-    justify-content: center;
-    padding: 15px;
-  }
-  
-  .login-container {
-    margin-left: 0;
-    justify-content: center;
-  }
-  
-  .login-form {
-    width: 100%;
-    max-width: 360px;
-    margin: 15px 0;
-    padding: 1.5rem 1.2rem;
-  }
-  
-  .social-login {
-    flex-direction: column;
-    gap: 0.6rem;
-  }
+/* Lắc lư cho người tuyết (nghiêng qua lại) */
+@keyframes idleSnowman {
+  0%,100% { transform: rotate(-3deg) translateY(0); }
+  50%     { transform: rotate(3deg) translateY(1px); }
+}
+.idle-sway-snowman{
+  animation: idleSnowman 3.2s ease-in-out infinite;
 }
 
-@media (max-width: 480px) {
-  .login-form {
-    padding: 1.2rem 0.8rem;
+/* Lắc lư cho cây thông (đung đưa nhẹ + thở) */
+@keyframes idlePine {
+  0%,100% { transform: rotate(0deg) translateY(0) scale(1); }
+  50%     { transform: rotate(1.4deg) translateY(1px) scale(1.01); }
+}
+.idle-sway-pine{
+  transform-origin: bottom center;
+  animation: idlePine 5s ease-in-out infinite;
+}
+
+/* Ẩn winter-line cũ nếu còn */
+.winter-line{ display: none; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 920px){
+  .login-hero{ 
+    grid-template-columns:1fr; 
+    gap:22px; 
   }
-  
-  .login-form h2 {
-    font-size: 1.4rem;
+  .login-panel{ 
+    width:100%; 
+    height:auto; 
+    padding:16px 18px; 
   }
-  
-  .form-group input,
-  .password-container input {
-    padding: 0.75rem 0.75rem 0.75rem 2.2rem;
-    font-size: 0.85rem;
-  }
-  
-  .input-icon {
-    left: 0.6rem;
-    font-size: 0.9rem;
-  }
-  
-  .password-toggle {
-    right: 0.6rem;
-    font-size: 0.9rem;
+  .draggable-emoji{
+    width: 36px;
+    height: 36px;
   }
 }

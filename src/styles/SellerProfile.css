@@ -26,8 +26,6 @@
 }
 .sp-crumb-link{color:#2563eb;text-decoration:none;font-weight:500}
 .sp-crumb-link:hover{text-decoration:underline}
-.sp-crumb-sep{color:#9ca3af}
-.sp-crumb-current{color:#111827;font-weight:500}
 
 .sp-head-row{
   display:flex;align-items:center;justify-content:space-between;margin-top:25px;
@@ -37,11 +35,17 @@
 .sp-btn{
   height:36px;padding:0 14px;border:1px solid #e5e7eb;background:#fff;
   cursor:pointer;font-size:14px;font-weight:500;color:#111827;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .sp-btn.primary{
   border:1px solid #1d4ed8;background:#1d4ed8;color:#fff
 }
-.sp-btn.primary:hover{filter:brightness(0.95)}
+.sp-btn.primary:hover{
+  filter:brightness(0.95);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(29, 78, 216, 0.25);
+}
+.sp-btn.ghost{background:#fff}
 
 /* ===============================
    ALERT
@@ -54,102 +58,483 @@
 .sp-alert .left{display:flex;align-items:center;gap:8px}
 
 /* ===============================
-   SHOP CARD
+   SHOP CARD / HERO ✨ CẢI TIẾN
    =============================== */
 .sp-card{
-  background:#fff;border:1px solid #e5e7eb;padding:16px;
+  background:#fff;border:1px solid #e5e7eb;padding:20px;
   display:flex;align-items:center;justify-content:space-between;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.shop-left{display:flex;align-items:center;gap:12px}
-.avatar{
-  width:48px;height:48px;background:#e0f2fe;
-  display:flex;align-items:center;justify-content:center;font-size:22px;
+.fade-in{
+  animation:fadeSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.shop-name{font-size:18px;font-weight:600;color:#111827}
-.shop-meta{display:flex;gap:10px;font-size:13px;margin-top:4px}
-.badge{display:inline-flex;align-items:center;gap:6px;font-weight:500}
-.badge.warn{background:#fff7ed;color:#c2410c;border:1px solid #fdba74;padding:2px 8px}
-.muted{color:#6b7280}
+@keyframes fadeSlideIn{
+  from{opacity:0; transform:translateY(8px)} 
+  to{opacity:1; transform:none}
+}
 
-.shop-right{display:flex;align-items:center;gap:10px}
-.toggle{display:flex;align-items:center;gap:8px}
-.toggle input[type="checkbox"]{width:36px;height:20px}
+.shop-hero { 
+  align-items: center;
+  max-width: 1100px;
+  margin: 16px auto;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(17,24,39,.08);
+  padding: 24px 28px;
+}
+.shop-hero:hover{
+  box-shadow: 0 12px 48px rgba(17,24,39,.12);
+}
+
+.shop-hero-left{ 
+  display:flex; 
+  align-items:center; 
+  gap:20px; 
+}
+
+
+/* 📝 Info block */
+.hero-info{ 
+  display:flex; 
+  flex-direction:column;
+  gap: 6px;
+  min-width: 280px; 
+}
+
+/* Tên shop */
+.hero-name{ 
+  font-size:24px; 
+  font-weight:800; 
+  color:#111827; 
+  line-height:1.2;
+  letter-spacing: -0.02em;
+  transition: color 0.2s ease;
+  margin-bottom: 7px;
+}
+.hero-name-input{
+  font-size:22px; 
+  font-weight:700; 
+  border:2px solid #e5e7eb; 
+  border-radius:12px; 
+  padding:10px 14px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+  max-width: 500px;
+}
+.hero-name-input:focus{ 
+  outline:none; 
+  border-color:#3b82f6; 
+  box-shadow:0 0 0 4px rgba(59,130,246,.12);
+  transform: translateY(-1px);
+}
+
+/* Email */
+.hero-email{ 
+  color:#6b7280; 
+  font-size: 15px;
+  max-width: 560px; 
+  white-space: nowrap; 
+  overflow: hidden; 
+  text-overflow: ellipsis;
+  margin-bottom: 7px;
+}
+.hero-email-input{
+  font-size: 15px;
+  color: #374151;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 8px 12px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+  max-width: 500px;
+  background: #fafafa;
+}
+.hero-email-input:focus{
+  outline: none;
+  border-color: #3b82f6;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(59,130,246,.12);
+  transform: translateY(-1px);
+}
+
+/* 🟡 Badge đẹp với nền vàng gradient */
+.shop-meta{
+  display:flex;
+  gap:14px;
+  font-size:13px;
+  margin-top:8px;
+  align-items: center;
+}
+.badge-status{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-weight:600;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  letter-spacing: 0.3px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+.badge-status.approved{
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: #78350f;
+  border: 1px solid #fbbf24;
+}
+.badge-status.approved:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4);
+}
+.badge-status.pending{
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+.meta-date{
+  color:#6b7280;
+  font-size: 13px;
+}
+
+/* Right actions */
+.shop-hero-right{ 
+  display:flex; 
+  align-items:center; 
+  gap:14px; 
+}
+.sp-btn.is-loading{ 
+  opacity:.7; 
+  pointer-events:none;
+  position: relative;
+}
+.sp-btn.is-loading::after{
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  right: 12px;
+}
 
 /* ===============================
    BODY LAYOUT
    =============================== */
 .sp-body{
-  display:flex;gap:16px;margin-top:16px;
+  display:flex;
+  gap:20px;
+  margin-top:20px;
+  max-width: 1100px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* Sidebar trái (sticky + highlight active) */
 .sp-side{
-  width:320px;min-width:260px;background:#fff;
+  width:320px;
+  min-width:280px;
+  background:#fff;
   height:fit-content;
-  position:sticky;top:20px; /* luôn neo khi cuộn */
+  position:sticky;
+  margin-top: -270px;
   align-self:flex-start;
+  border:1px solid #e5e7eb;
+  padding: 16px 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,.04);
+  transition: box-shadow 0.3s ease;
+}
+.sp-side:hover{
+  box-shadow: 0 4px 16px rgba(0,0,0,.08);
 }
 .sp-side-item{
-  width:100%;text-align:left;background:#fff;border:none;cursor:pointer;
-  padding:14px 16px;display:flex;align-items:center;gap:12px;
-  border-bottom:1px solid #f3f4f6;color:#111827;
-  transition:all 0.2s ease;
+  width:100%;
+  text-align:left;
+  background:transparent;
+  border:none;
+  cursor:pointer;
+  padding:16px 20px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  color:#374151;
+  transition:all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-bottom:6px;
+  position: relative;
 }
-.sp-side-item:last-child{border-bottom:none}
+.sp-side-item:last-child{margin-bottom:0}
 .sp-side-item .state{
-  width:22px;height:22px;display:inline-grid;place-items:center;
-  font-size:13px;border:1px solid #e5e7eb;background:#fff;color:#6b7280;
+  width:26px;
+  height:26px;
+  display:inline-grid;
+  place-items:center;
+  font-size:14px;
+  font-weight:bold;
+  border-radius:50%;
+  flex-shrink:0;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.sp-side-item.done .state{border-color:#86efac;background:#ecfdf5;color:#16a34a}
-.sp-side-item.pending .state{border-color:#fde68a;background:#fff8e1;color:#a16207}
-.sp-side-item .t1{font-weight:600}
-
-/* Active item highlight */
-.sp-side-item.active{
-  background:#f0f7ff;
-  color:#1890FF;
-  border-right:4px solid #1890FF;
+.sp-side-item.done .state{
+  border:2px solid #10b981;
+  background:#10b981;
+  color:#fff;
+}
+.sp-side-item.pending .state{
+  border:2px solid #9ca3af;
+  background:#9ca3af;
+  color:#fff;
+}
+.sp-side-item .t1{
+  font-weight:500;
+  font-size:15px;
+  line-height:1.4;
+  color:#374151;
+  transition: color 0.2s ease;
+}
+.sp-side-item:hover{
+  background:rgba(59,130,246,.08);
+  transform: translateX(2px);
+}
+.sp-side-item.is-active{
+  background: rgba(59,130,246,.12);
+  border-left:4px solid #3b82f6;
+  margin-left:-1px;
+}
+.sp-side-item.is-active .t1{
+  color:#1d4ed8;
+  font-weight:600;
+}
+.sp-side-item.is-active .state{
+  transform: scale(1.1);
 }
 
 /* Panel phải */
-.sp-panel{
-  flex:1;background:transparent;border:none;
+.sp-panel{ 
+  flex:1;
+  background:transparent;
+  border:none; 
 }
 
 /* ===============================
    SECTION
    =============================== */
 .sp-section{
-  background:#fff;border:1px solid #e5e7eb;margin-bottom:24px; /* giãn cách rõ hơn */
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius: 12px;
+  margin-bottom:24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.04);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
 }
-.sp-section{ scroll-margin-top: 96px; } 
+.sp-section:hover{
+  box-shadow: 0 4px 16px rgba(0,0,0,.08);
+}
+.sp-section{ scroll-margin-top: 96px; }
 .sp-section-head{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:14px 16px;border-bottom:1px solid #e5e7eb;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:16px 20px;
+  border-bottom:1px solid #e5e7eb;
+  background: linear-gradient(to bottom, #fafafa 0%, #fff 100%);
 }
-.sp-section-head h2{margin:0;font-size:18px;font-weight:600;color:#111827}
-.sp-link{border:none;background:transparent;color:#2563eb;cursor:pointer;font-weight:500}
-
-.sp-subdesc{
-  padding:10px 16px;color:#6b7280;border-bottom:1px solid #f3f4f6
+.sp-section-head h2{
+  margin:0;
+  font-size:19px;
+  font-weight:700;
+  color:#111827;
+  letter-spacing: -0.01em;
+}
+.sp-subdesc{ 
+  padding:12px 20px;
+  color:#6b7280;
+  border-bottom:1px solid #f3f4f6;
+  background: #fafafa;
+  font-size: 14px;
 }
 
 .sp-table{font-size:14px}
 .sp-table .row{
-  display:flex;justify-content:space-between;gap:16px;
-  padding:12px 16px;border-bottom:1px solid #f3f4f6
+  display:flex;
+  justify-content:space-between;
+  gap:16px;
+  padding:14px 20px;
+  border-bottom:1px solid #f3f4f6;
+  transition: background 0.2s ease;
+}
+.sp-table .row:hover{
+  background: #fafafa;
 }
 .sp-table .row:last-child{border-bottom:none}
-.sp-table .label{color:#111827;font-weight:600;flex:0 0 38%}
+.sp-table .label{
+  color:#111827;
+  font-weight:600;
+  flex:0 0 38%;
+}
 .sp-table .value{flex:1}
 
-.value-group{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.text-strong{font-weight:600}
-.text-mute{color:#9ca3af}
+/* 🆔 ID Badge đẹp */
+.id-badge{
+  display: inline-block;
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  color: #1e40af;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  border: 1px solid #93c5fd;
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.15);
+}
 
-.sp-pill{
-  display:inline-block;padding:6px 10px;font-size:13px;
-  border:1px solid #facc15;background:#fff8e1;color:#a16207
+.sp-input{
+  width:100%; 
+  padding:10px 14px; 
+  border:2px solid #e5e7eb; 
+  border-radius:10px;
+  font-size:14px; 
+  background:#fff;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.sp-input:disabled{
+  background:#f9fafb;
+  color:#9ca3af;
+  cursor: not-allowed;
+}
+.sp-input:not(:disabled):hover{
+  border-color: #d1d5db;
+}
+.sp-input:focus{
+  outline:none;
+  border-color:#3b82f6;
+  box-shadow:0 0 0 4px rgba(59,130,246,.12);
+  transform: translateY(-1px);
+}
+
+/* ===============================
+   LOADING & TOAST
+   =============================== */
+.sp-loading{
+  position:fixed;
+  inset:0;
+  display:grid;
+  place-items:center;
+  gap:12px;
+  background:rgba(0,0,0,.06);
+  z-index:50;
+  font-weight:600;
+  color:#111827;
+  backdrop-filter: blur(4px);
+}
+.spinner{
+  width:40px;
+  height:40px;
+  border:4px solid #e5e7eb;
+  border-top-color:#1d4ed8;
+  border-radius:50%;
+  animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sp-toast{
+  position:fixed; 
+  right:20px; 
+  bottom:20px; 
+  padding:14px 18px; 
+  border-radius:12px;
+  color:#fff; 
+  background:#111827; 
+  z-index:60; 
+  animation:toastSlide .3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 10px 40px rgba(0,0,0,.2);
+  font-weight: 600;
+  font-size: 15px;
+}
+.sp-toast.success{
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+}
+.sp-toast.error{
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+}
+@keyframes toastSlide{
+  from{opacity:0; transform:translateY(12px) scale(0.95)} 
+  to{opacity:1; transform:none}
+}
+
+/* ===============================
+   TOGGLE SWITCH
+   =============================== */
+.tk-switch{
+  position: relative;
+  width: 90px;
+  height: 36px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.tk-track{
+  position: absolute; 
+  inset: 0; 
+  background: #e5e7eb; 
+  border-radius: 9999px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,.1); 
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.tk-thumb{
+  position: absolute; 
+  left: 4px; 
+  top: 4px; 
+  width: 28px; 
+  height: 28px; 
+  background: #fff;
+  border-radius: 9999px; 
+  box-shadow: 0 2px 6px rgba(0,0,0,.2); 
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.tk-text{ 
+  position: relative; 
+  z-index: 1; 
+  font-size: 14px; 
+  font-weight: 600;
+  color: #fff; 
+  user-select: none; 
+}
+.tk-info{
+  position: absolute; 
+  right: 10px; 
+  top: 50%; 
+  transform: translateY(-50%);
+  width: 18px; 
+  height: 18px; 
+  border-radius: 50%; 
+  border: 1.5px solid rgba(255,255,255,.85);
+  color: rgba(255,255,255,.95); 
+  display: grid; 
+  place-items: center; 
+  font-size: 12px; 
+  font-weight: 700;
+  z-index: 1;
+  pointer-events: none;
+}
+.tk-switch.is-on .tk-track{ 
+  background: linear-gradient(135deg, #1890FF 0%, #096dd9 100%);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,.15), 0 0 0 2px rgba(24,144,255,.2);
+}
+.tk-switch.is-on .tk-thumb{ 
+  transform: translateX(54px);
+  box-shadow: 0 4px 12px rgba(0,0,0,.3);
+}
+.tk-switch:hover .tk-thumb{
+  box-shadow: 0 4px 12px rgba(0,0,0,.25);
+}
+.shop-hero-right .tk-switch{ 
+  margin-right: 8px; 
 }
 
 /* ===============================
@@ -161,203 +546,237 @@
 }
 @media (max-width: 768px){
   .sp-body{flex-direction:column}
-  .sp-side{width:100%;position:relative;top:0;border-right:none}
-  .sp-table .row{flex-direction:column;gap:6px}
+  .sp-side{
+    width:100%;
+    position:relative;
+    top:0;
+    border-right:none;
+  }
+  .sp-table .row{
+    flex-direction:column;
+    gap:8px;
+  }
   .sp-table .label{flex-basis:auto}
-}
-/* =============================== 
-   SIDEBAR STYLING - Design basé sur l'image
-=============================== */
-
-.sp-side {
-    width: 320px;
-    min-width: 280px;
-    background: #fff; /* Fond gris clair comme dans l'image */
-    border: 1px solid #e5e7eb;
-    height: fit-content;
-    position: sticky;
-    top: 20px;
-    align-self: flex-start;
-    padding: 16px 0; /* Padding interne */
-}
-
-.sp-side-item {
-    width: 100%;
-    text-align: left;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 16px 20px;
-    display: flex;
+  .shop-hero{
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .shop-hero-left{
+    flex-direction: column;
     align-items: center;
-    gap: 12px;
-    color: #374151; /* Texte gris foncé */
-    transition: all 0.2s ease;
-    border-bottom: none; /* Supprime les bordures entre éléments */
-    margin-bottom: 8px; /* Espacement entre les éléments */
+    text-align: center;
+    width: 100%;
+  }
+  .shop-hero-right{
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .hero-name, .hero-name-input{ 
+    font-size:20px; 
+  }
+  .hero-info{
+    align-items: center;
+    width: 100%;
+  }
+}
+/* === Flush trái cho khối shop-hero-left === */
+.shop-hero{
+  /* giảm padding trái để khối bên trái “sát” hơn */
+  padding-left: 12px; /* trước là 28px */
+}
+.shop-hero-left{
+  margin-left: 0 !important; /* đảm bảo không bị lệch do rule khác */
 }
 
-.sp-side-item:last-child {
-    margin-bottom: 0;
+/* Responsive: vẫn to hơn nhưng gọn trên mobile */
+@media (max-width: 768px){
+  .shop-hero{ padding-left: 10px; }
+  .hero-avatar{ width: 96px; height: 96px; }
+  .hero-avatar.locked{ border-radius: 50% !important; }
+}
+/* Đẩy card về sát bên phải */
+.sp-card.fade-in.shop-hero{
+  margin: 16px 0 16px auto !important; /* left:auto → dính phải */
 }
 
-.sp-side-item .state {
-    width: 24px;
-    height: 24px;
-    display: inline-grid;
-    place-items: center;
-    font-size: 14px;
-    font-weight: bold;
-    border-radius: 50%; /* Cercle parfait */
-    flex-shrink: 0; /* Empêche la réduction de taille */
+/* Nếu có rule khác set margin:auto; trên .shop-hero thì khóa luôn */
+.shop-hero{
+  margin-right: 0 !important;
+  margin-left: auto !important;
+}
+/* Kích thước cố định cho thẻ: sp-card fade-in shop-hero */
+.sp-card.fade-in.shop-hero{
+  width: 562px;
+  height: 150px;
+  max-width: 562px;   /* chặn rule max-width cũ */
+  min-width: 562px;
+  padding: 16px;      /* thu bớt padding cho vừa nội dung */
+  overflow: hidden;   /* tránh tràn khi nội dung dài */
+  flex-wrap: wrap;    /* cho phần right xuống dòng nếu chật */
 }
 
-/* État "done" avec coche verte */
-.sp-side-item.done .state {
-    border: 2px solid #10b981; /* Bordure verte */
-    background: #10b981; /* Fond vert */
-    color: #ffffff; /* Texte blanc */
+/* Tối ưu layout trong khung hẹp */
+.sp-card.fade-in.shop-hero .shop-hero-left{
+  gap: 12px;
+}
+.sp-card.fade-in.shop-hero .hero-info{
+  min-width: 0;       /* cho phép co hẹp */
+}
+.sp-card.fade-in.shop-hero .hero-name{
+  font-size: 18px;
+}
+.sp-card.fade-in.shop-hero .hero-email{
+  font-size: 13px;
 }
 
-/* État "pending" avec point d'interrogation gris */
-.sp-side-item.pending .state {
-    border: 2px solid #9ca3af; /* Bordure grise */
-    background: #9ca3af; /* Fond gris */
-    color: #ffffff; /* Texte blanc */
+/* Avatar hơi gọn để vừa khung */
+.sp-card.fade-in.shop-hero .hero-avatar{
+  width: 88px;
+  height: 88px;
 }
 
-.sp-side-item .t1 {
-    font-weight: 400; /* Poids normal comme dans l'image */
-    font-size: 15px; /* Taille de police plus grande */
-    line-height: 1.4;
-    color: #374151; /* Texte gris foncé */
+/* Nút bên phải xuống dòng khi chật */
+.sp-card.fade-in.shop-hero .shop-hero-right{
+  width: 100%;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+/* === Card hero cố định kích thước + không co khi zoom === */
+.sp-card.fade-in.shop-hero{
+  /* giữ dính mép phải như bạn đang dùng */
+  margin: 16px 0 16px auto !important;
+
+  /* KHÓA kích thước giống một panel riêng */
+  width: 562px;
+  min-width: 562px;
+  max-width: 562px;
+
+  height: 250px;
+  min-height: 250px;
+  max-height: 250px;
+
+  /* Không cho flex layout ép nhỏ */
+  flex: 0 0 562px;
+  flex-shrink: 0;
+
+  /* Vượt qua max-width cũ và các rule trước */
+  max-width: none !important;
+  box-sizing: border-box;
+  overflow: hidden;          /* tránh tràn layout khi nội dung dài */
+  align-items: center;       /* canh giữa theo trục dọc trong khung 180px */
+  flex-wrap: wrap;           /* cho phần right xuống dòng nếu thiếu chỗ */
+  padding: 12px 16px;        /* gọn padding để không tràn */
 }
 
-/* État actif/hover (optionnel) */
-.sp-side-item:hover {
-    background: rgba(59, 130, 246, 0.05);
+/* Giữ layout nằm ngang, bỏ đổi cột ở mobile (để card không tự “co”) */
+@media (max-width: 768px){
+  .shop-hero{ 
+    flex-direction: row !important; 
+    align-items: center !important;
+  }
+  .sp-card.fade-in.shop-hero{
+    width: 562px !important;
+    min-width: 562px !important;
+    max-width: 562px !important;
+    height: 250px !important;
+    min-height: 250px !important;
+    max-height: 250px !important;
+  }
 }
 
-/* État actif - Garde la bordure bleue à gauche + texte bleu */
-.sp-side-item.is-active {
-    background: transparent; /* Garde le fond transparent */
-    border-left: 3px solid #3b82f6; /* GARDE la bordure bleue à gauche */
-    margin-left: -1px; /* Compense la bordure pour éviter le décalage */
+/* Chỉnh nội dung gọn trong khung cố định */
+.sp-card.fade-in.shop-hero .shop-hero-left{ gap: 10px; }
+.sp-card.fade-in.shop-hero .hero-info{ min-width: 0; }
+.sp-card.fade-in.shop-hero .hero-name{ font-size: 18px; line-height: 1.2; }
+.sp-card.fade-in.shop-hero .hero-email{ font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sp-card.fade-in.shop-hero .shop-hero-right{ width: 100%; justify-content: flex-end; gap: 8px; margin-top: 6px; }
+/* Bỏ border-radius cho thẻ sp-card.fade-in.shop-hero */
+.sp-card.fade-in.shop-hero{
+  border-radius: 0 !important;
 }
 
-.sp-side-item.is-active .t1 {
-    color: #1d4ed8; /* Texte bleu */
-    font-weight: 500;
+/* .shop-hero trước đó set 16px → khóa về 0 */
+.shop-hero{
+  border-radius: 0 !important;
 }
-
-/* =============================== 
-   RESPONSIVE ADJUSTMENTS
-=============================== */
-
-@media (max-width: 1024px) {
-    .sp-side {
-        width: 280px;
-    }
-}
-
-@media (max-width: 768px) {
-    .sp-body {
-        flex-direction: column;
-    }
-    
-    .sp-side {
-        width: 100%;
-        position: relative;
-        top: 0;
-        border-right: none;
-    }
-    
-    .sp-side-item {
-        padding: 14px 16px;
-    }
-    
-    .sp-side-item .t1 {
-        font-size: 14px; /* Taille légèrement réduite sur mobile */
-    }
-}
-/* ===============================
-   TOGGLE SWITCH (On/Off)
-   =============================== */
-.tk-switch{
-  position: relative;
-  width: 86px;              /* dài pill */
-  height: 32px;             /* cao pill */
-  border: 0;
-  background: transparent;
-  padding: 0;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  outline: none;
-}
-
-.tk-track{
-  position: absolute;
-  inset: 0;
-  background: #e5e7eb;      /* xám nhạt khi OFF */
-  border-radius: 9999px;
-  box-shadow: inset 0 0 0 1px #e5e7eb;
-  transition: background .2s ease;
-}
-
-.tk-thumb{
-  position: absolute;
-  left: 4px;
-  top: 4px;
-  width: 24px;
-  height: 24px;
+/* ==== Avatar tròn to + click chọn ảnh ==== */
+.hero-avatar{
+  width: 132px !important;
+  height: 132px !important;
+  border-radius: 50% !important;
+  overflow: hidden !important;
   background: #fff;
-  border-radius: 9999px;
-  box-shadow: 0 1px 2px rgba(0,0,0,.12);
-  transition: transform .2s ease;
-}
-
-/* chữ “Tắt/Bật” giữa pill */
-.tk-text{
   position: relative;
-  z-index: 1;
-  font-size: 14px;
-  line-height: 1;
-  color: #fff;               /* chữ trắng như ảnh */
-  user-select: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,.08);
+}
+.hero-avatar.editable{ cursor: pointer; }
+.hero-avatar.locked{ cursor: default; }
+
+/* Ảnh fill full hình tròn */
+.hero-avatar-img--cover{
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;   /* <— fill full */
+  object-position: center !important;
+  display: block;
+  background: #fff;
 }
 
-/* chấm “i” nằm bên phải trong pill */
-.tk-info{
+/* Dấu + nằm giữa hình tròn (chỉ khi editing) */
+.hero-plus{
   position: absolute;
-  right: 8px;
+  left: 50%;
   top: 50%;
-  transform: translateY(-50%);
-  width: 18px; height: 18px;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  border: 1px solid rgba(255,255,255,.8);
-  color: rgba(255,255,255,.95);
+  background: rgba(0,0,0,.55);
+  color: #fff;
   display: grid;
   place-items: center;
-  font-size: 12px;
+  font-size: 24px;
+  font-weight: 800;
   line-height: 1;
-  z-index: 1;
-  pointer-events: none;
+  box-shadow: 0 6px 16px rgba(0,0,0,.25);
+  pointer-events: none; /* không chặn click */
 }
 
-/* ON state */
-.tk-switch.is-on .tk-track{
-  background: #1890FF;       /* xanh theo yêu cầu */
-  box-shadow: inset 0 0 0 1px #1890FF;
+/* Ẩn mọi style cũ của nút edit nếu còn sót */
+.hero-edit{ display: none !important; }
+
+/* Mobile: cân đối lại kích thước */
+@media (max-width: 768px){
+  .hero-avatar{ width: 110px !important; height: 110px !important; }
+  .hero-plus{ width: 36px; height: 36px; font-size: 22px; }
 }
-.tk-switch.is-on .tk-thumb{
-  transform: translateX(54px);  /* đẩy bi sang phải */
+/* Địa chỉ dưới email (mới) */
+.hero-address{
+  color:#6b7280;
+  font-size: 14px;
+  max-width: 560px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: -2px;  /* khít với email */
 }
 
-/* nhỏ chỉnh khoảng cách cạnh phải */
-.shop-right .tk-switch{ margin-right: 8px; }
-@media (prefers-reduced-motion: reduce){
-  html:focus-within { scroll-behavior: auto; }
-  .tk-thumb, .tk-track { transition: none; }
+/* Đặt meta bên trái, nút bên phải trên cùng một hàng */
+.shop-hero-right{
+  display:flex;
+  align-items:center;
+  gap:14px;
 }
+
+.shop-hero-right .shop-meta{
+  margin-right:auto;           /* đẩy nút sang phải */
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+/* Giảm margin-top cũ của meta để khít hàng khi ở bên phải */
+.shop-meta{ margin-top: 0; }

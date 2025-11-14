@@ -1,68 +1,134 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  /* ===== Reset cơ bản + biến layout ===== */
+  *,
+  *::before,
+  *::after { box-sizing: border-box; }
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
   :root {
-    color: #213547;
-    background-color: #ffffff;
+    --header-h: 10px;     /* CHỈNH theo chiều cao Header thực tế của bạn */
+    --page-bg: #ffffff;
+
+    font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
+
+    color-scheme: light dark;
+    color: #213547;       /* mặc định light */
+    background-color: var(--page-bg);
+
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
-  a:hover {
-    color: #747bff;
+  /* Header luôn bám trên cùng khi cuộn */
+  .site-header, header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;        /* nằm trên banner/slider */
+    background: #fff;     /* tránh trong suốt khi trôi */
+    box-shadow: 0 1px 0 rgba(0,0,0,.06); /* nhẹ nhàng */
   }
+
+  /* ===== Link ===== */
+  a { font-weight: 500; color: #646cff; text-decoration: none; }
+  a:hover { color: #535bf2; }
+
+  /* ===== Body: KHÔNG dùng flex center, cho phép cuộn và ẩn scrollbar ===== */
+  html, body { height: 100%; }
+
+  body {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+
+    /* Cuộn bình thường nhưng ẩn thanh cuộn */
+    overflow-y: auto;
+    -ms-overflow-style: none;    /* IE/Edge cũ */
+    scrollbar-width: none;       /* Firefox */
+    -webkit-overflow-scrolling: touch; /* mượt trên iOS */
+  }
+  body::-webkit-scrollbar { display: none; } /* Chrome/Safari */
+
+  /* ===== Headings / Buttons mặc định ===== */
+  h1 { font-size: 3.2em; line-height: 1.1; }
+
   button {
+    border-radius: 8px;
+    border: 1px solid transparent;
+    padding: 0.6em 1.2em;
+    font-size: 1em;
+    font-weight: 500;
+    font-family: inherit;
     background-color: #f9f9f9;
+    cursor: pointer;
+    transition: border-color 0.25s;
   }
+  button:hover { border-color: #646cff; }
+  button:focus,
+  button:focus-visible { outline: 4px auto -webkit-focus-ring-color; }
+
+  /* ===== Dark scheme (tuỳ chọn) ===== */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color: rgba(255, 255, 255, 0.87);
+      --page-bg: #242424;
+    }
+    a:hover { color: #747bff; }
+    button { background-color: #1a1a1a; }
+  }
+
+  /* ===== Helper: vùng app chính có thể dùng nếu cần ===== */
+  /* .app-container { min-height: 100vh; background: var(--page-bg); } */
+/* Phần dưới Header: chiếm hết chiều cao còn lại và KHÔNG cuộn */
+.main-content{
+  height: calc(100vh - var(--header-h));
+  overflow: hidden;              /* chặn cuộn toàn khối */
+  background-color: #fff;
+}
+
+/* Bố cục 2 cột: Sidebar + Nội dung */
+.content-layout{
+  height: 100%;
+  display: grid;
+  grid-template-columns: 260px 1fr; /* rộng sidebar mặc định */
+  gap: 16px;
+}
+
+/* Nếu bạn có trạng thái thu gọn sidebar, thêm class này ở MainLayout */
+.content-layout.sidebar-collapsed{
+  grid-template-columns: 72px 1fr; /* rộng sidebar khi thu gọn */
+}
+
+/* Cột chứa Sidebar: đứng yên, không cuộn */
+.layout-sidebar{
+  height: 100%;
+}
+
+/* Cột phải: CHỈ nơi này cuộn */
+.page-content{
+  height: 100%;
+  min-width: 0;         /* tránh tràn grid */
+  overflow: auto;       /* cuộn ở đây */
+  padding-right: 8px;   /* tuỳ chọn: tránh thanh cuộn dính sát nội dung */
+}
+
+/* (Tuỳ chọn) làm thanh cuộn của cột phải mảnh hơn */
+.page-content::-webkit-scrollbar{
+  width: 8px;
+}
+.page-content::-webkit-scrollbar-thumb{
+  background: rgba(0,0,0,.18);
+  border-radius: 8px;
+}
+.page-content{
+  scrollbar-width: thin; /* Firefox */
+}
+
+/* Header vẫn sticky như bạn đang có */
+.site-header, header{
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: #fff;
+  box-shadow: 0 1px 0 rgba(0,0,0,.06);
 }

@@ -1,20 +1,152 @@
-/* src/styles/footer.css */
-.footer {
-  background-color: #333;
-  color: white;
-  text-align: center;
-  padding: 1rem;
+/* ==== FOOTER - Black theme / white buttons ==== */
+.ft{
+  background: #000;               /* NỀN ĐEN */
+  color: #fff;                    /* CHỮ TRẮNG */
+  padding: 34px 18px 18px;
   position: relative;
-  bottom: 0;
-  width: 100%;
 }
 
-.footer-content {
+/* Layout */
+.ft__inner{
   max-width: 1200px;
   margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.1fr 0.7fr 0.7fr 1.2fr;
+  gap: 26px;
 }
 
-.footer p {
-  margin: 0.5rem 0;
-  font-size: 0.9rem;
+/* Brand */
+.ft__brand{ display: flex; gap: 12px; align-items: flex-start; }
+
+/* Logo: nền trắng, icon/cart đen */
+.ft__logo{
+  width: 42px; height: 42px; border-radius: 12px;
+  background:#fff;                 /* nền trắng */
+  color:#000;                      /* cart đen (SVG kế thừa color) */
+  display:grid; place-items:center; font-size: 22px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.35);
 }
+
+.ft__title{ margin: 0; font-size: 20px; font-weight: 800; letter-spacing:.2px; color:#fff; }
+.ft__tagline{ margin: 6px 0 10px; color:#d9d9d9; font-size: 14px; }
+
+/* Column titles */
+.ft__col-title{
+  margin: 4px 0 10px;
+  font-size: 15px;
+  font-weight: 800;
+  color:#ffffff;
+  letter-spacing:.3px;
+  text-transform: uppercase;
+}
+
+/* Links */
+.ft__links{ list-style:none; padding:0; margin:0; display:grid; gap:8px; }
+.ft__links a{
+  color:#fff; text-decoration:none; font-size:14px; opacity:.9;
+}
+.ft__links a:hover{ opacity:1; text-decoration: underline; }
+
+/* Socials: nút TRẮNG, icon ĐEN */
+.ft__socials{ list-style:none; display:flex; gap:10px; padding:0; margin:10px 0 0; }
+.ft__socials a{
+  display:grid; place-items:center;
+  width:34px; height:34px; border-radius:50%;
+  background:#fff;                 /* trắng */
+  color:#000;                      /* icon đen */
+  border:1px solid #2a2a2a;
+  transition: transform .15s ease, background .2s ease, border-color .2s;
+}
+.ft__socials a:hover{
+  transform: translateY(-2px);
+  background:#f2f2f2;
+  border-color:#3a3a3a;
+}
+
+/* Contact */
+.ft__contact{ list-style:none; padding:0; margin:0 0 14px; display:grid; gap:6px; color:#eaeaea; font-size:14px; }
+
+/* Newsletter */
+.ft__newsletter{ display:flex; gap:8px; }
+.ft__newsletter input{
+  flex:1; height:40px; border-radius:10px; border:1px solid #2a2a2a;
+  background: #0f0f0f; color:#fff; padding:0 12px; outline:none;
+}
+.ft__newsletter input::placeholder{ color:#9d9d9d; }
+
+/* Newsletter button: TRẮNG – chữ ĐEN */
+.ft__newsletter button{
+  height:40px; border:1px solid #2a2a2a; border-radius:10px;
+  padding:0 14px; font-weight:700;
+  background:#fff;                 /* trắng */
+  color:#000;                      /* chữ đen */
+  cursor:pointer;
+}
+.ft__newsletter button:hover{ background:#f2f2f2; }
+
+/* Payment badges */
+.ft__badges{ display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+.ft__badge{
+  font-size:12px; padding:6px 10px; border-radius:999px;
+  background:#121212; color:#eaeaea; border:1px solid #2a2a2a;
+}
+
+/* Divider & bottom bar */
+.ft__divider{
+  margin: 18px auto 12px;
+  max-width: 1200px;
+  border:0; height:1px; background: linear-gradient(90deg, transparent, #222, transparent);
+}
+.ft__bottom{
+  max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-between;
+  color:#cfcfcf; font-size:13px;
+}
+.ft__policies{ display:flex; gap:16px; list-style:none; margin:0; padding:0; }
+.ft__policies a{ color:#cfcfcf; text-decoration:none; }
+.ft__policies a:hover{ text-decoration:underline; }
+
+/* Back to top: TRẮNG – icon ĐEN */
+.ft__top{
+  position: fixed; right: 18px; bottom: 18px;
+  width: 42px; height: 42px; border-radius: 50%;
+  border: 1px solid #2a2a2a;
+  background:#fff;                 /* trắng */
+  color:#000;                      /* đen */
+  box-shadow: 0 8px 24px rgba(0,0,0,.45);
+  cursor: pointer; opacity:0; transform: translateY(8px); pointer-events:none;
+  transition: opacity .2s ease, transform .2s ease, filter .2s ease;
+  z-index: 50;
+}
+.ft__top.show{ opacity:1; transform: translateY(0); pointer-events:auto; }
+.ft__top:hover{ background:#f2f2f2; }
+
+/* Responsive */
+@media (max-width: 980px){
+  .ft__inner{ grid-template-columns: 1fr 1fr; gap:20px; }
+}
+@media (max-width: 600px){
+  .ft__inner{ grid-template-columns: 1fr; }
+  .ft__bottom{ flex-direction: column; gap: 8px; text-align:center; }
+}
+/* Nhóm bên phải của dòng cuối footer */
+.ft__bottom-right{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Nút lên đầu trang: CHỈ nằm trong footer (không fixed nữa) */
+.ft__top{
+  position: static;               /* bỏ fixed */
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 1px solid #2a2a2a;
+  background:#fff;                /* trắng */
+  color:#000;                     /* đen */
+  box-shadow: none;               /* không cần bóng lớn */
+  cursor: pointer;
+  opacity: 1;                     /* luôn hiển thị */
+  transform: none;
+  pointer-events: auto;
+}
+.ft__top:hover{ background:#f2f2f2; }

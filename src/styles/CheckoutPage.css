@@ -1,0 +1,893 @@
+/* src/styles/CheckoutPage.css - THE CIU Style */
+
+.theciu-checkout {
+  background: #ffffff;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: #1a1a1a;
+}
+
+.theciu-container { 
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Header */
+.theciu-header {
+  padding: 24px 0;
+  border-bottom: 1px solid #e6e6e6;
+  margin-bottom: 24px;
+}
+
+.theciu-header h1 {
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  color: #1a1a1a;
+}
+
+.theciu-breadcrumb {
+  font-size: 14px;
+  color: #666666;
+}
+
+.theciu-breadcrumb a {
+  color: #666666;
+  text-decoration: none;
+}
+
+.theciu-breadcrumb a:hover {
+  color: #1a1a1a;
+}
+
+.theciu-breadcrumb span {
+  margin: 0 8px;
+}
+
+/* Layout */
+.theciu-layout {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 32px;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .theciu-layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+/* Card Component */
+.theciu-card {
+  background: #ffffff;
+  border: 1px solid #e6e6e6;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.theciu-card-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.theciu-card-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.theciu-link {
+  background: none;
+  border: none;
+  color: #0066cc;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.theciu-link:hover {
+  color: #0052a3;
+}
+
+/* Form Styles */
+.theciu-form {
+  padding: 24px;
+}
+
+.theciu-field-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.theciu-field {
+  margin-bottom: 16px;
+}
+
+.theciu-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 768px) {
+  .theciu-field-group,
+  .theciu-field-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.theciu-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  font-size: 14px;
+  background: #ffffff;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.theciu-input:focus {
+  outline: none;
+  border-color: #0066cc;
+  box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.1);
+}
+
+.theciu-input::placeholder {
+  color: #999999;
+}
+
+/* Select Styles */
+.theciu-select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.theciu-select {
+  width: 100%;
+  padding: 12px 40px 12px 16px;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  font-size: 14px;
+  background: #ffffff;
+  cursor: pointer;
+  appearance: none;
+  box-sizing: border-box;
+}
+
+.theciu-select:focus {
+  outline: none;
+  border-color: #0066cc;
+  box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.1);
+}
+
+.theciu-select:disabled {
+  background: #f5f5f5;
+  color: #999999;
+  cursor: not-allowed;
+}
+
+.theciu-select-wrapper::after {
+  content: '▼';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+  color: #666666;
+  pointer-events: none;
+}
+
+/* Checkbox */
+.theciu-checkbox-wrapper {
+  margin: 20px 0;
+}
+
+.theciu-checkbox-label {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: #1a1a1a;
+  cursor: pointer;
+}
+
+.theciu-checkbox {
+  margin-right: 8px;
+  accent-color: #0066cc;
+}
+
+/* Buttons */
+.theciu-btn-primary {
+  background: #1a1a1a;
+  color: #ffffff;
+  border: none;
+  padding: 14px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.theciu-btn-primary:hover:not(:disabled) {
+  background: #333333;
+}
+
+.theciu-btn-primary:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+}
+
+.theciu-btn-full {
+  width: 100%;
+}
+
+/* Address Display */
+.theciu-address-display {
+  padding: 24px;
+}
+
+.theciu-address-line {
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #1a1a1a;
+}
+
+.theciu-tag {
+  display: inline-block;
+  background: #e6f3ff;
+  color: #0066cc;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 8px;
+}
+
+/* Shipping Options */
+.theciu-shipping-options {
+  padding: 16px 24px 24px;
+}
+
+.theciu-radio-option {
+  display: block;
+  padding: 16px;
+  border: 1px solid #e6e6e6;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.theciu-radio-option:hover {
+  border-color: #0066cc;
+}
+
+.theciu-radio-option.selected {
+  border-color: #0066cc;
+  background: #f8fbff;
+}
+
+.theciu-radio-input {
+  display: none;
+}
+
+.theciu-radio-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.theciu-radio-title {
+  font-weight: 500;
+  color: #1a1a1a;
+  margin-bottom: 4px;
+}
+
+.theciu-radio-desc {
+  font-size: 13px;
+  color: #666666;
+}
+
+.theciu-radio-price {
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+/* Payment Options */
+.theciu-payment-options {
+  padding: 16px 24px 24px;
+}
+
+.theciu-payment-option {
+  display: block;
+  padding: 16px;
+  border: 1px solid #e6e6e6;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.theciu-payment-option:hover {
+  border-color: #0066cc;
+}
+
+.theciu-payment-option.selected {
+  border-color: #0066cc;
+  background: #f8fbff;
+}
+
+.theciu-payment-content {
+  display: flex;
+  align-items: center;
+}
+
+.theciu-payment-icon {
+  margin-right: 12px;
+  font-size: 20px;
+}
+
+.theciu-payment-name {
+  font-weight: 500;
+  color: #1a1a1a;
+}
+
+/* Products */
+.theciu-products {
+  padding: 16px 24px 24px;
+}
+
+.theciu-product-item {
+  display: flex;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.theciu-product-item:last-child {
+  border-bottom: none;
+}
+
+.theciu-product-image {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-right: 16px;
+}
+
+.theciu-product-info {
+  flex: 1;
+}
+
+.theciu-product-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a1a1a;
+  margin: 0 0 4px 0;
+  line-height: 1.3;
+}
+
+.theciu-product-variant {
+  font-size: 12px;
+  color: #666666;
+  margin: 0 0 8px 0;
+}
+
+.theciu-product-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.theciu-product-qty {
+  font-size: 13px;
+  color: #666666;
+}
+
+.theciu-product-price {
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+/* Order Summary */
+.theciu-sticky {
+  position: sticky;
+  top: 24px;
+}
+
+.theciu-order-summary {
+  padding: 24px;
+}
+
+.theciu-coupon-section {
+  margin-bottom: 24px;
+}
+
+.theciu-coupon-input-group {
+  display: flex;
+  gap: 8px;
+}
+
+.theciu-coupon-input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 30px;
+  font-size: 13px;
+}
+
+.theciu-coupon-btn {
+  padding: 10px 16px;
+  background: #0c0b0b;
+  border: 1px solid #d9d9d9;
+  border-radius: 30px;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  color: #fff;
+}
+
+.theciu-coupon-btn:hover {
+  background: #a82d2d;
+}
+
+/* Price Breakdown */
+.theciu-price-breakdown {
+  margin-bottom: 24px;
+}
+
+.theciu-price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  font-size: 14px;
+}
+
+.theciu-price-row span:first-child {
+  color: #666666;
+}
+
+.theciu-discount {
+  color: #ff4444;
+}
+
+.theciu-divider {
+  height: 1px;
+  background: #e6e6e6;
+  margin: 12px 0;
+}
+
+.theciu-total-row {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
+  padding: 12px 0;
+}
+
+/* Checkout Button */
+.theciu-btn-checkout {
+  width: 100%;
+  background: #1a1a1a;
+  color: #ffffff;
+  border: none;
+  padding: 16px;
+  border-radius: 40px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 16px;
+  transition: background-color 0.2s ease;
+}
+
+.theciu-btn-checkout:hover:not(:disabled) {
+  background: #902525;
+}
+
+.theciu-btn-checkout:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+}
+
+/* Terms */
+.theciu-terms {
+  margin-bottom: 16px;
+}
+
+.theciu-terms-label {
+  display: flex;
+  align-items: flex-start;
+  font-size: 12px;
+  color: #666666;
+  cursor: pointer;
+  line-height: 1.4;
+}
+
+.theciu-terms-checkbox {
+  margin-right: 8px;
+  margin-top: 2px;
+  accent-color: #0066cc;
+}
+
+.theciu-terms-link {
+  color: #0066cc;
+  text-decoration: none;
+}
+
+.theciu-terms-link:hover {
+  text-decoration: underline;
+}
+
+/* Note */
+.theciu-note {
+  font-size: 11px;
+  color: #999999;
+  text-align: center;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .theciu-container {
+    padding: 0 16px;
+  }
+  
+  .theciu-header {
+    padding: 16px 0;
+  }
+  
+  .theciu-header h1 {
+    font-size: 24px;
+  }
+  
+  .theciu-card-header,
+  .theciu-form,
+  .theciu-address-display,
+  .theciu-order-summary {
+    padding: 16px;
+  }
+  
+  .theciu-product-image {
+    width: 50px;
+    height: 50px;
+  }
+}
+/* Bổ sung nhẹ cho phần trong Order Summary */
+.theciu-muted {
+  font-size: 15px;
+  color: #0a0909;
+  font-weight: 600;
+}
+
+/* Cho phép danh sách sản phẩm nằm gọn trong sidebar */
+.theciu-products.in-summary {
+  padding: 0 0 8px 0;
+}
+
+.theciu-note-wrapper {
+  margin: 12px 0 16px;
+}
+
+.theciu-note-label {
+  display: block;
+  font-size: 13px;
+  color: #666666;
+  margin-bottom: 8px;
+}
+
+.theciu-note-textarea {
+  width: 100%;
+  min-height: 96px;
+  resize: vertical;
+  padding: 10px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  font-size: 13px;
+  outline: none;
+}
+
+.theciu-note-textarea:focus {
+  border-color: #0066cc;
+  box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.1);
+}
+
+.theciu-note.small {
+  font-size: 11px;
+  color: #999999;
+}
+
+/* Đường kẻ xám đã có: .theciu-divider { ... } — dùng lại */
+/* src/styles/CheckoutPage.css - Thêm vào cuối file */
+
+/* Actions in Card Header */
+.theciu-card-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* Secondary Button Style */
+.theciu-btn-secondary {
+  background-color: #070707;
+  border: 1px solid #141313;
+  color: #f0eeee;
+  padding: 8px 16px; /* Tăng padding cho cân đối */
+  border-radius: 20px; /* Bo tròn hình con nhộng */
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap; /* Ngăn nút xuống dòng */
+}
+
+.theciu-btn-secondary:hover {
+  background-color: #bc3030;
+  border-color: #cc4747;
+}
+
+/* --- NEW STYLES FOR ADDRESS DISPLAY --- */
+
+/* Container chính cho phần hiển thị thông tin */
+.theciu-address-display {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* Khoảng cách giữa các dòng */
+}
+
+/* Dòng chứa Tên và SĐT */
+.theciu-display-row {
+  display: flex;
+  gap: 12px; /* Khoảng cách giữa Tên và SĐT */
+  width: 100%;
+}
+
+/* Kiểu dáng cho các ô hiển thị thông tin */
+.theciu-display-field {
+  background-color: #ffffff;
+  border: 1px solid #d9d9d9; /* Viền xám */
+  color: #000;             /* Chữ đen */
+  padding: 8px 16px;
+  border-radius: 20px;         /* Bo tròn hình con nhộng */
+  font-size: 14px;
+  font-weight: 400;
+  box-sizing: border-box;
+  width: 100%;                 /* Ô địa chỉ sẽ chiếm toàn bộ chiều rộng */
+  text-align: left;
+  flex: 1;                     /* Hai ô Tên và SĐT sẽ chia đôi không gian */
+  /* Chống tràn văn bản */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 320;
+}
+
+.theciu-tag {
+  display: inline-block;
+  background: #e6f3ff;
+  color: #0066cc;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 0;
+  align-self: flex-start; /* Căn thẻ tag về bên trái */
+}
+/* === PILL STYLE FOR INPUTS/SELECTS (đen chữ, viền xám, bo tròn) === */
+.theciu-input-pill {
+  border: 1px solid #d9d9d9 !important;
+  border-radius: 20px !important;
+  color: #1a1a1a !important;
+  background: #ffffff !important;
+  padding: 12px 16px !important;
+}
+
+/* Áp cho select (kế thừa .theciu-select) */
+.theciu-select.theciu-input-pill {
+  border-radius: 20px !important;
+  padding-right: 40px !important; /* chừa chỗ mũi tên */
+}
+
+/* Khi focus vẫn dùng màu focus hiện tại */
+.theciu-input-pill:focus,
+.theciu-select.theciu-input-pill:focus {
+  outline: none;
+  border-color: #0066cc !important;
+  box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.1) !important;
+}
+
+/* Hàng hiển thị Tên + SĐT (đã có ở trên) giữ nguyên */
+/* === Loading dots for checkout button === */
+.theciu-btn-checkout.is-loading {
+  position: relative;
+}
+
+.theciu-loading-dots {
+  display: inline-flex;
+  gap: 4px;
+  margin-left: 6px;
+}
+
+.theciu-loading-dots span {
+  display: inline-block;
+  line-height: 1;
+  transform: translateY(0);
+  animation: theciuDotBounce 1s ease-in-out infinite;
+}
+
+.theciu-loading-dots span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.theciu-loading-dots span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes theciuDotBounce {
+  0%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-4px); }
+}
+/* ===== Checkout: Voucher section ===== */
+.theciu-voucher-section {
+  padding: 16px 24px 20px;
+}
+
+.theciu-voucher-error {
+  color: #b00020;
+  margin-bottom: 8px;
+}
+
+.theciu-voucher-group + .theciu-voucher-group {
+  border-top: 1px solid #f0f0f0;
+  margin-top: 14px;
+  padding-top: 14px;
+}
+
+.theciu-voucher-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: #333;
+}
+
+.theciu-voucher-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.theciu-voucher-empty {
+  font-size: 13px;
+  color: #777;
+}
+
+.theciu-voucher-pill {
+  display: inline-grid;
+  grid-auto-flow: row;
+  gap: 2px;
+  align-items: center;
+  justify-items: start;
+  min-width: 220px;
+  padding: 10px 14px;
+  background: #fff;
+  border: 1px dashed #d9d9d9;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all .16s ease;
+  text-align: left;
+}
+
+.theciu-voucher-pill .code {
+  font-weight: 800;
+  color: #111;
+  font-size: 13px;
+}
+.theciu-voucher-pill .label {
+  font-size: 12px; color: #444;
+}
+.theciu-voucher-pill .min {
+  font-size: 11px; color: #777;
+}
+
+.theciu-voucher-pill:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(0,0,0,.08);
+  background: #fafafa;
+}
+
+.theciu-voucher-pill.is-disabled {
+  opacity: .55;
+  cursor: not-allowed;
+  background: #f7f7f7;
+}
+.theciu-voucher-pill.is-disabled:hover {
+  transform: none;
+  box-shadow: none;
+  background: #f7f7f7;
+}
+
+/* ĐÃ CHỌN: nền đen chữ trắng, luôn hiển thị (không cần hover) */
+.theciu-voucher-pill.is-selected {
+  background: #0f0f0f !important;
+  color: #fff !important;
+  border-color: #0f0f0f !important;
+  box-shadow: none !important;
+}
+.theciu-voucher-pill.is-selected .code,
+.theciu-voucher-pill.is-selected .label,
+.theciu-voucher-pill.is-selected .min {
+  color: #fff !important;
+}
+
+.theciu-voucher-picked {
+  font-size: 13px;
+  color: #111;
+  margin-top: 8px;
+}
+.theciu-voucher-remove {
+  margin-left: 8px;
+  background: transparent;
+  border: none;
+  color: #0066cc;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 13px;
+}
+.theciu-voucher-remove:hover { color: #004a99; }
+/* ==== Ticket outline for voucher pill ==== */
+.theciu-voucher-pill{
+  position: relative;
+  border: 2px solid #000;            /* viền đen */
+  border-radius: 12px;               /* bo góc nhẹ */
+  background: #fff;                  /* nền thẻ (giống card) */
+  color: #111;
+  padding: 10px 14px;
+}
+
+/* hai “notch” khoét ở giữa cạnh trái/phải */
+.theciu-voucher-pill::before,
+.theciu-voucher-pill::after{
+  content:"";
+  position:absolute;
+  top:50%;
+  width:16px; height:16px;
+  border-radius:50%;
+  background:#fff;                   /* MÀU nền phía sau thẻ (card) */
+  transform: translateY(-50%);
+  z-index: 1;                        /* che lên đường viền */
+}
+
+/* notch trái/phải – đặt nửa ra ngoài để tạo hiệu ứng khoét */
+.theciu-voucher-pill::before{ left:-8px; }
+.theciu-voucher-pill::after { right:-8px; }
+
+/* trạng thái đã chọn: nền đen chữ trắng, vẫn giữ notch */
+.theciu-voucher-pill.is-selected{
+  background:#000; color:#fff; border-color:#000;
+}
+.theciu-voucher-pill.is-selected::before,
+.theciu-voucher-pill.is-selected::after{
+  background:#fff;                   /* notch vẫn “khuyết” trên nền card trắng */
+}
+
+/* trạng thái không đủ điều kiện */
+.theciu-voucher-pill.is-disabled{
+  opacity:.55; cursor:not-allowed;
+}

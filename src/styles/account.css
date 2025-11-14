@@ -1,0 +1,131 @@
+.account-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 20px;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.account-main {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  background: #f5f7fb;
+  min-height: calc(100vh - 120px); /* trừ Header + Footer */
+}
+
+.account-sidebar {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.06);
+  position: sticky;
+  top: 16px;
+}
+
+.account-sidebar__title {
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.account-sidebar__nav {
+  display: grid;
+  gap: 8px;
+}
+
+.account-sidebar__link {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #333;
+  text-decoration: none;
+}
+
+.account-sidebar__link:hover {
+  background: #f5f7fb;
+}
+
+.account-sidebar__link.is-active {
+  background: #e8f0fe;
+  color: #1a73e8;
+  font-weight: 600;
+}
+
+.account-page .card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.06);
+}
+
+.card__title {
+  margin: 0 0 12px;
+}
+
+.account-sidebar {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 6px rgba(0,0,0,.08);
+  padding: 16px;
+}
+
+.account-sidebar__title {
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.account-sidebar__nav {
+  display: grid;
+  gap: 8px;
+}
+
+.account-sidebar__link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #333;
+  padding: 10px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background .15s ease;
+}
+.account-sidebar__link:hover {
+  background: #f6f6f6;
+}
+.account-sidebar__link.is-active {
+  background: #111;
+  color: #fff;
+}
+
+.account-sidebar__divider {
+  height: 1px;
+  background: #eee;
+  margin: 12px 0;
+}
+
+.account-sidebar__logout {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #ffe8e6;
+  color: #9a1c1c;
+  border: 1px solid #ffd1cd;
+  cursor: pointer;
+  transition: filter .15s ease, transform .02s;
+}
+.account-sidebar__logout:hover {
+  filter: brightness(0.98);
+}
+.account-sidebar__logout:active {
+  transform: translateY(1px);
+}
+.account-sidebar__logout:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}

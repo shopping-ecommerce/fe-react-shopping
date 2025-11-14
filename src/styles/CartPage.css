@@ -1,0 +1,440 @@
+:root{
+  --bg:#f6f7f9;
+  --white:#fff;
+  --text:#101010;
+  --muted:#6b7280;
+  --line:#eaeaec;
+}
+
+/* Trang nền trắng + bo góc */
+.cart{
+  background:#fff;
+  padding:24px 0;
+  border-radius:20px;
+}
+
+/* Khối trắng bao trọn: bên trong rộng 1176px (1208 - 2*16 padding) */
+.cart__wrap{
+  max-width: 1208px;              /* <-- quan trọng để (inner width) = 1176px */
+  margin: 0 auto;
+  background: var(--white);
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+  padding: 10px 16px 0;
+  color: var(--text);              /* fix: không để #fff */
+}
+
+/* Header */
+.cart__header h1{
+  margin:20px 0 15px;
+  font-size:36px;
+  line-height:1.1;
+  margin-left: 10px;
+}
+.cart__header p{ margin:0 0 14px; margin-left: 10px; font-weight: 400;}
+
+/* Shop */
+.cart__shop{ margin-bottom:10px; }
+.cart__shop-head{ display:flex; align-items:center; gap:10px; padding:10px 6px 6px; }
+.cart__shop-dot{ width:10px; height:10px; border-radius:50%; background:#ffd400; box-shadow:0 0 0 3px rgba(0,0,0,.06) inset; }
+.cart__shop-name{ font-weight:700; }
+
+/* ITEM: 1176 x 126 */
+.cart__item{
+  position: relative;
+  display: grid;
+  grid-template-columns: 36px 84px 1fr 168px 160px;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;                 /* tổng chiều cao phải khớp 126 -> clamp chữ để không tràn */
+  margin: 12px 0;
+  border-radius: 20px;
+  background: #F6F6F6;
+  height: 126px;                 /* <-- cố định cao */
+  box-shadow: none;
+  overflow: hidden;              /* tránh tràn nếu nội dung dài */
+}
+
+/* Nút xoá & checkbox như cũ */
+.cart__item-remove{ position:absolute; right:16px; top:10px; width:28px; height:28px; border-radius:50%; background:transparent; border:none; cursor:pointer; font-size:24px; line-height:1; color:#9ca3af; }
+.cart__item-remove:hover{ color:#111; }
+
+.chk{ position:relative; display:inline-flex; width:26px; height:26px; }
+.chk input{ appearance:none; -webkit-appearance:none; width:26px; height:26px; border:2px solid #cfcfd4; border-radius:50%; background:#fff; cursor:pointer; transition:all .2s; }
+.chk input:checked{ background:#111; border-color:#111; }
+.chk__dot{ position:absolute; inset:6px; border-radius:50%; pointer-events:none; }
+.chk input:checked + .chk__dot{ background:#fff; }
+
+/* Ảnh */
+.cart__thumb{ width:84px; height:84px; border-radius:12px; overflow:hidden; }
+.cart__thumb img{ width:100%; height:100%; object-fit:cover; }
+
+/* Nội dung & clamp để giữ 126px */
+.cart__title{
+  margin:0 0 8px;
+  font-weight:800;
+  line-height:1.3;
+  font-size:18px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;         /* tối đa 2 dòng tiêu đề */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.cart__variants{ display:flex; gap:22px; flex-wrap:nowrap; }
+.cart__variant{ display:flex; align-items:center; gap:8px; color:var(--muted); white-space:nowrap; }
+.select{ position:relative; }
+.select select{
+  appearance:none; -webkit-appearance:none; outline:none;
+  background:#fff; border:1.5px solid #d0d0d5;
+  border-radius:999px; padding:8px 36px 8px 14px;
+  font-weight:600; color:#111; cursor:pointer;
+}
+.select__caret{ position:absolute; right:12px; top:50%; transform:translateY(-50%); font-size:12px; color:#111; pointer-events:none; }
+
+/* Qty: – [pill] + (nút rời) */
+.cart__qty{ display:flex; align-items:center; justify-content:flex-end; gap:10px; }
+.qty__btn{ width:32px; height:32px; border:none; background:transparent; font-size:22px; line-height:1; cursor:pointer; }
+.qty__btn:disabled{ opacity:.45; cursor:not-allowed; }
+.qty__num{
+  min-width:48px; height:32px; display:flex; align-items:center; justify-content:center;
+  border:1.5px solid #d0d0d5; border-radius:999px; padding:0 10px; font-weight:700; background:#fff;
+}
+
+/* Giá phải */
+.cart__price{ justify-self:end; font-weight:800; font-size:20px; }
+
+/* Footer trong khối trắng */
+.cart__footer{
+  position: sticky; bottom: 0; left: 0; right: 0;
+  display:flex; align-items:center; gap:12px;
+  background: var(--white);
+  padding: 16px;
+  border-top: 1px solid var(--line);
+  border-bottom-left-radius: 18px; border-bottom-right-radius: 18px;
+}
+.cart__select-all{ font-weight:600; }
+.cart__spacer{ flex:1; }
+.cart__total{ display:flex; align-items:center; gap:10px; }
+.cart__total strong{ font-size:18px; }
+.cart__checkout{ margin-left:8px; background:#111; color:#fff; border:none; cursor:pointer; padding:12px 18px; border-radius:999px; font-weight:800; }
+
+/* Responsive */
+@media (max-width: 900px){
+  .cart__wrap{ max-width: 100%; }
+  .cart__item{
+    grid-template-columns: 30px 74px 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 12px;
+    height: auto;                /* mobile cho phép cao tự nhiên */
+  }
+  .cart__qty, .cart__price{ justify-self:start; }
+  .cart__qty{ order:3; }
+  .cart__price{ order:3; }
+}
+/* --- Topbar chứa nút Tiếp tục mua sắm (nằm trên cart trắng) --- */
+.cart__topbar{
+  max-width: 1208px;           /* khớp chiều rộng với .cart__wrap */
+  margin: 0 auto 10px;         /* nằm ngay trên khối cart trắng */
+  padding: 8px 0;
+  margin-top: -15px;
+}
+
+/* Nút “Tiếp tục mua sắm” dạng viên bo, có icon mũi tên trái */
+.cart__continue{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border: 1.5px solid #d0d0d5;
+  border-radius: 999px;
+  background: #fff;
+  color: #111;
+  font-weight: 600;
+  cursor: pointer;
+}
+.cart__continue:hover{ background:#fafafa; }
+/* GỠ vòng tròn quanh mũi tên */
+.cart__continue-ic{
+  width: auto;
+  height: auto;
+  border: none;           /* <- bỏ viền */
+  border-radius: 0;       /* <- bỏ bo tròn */
+  padding: 0;             /* <- bỏ padding */
+  font-size: 18px;        /* mũi tên rõ hơn */
+  line-height: 1;
+  margin-bottom: 5px;
+}
+
+
+/* --- Divider ngay dưới dòng “Có n sản phẩm ...” --- */
+.cart__divider{
+  height: 1px;
+  background: #eaeaec;
+  margin: 12px 0 0;
+}
+
+/* (Giữ nguyên các rule khác của bạn) */
+.chk__dot--checked {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.chk input:disabled + .chk__dot {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+/* Ajoutez ceci à votre fichier CartPage.css */
+
+.cart__delete-selected {
+  background: #d02234;
+  color: white;
+  border: 1px solid #dc3545;
+  border-radius: 30px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 120px;
+}
+
+.cart__delete-selected:hover:not(:disabled) {
+  background: #c82333;
+  border-color: #bd2130;
+  transform: translateY(-1px);
+}
+
+.cart__delete-selected:disabled {
+  background: #000;
+  border-color: #000;
+  cursor: not-allowed;
+  opacity: 0.65;
+  transform: none;
+}
+
+.cart__checkout {
+  background: #060708;
+  color: white;
+  border: 1px solid #090a0b;
+  border-radius: 30px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 120px;
+}
+
+.cart__checkout:hover:not(:disabled) {
+  background: #1c1f21;
+  border-color: #131518;
+  transform: translateY(-1px);
+}
+
+.cart__checkout:disabled {
+  background: #6c757d;
+  border-color: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.65;
+  transform: none;
+}
+
+.chk__dot--checked {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.chk input:disabled + .chk__dot {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+/* ===== Nút đẹp gọn ===== */
+.cart__topbar-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn {
+  appearance: none;
+  border: 0;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform .12s ease, box-shadow .12s ease, background-color .12s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn:active { transform: translateY(1px); }
+
+.btn--tour {
+  background: linear-gradient(135deg, #4f46e5, #22c55e);
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(79, 70, 229, 0.35);
+}
+.btn--tour:hover { filter: brightness(1.05); }
+
+.btn--ghost {
+  background: transparent;
+  color: #4b5563;
+  border: 1px dashed #cbd5e1;
+}
+.btn--ghost:hover { background: #f1f5f9; }
+
+/* ===== Làm Driver.js popover “xịn” hơn (global) ===== */
+.driver-popover {
+  border-radius: 14px !important;
+  box-shadow: 0 20px 40px rgba(2, 6, 23, 0.25) !important;
+  border: 1px solid rgba(148, 163, 184, 0.25) !important;
+  overflow: hidden;
+}
+.driver-popover-title {
+  font-weight: 700 !important;
+  font-size: 15px !important;
+  letter-spacing: .2px;
+}
+.driver-popover-description {
+  color: #334155 !important;
+  font-size: 14px !important;
+  line-height: 1.45 !important;
+}
+.driver-popover-footer {
+  border-top: 1px solid rgba(148, 163, 184, 0.2) !important;
+  padding-top: 10px !important;
+}
+.driver-popover-next-btn,
+.driver-popover-prev-btn,
+.driver-popover-close-btn {
+  border-radius: 999px !important;
+  padding: 6px 12px !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+}
+.driver-popover-next-btn {
+  background: #4f46e5 !important;
+  color: #fff !important;
+  border: none !important;
+}
+.driver-popover-prev-btn {
+  background: #e2e8f0 !important;
+  color: #0f172a !important;
+  border: none !important;
+}
+.driver-popover-close-btn {
+  background: transparent !important;
+  color: #64748b !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+/* highlight stage padding cảm giác thoáng hơn */
+.driver-active-element {
+  border-radius: 10px !important;
+}
+/* --- Cụm công cụ topbar: dấu ? + 2 nút (ẩn/hiện) --- */
+.cart__topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cart__topbar-tools {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  gap: 8px;
+}
+
+/* Nút ? tròn gọn */
+.help-toggle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1.5px solid #d0d0d5;
+  background: #fff;
+  color: #111;
+  font-weight: 800;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  transition: box-shadow .12s ease, transform .12s ease, background-color .12s ease;
+  margin-bottom: 30px;
+}
+.help-toggle:hover { background: #fafafa; }
+.help-toggle:active { transform: translateY(1px); }
+
+/* Dãy 2 nút: ẩn mặc định, show khi có .is-open */
+.tools-list {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  margin-left: 6px;
+
+  /* animation show/hide mượt */
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  transform: translateX(6px);
+  transition: max-width .25s ease, opacity .2s ease, transform .25s ease;
+}
+.tools-list.is-open {
+  max-width: 420px;   /* vừa đủ chứa 2 nút */
+  opacity: 1;
+  transform: translateX(0);
+  margin-bottom: 30px;
+}
+
+/* Reuse button styles bạn đã có */
+.btn {
+  appearance: none;
+  border: 0;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform .12s ease, box-shadow .12s ease, background-color .12s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn:active { transform: translateY(1px); }
+
+.btn--tour {
+  background: linear-gradient(135deg, #4f46e5, #22c55e);
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(79, 70, 229, 0.35);
+}
+.btn--tour:hover { filter: brightness(1.05); }
+
+.btn--ghost {
+  background: transparent;
+  color: #4b5563;
+  border: 1px dashed #cbd5e1;
+}
+.btn--ghost:hover { background: #f1f5f9; }
+
+/* (giữ nguyên phần Driver.js popover bạn đã dán trước đó) */
+/* styles/CartPage.css */
+.pill {
+  display: inline-block;
+  padding: 4px 10px;
+  background: #f3f4f6;
+  border-radius: 999px;
+  font-size: 13px;
+  border: 1px solid #e5e7eb;
+  min-width: 48px;
+  text-align: center;
+}
+.cart__variants {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.cart__variant > span {
+  margin-right: 8px;
+  color: #555;
+}

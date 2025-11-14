@@ -1126,42 +1126,50 @@
 }
 
 /* ==== FIX CỘT CHECKBOX ==== */
-.orders-table th:nth-child(1),
-.orders-table td:nth-child(1) {
-  width: 60px !important;
-  min-width: 60px !important;
-  max-width: 60px !important;
-  text-align: center;
-  padding: 0;
-  align-items: center;
-  margin-top: 40px;
-}
-
+/* ==== FIX CỘT CHECKBOX (giữ nguyên) ==== */
+/* Ô checkbox (body) */
 .orders-table td:nth-child(1) {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  align-items: center;      /* căn giữa dọc */
+  justify-content: center;  /* căn giữa ngang */
+  padding: 0;
+  margin-top: 50px;
 }
 
+/* Ô checkbox (header) */
+.orders-table th:nth-child(1) .order-mgmt-th-content {
+  display: flex;
+  align-items: center;      /* căn giữa dọc */
+  justify-content: center;  /* căn giữa ngang */
+  height: 100%;
+}
+
+/* Bản thân checkbox */
 .orders-table td:nth-child(1) input[type="checkbox"],
 .orders-table th:nth-child(1) input[type="checkbox"] {
-  transform: scale(1.2);  /* thu nhỏ checkbox */
-  margin: 0 auto;
+  display: block;
+  margin: 0;               /* bỏ auto spacing */
+  transform: scale(1.2);   /* nếu muốn lớn hơn một chút */
 }
 
-/* Các cột còn lại chia width */
+/* (tuỳ chọn) Set chiều cao hàng để cảm giác cân đối hơn */
+.orders-table tbody tr {
+  height: 64px;            /* hoặc 56px/60px tuỳ ý */
+}
+
+
+/* ==== CHIA 5 CỘT CÒN LẠI (tổng 6 cột) ==== */
 .orders-table th:nth-child(2),
-.orders-table td:nth-child(2) { width: 15%; }
+.orders-table td:nth-child(2) { width: 22%; }  /* Mã đơn + KH */
 .orders-table th:nth-child(3),
-.orders-table td:nth-child(3) { width: 25%; }
+.orders-table td:nth-child(3) { width: 26%; }  /* Trạng thái + nhãn */
 .orders-table th:nth-child(4),
-.orders-table td:nth-child(4) { width: 20%; }
+.orders-table td:nth-child(4) { width: 20%; }  /* SL/DT/GTĐH */
 .orders-table th:nth-child(5),
-.orders-table td:nth-child(5) { width: 15%; }
+.orders-table td:nth-child(5) { width: 14%; }  /* Nhận đơn */
 .orders-table th:nth-child(6),
-.orders-table td:nth-child(6) { width: 15%; }
-.orders-table th:nth-child(7),
-.orders-table td:nth-child(7) { width: 15%; }
+.orders-table td:nth-child(6) { width: 18%; }  /* Thao tác */
+
 
 /* Body */
 .orders-table tbody td {
@@ -1424,7 +1432,7 @@
 }
 
 .action-btn {
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  background: linear-gradient(135deg, #f00707, #e90505);
   color: #ffffff;
   border: none;
   padding: 10px 16px;
@@ -1458,18 +1466,18 @@
 }
 
 .action-btn:hover {
-  background: linear-gradient(135deg, #1d4ed8, #1e40af);
+  background: linear-gradient(135deg, #d81d1d, #c90808);
   transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 8px 25px rgba(223, 35, 10, 0.4);
 }
 
 .action-btn.secondary {
-  background: linear-gradient(135deg, #10b981, #059669);
+  background: linear-gradient(135deg, #0b0c0c, #060707);
 }
 
 .action-btn.secondary:hover {
-  background: linear-gradient(135deg, #059669, #047857);
-  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+  background: linear-gradient(135deg, #020705, #030e0a);
+  box-shadow: 0 8px 25px rgba(9, 20, 16, 0.4);
 }
 
 .action-icon {
@@ -2074,3 +2082,255 @@ select:focus {
   z-index: 1;
   overflow: visible;
 }
+/* Đảm bảo bảng full chiều ngang */
+.orders-table .table-wrap table {
+  width: 100% !important;
+  table-layout: fixed;
+}
+
+/* Ô trống căn giữa cả ngang lẫn dọc */
+.orders-table tbody td.empty-state {
+  /* table-cell + vertical-align là cách ổn định nhất với bảng */
+  display: table-cell !important;
+  vertical-align: middle !important;
+  text-align: center !important;
+
+  /* tạo khoảng cao để căn giữa theo chiều dọc nhìn rõ */
+  height: 380px;                 /* bạn có thể chỉnh lại cho phù hợp */
+  padding: 0 !important;
+  background: #fff;
+  border-radius: 8px;
+}
+
+/* Bên trong giữ layout gọn gàng */
+.orders-table tbody td.empty-state .no-data {
+  display: inline-grid;
+  gap: 8px;
+  margin: 0 auto;                /* căn giữa theo ngang */
+}
+
+.orders-table tbody td.empty-state .no-data-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.orders-table tbody td.empty-state .no-data-subtitle {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* Phòng trường hợp có rule khác đẩy ô về trái do width cột */
+.orders-table tbody tr > td.empty-state { width: 100% !important; }
+/* Khối SL/Phân loại/GTĐH gọn gàng hơn */
+.quantity-revenue {
+  display: grid;
+  gap: 6px;
+  align-items: start;
+}
+
+/* List phân loại */
+.variant-item .variants-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.variant-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Chip chung */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 18px;
+  border: 1px solid var(--om-chip-border, #e6e6e6);
+  background: #fafafa;
+  white-space: nowrap;
+}
+
+/* Chip theo loại */
+.chip.size {
+  background: #f5f7ff;
+  border-color: #d6e0ff;
+}
+
+.chip.color {
+  background: #fff7f5;
+  border-color: #ffd6cc;
+}
+
+.chip.qty {
+  background: #f6ffed;
+  border-color: #b7eb8f;
+}
+
+.chip.none {
+  background: #f9f9f9;
+  border-color: #e6e6e6;
+  color: #666;
+}
+
+/* Chấm màu trong chip Màu sắc */
+.chip .sw {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, .15);
+  margin-right: 6px;
+}
+
+/* Nút xem thêm/thu gọn */
+.variants-toggle {
+  margin-top: 2px;
+  background: transparent;
+  border: none;
+  color: #02070e;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 0;
+  margin-right: 40px;
+}
+
+@media (max-width: 1024px) {
+  .variant-row .chip {
+    font-size: 11px;
+    padding: 2px 6px;
+  }
+}
+/* Cột SL/Phân loại/GTĐH */
+.order-col-qty {
+  display: grid;
+  gap: 8px;
+}
+
+/* Hàng meta: SL tổng + GTĐH */
+.variant-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+/* List phân loại */
+.variant-item .variants-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.variant-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Chip chung */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 18px;
+  border: 1px solid var(--om-chip-border, #e6e6e6);
+  background: #fafafa;
+  white-space: nowrap;
+}
+
+/* Chip theo loại */
+.chip.size {
+  background: #f5f7ff;
+  border-color: #d6e0ff;
+}
+
+.chip.color {
+  background: #fff7f5;
+  border-color: #ffd6cc;
+}
+
+.chip.qty {
+  background: #f6ffed;
+  border-color: #b7eb8f;
+}
+
+/* SL tổng có thể đậm hơn 1 chút */
+.chip.qty.total {
+  font-weight: 600;
+}
+
+/* GTĐH bo tròn như chip */
+.chip.value {
+  background: #fffbe6;
+  border-color: #ffe58f;
+}
+
+/* Chip none */
+.chip.none {
+  background: #f9f9f9;
+  border-color: #e6e6e6;
+  color: #666;
+}
+
+/* Chấm màu trong chip Màu sắc */
+.chip .sw {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, .15);
+  margin-right: 6px;
+}
+
+
+.variants-toggle:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 1024px) {
+  .chip { font-size: 11px; padding: 2px 8px; }
+}
+/* ===== Icon-only action buttons ===== */
+.action-buttons-cell {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Base: nhỏ gọn 32x32, icon giữa */
+.icon-btn {
+  width: 60px;
+  height: 32px;
+  border: none;
+  outline: none;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform .06s ease, filter .12s ease, opacity .12s ease;
+  padding: 0;
+  line-height: 1;
+}
+.icon-btn svg { width: 18px; height: 18px; }
+
+/* States */
+.icon-btn:hover { filter: brightness(1.05); }
+.icon-btn:active { transform: translateY(1px); }
+.icon-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+/* Variants */
+.icon-view { background: #111; color: #fff; }          /* Nền đen, icon trắng */
+.icon-cancel { background: #e53935; color: #fff; }     /* Nền đỏ, icon trắng */
+.icon-confirm { background: #1e88e5; color: #fff; }    /* Nền xanh dương, icon trắng */
+
+/* (Optional) Tooltip via title attr look nicer on desktop */
+.icon-btn[title] { position: relative; }
+
+/* Giữ bố cục ổn trong ô thao tác hẹp */
+.action-cell { width: 1%; white-space: nowrap; }

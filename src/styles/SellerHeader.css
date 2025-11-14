@@ -154,3 +154,491 @@
   .tk-pill { display: none; }
   .tk-store-name { max-width: 120px; }
 }
+/* SellerHeader.css */
+.tk-wallet-btn {
+  border-color: #e5ecff;
+  background: linear-gradient(180deg,#ffffff 0%,#f7faff 100%);
+}
+.tk-wallet-btn:hover {
+  background: #eef4ff;
+  box-shadow: 0 0 0 3px rgba(42,108,234,0.12);
+}
+/* src/styles/SellerHeader.css — thêm */
+.tk-store-switch .tk-store-name {
+  max-width: 200px;           /* chỉnh tuỳ ý */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  vertical-align: bottom;
+}
+/* ===== Header Policy Banner - 1 dòng gọn gàng ===== */
+.tos-snooze-banner{
+  width: 100%;
+  background: #fff7ed;                 /* cam nhạt */
+  border-bottom: 1px solid #fde7c7;
+  font-size: 14px;
+}
+.tos-snooze-inner{
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #9a3412;
+  white-space: nowrap;                 /* giữ 1 dòng */
+  overflow: hidden;                    /* tránh tràn */
+}
+
+.tos-banner-left{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1 1 auto;                      /* chiếm hết phần còn lại */
+}
+.tos-banner-icon{
+  flex: 0 0 auto;
+}
+.tos-banner-text{
+  text-overflow: ellipsis;             /* nếu dài quá thì ... */
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.tos-banner-actions{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.tos-banner-view{
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #d6e2ff;           /* xanh nhạt */
+  background: #eef5ff;
+  color: #0b5ed7;
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.tos-banner-view:hover{
+  filter: brightness(1.02);
+}
+
+.tos-banner-accept{
+  display: inline-flex;
+  align-items: center;
+  background: #111827;
+  color: #fff;
+  border: 1px solid #0f172a;
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 6px 16px rgba(16,24,40,.12);
+}
+.tos-banner-accept .me-1{ margin-right: 6px; }
+
+/* Mobile: vẫn cố gắng 1 dòng; khi quá hẹp sẽ ưu tiên co chữ và ẩn bớt bằng ... */
+@media (max-width: 576px){
+  .tos-snooze-inner{
+    font-size: 13px;
+    padding: 8px 12px;
+    gap: 8px;
+  }
+  .tos-banner-view, .tos-banner-accept{
+    padding: 6px 8px;
+  }
+}
+/* ===== TOS Snooze Banner (giữ nguyên nếu đã có) ===== */
+.tos-snooze-banner{
+  width: 100%;
+  background: #fff7ed;
+  border-bottom: 1px solid #fde7c7;
+}
+.tos-snooze-inner{
+  max-width: 1280px; margin: 0 auto;
+  padding: 8px 16px; display: flex; align-items: center; gap: 10px;
+  color:#9a3412;
+}
+.tos-snooze-inner .grow{ flex: 1 1 auto; }
+.tos-banner-link{
+  background: transparent; border: none; color:#0b5ed7; font-weight:600;
+  text-decoration: underline; cursor: pointer; padding: 6px 8px; border-radius: 8px;
+}
+.tos-banner-accept{
+  background:#111827; color:#fff; border:1px solid #0f172a; border-radius: 10px;
+  padding: 6px 10px; font-weight:700; box-shadow:0 6px 16px rgba(16,24,40,.12);
+}
+
+/* ===== Modal TOS (giữ nguyên phần chung) ===== */
+.tos-modal-backdrop{ position: fixed; inset: 0; background: rgba(15,23,42,.48); backdrop-filter: blur(2px); z-index: 9998; }
+.tos-modal{
+  position: fixed; left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(720px, calc(100% - 32px));
+  background: #fff; border: 1px solid #e6ebf2; border-radius: 16px;
+  box-shadow: 0 24px 80px rgba(2, 8, 20, .28);
+  z-index: 9999; display: flex; flex-direction: column; overflow: hidden;
+}
+.tos-modal-head{ padding: 14px 18px; border-bottom: 1px solid #eef2f7; background: linear-gradient(180deg,#f8fafc 0%,#f3f6fb 100%); }
+.tos-modal-title{ font-weight: 700; color: #0f172a; font-size: 18px; display: flex; align-items: center; }
+.tos-modal-body{ padding: 16px 18px; }
+.tos-modal-alert.error{ background: #fff5f5; color:#b42318; border:1px solid #f4d6d5; padding: 10px 12px; border-radius: 10px; margin-bottom: 10px; }
+.tos-meta{ display: flex; gap: 18px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
+.tos-meta .badge{ display:inline-block; background:#e9f2ff; color:#0b5ed7; border:1px solid #cfe0ff; padding:2px 8px; border-radius: 999px; font-weight:600; }
+.tos-desc{ color:#374151; line-height:1.6; margin-bottom: 14px; }
+.tos-links{ display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.tos-link-btn{ display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 10px; border: 1px solid #e5eaf1; background: #f8fafc; color:#0b5ed7; text-decoration: none; font-weight: 600; }
+.tos-link-btn:hover{ filter: brightness(1.02); }
+.tos-link-btn.outline{ background:#fff; color:#111827; border-color:#e6ebf2; }
+
+.tos-modal-actions{ display: flex; justify-content: flex-end; gap: 10px; padding: 12px 18px; border-top: 1px solid #eef2f7; background:#fff; }
+.tos-btn{ height: 42px; padding: 0 16px; border-radius: 10px; border: 1px solid transparent; font-weight: 700; }
+.tos-btn.defer{ background:#fff; color:#6b7280; border-color:#e5e7eb; }
+.tos-btn.defer:hover{ background:#f9fafb; }
+.tos-btn.accept{ background:#111827; color:#fff; border-color:#0f172a; box-shadow:0 8px 20px rgba(16,24,40,.16); }
+.tos-btn.accept[aria-busy="true"]{ opacity: .8; pointer-events: none; }
+
+/* Mobile */
+@media (max-width: 576px){
+  .tos-modal{ width: calc(100% - 20px); }
+  .tos-modal-title{ font-size: 16px; }
+  .tos-snooze-inner{ padding: 8px 12px; }
+}
+/* ==== Marquee cho thông báo ==== */
+.tos-banner-left{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.tos-marquee{
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;          /* ẩn phần tràn khi chạy */
+  height: 20px;              /* chiều cao dòng */
+  display: flex;
+  align-items: center;
+}
+
+.tos-marquee-track{
+  display: inline-block;
+  white-space: nowrap;
+  will-change: transform;
+  padding-left: 100%;        /* bắt đầu ngoài màn hình bên phải */
+  animation: tos-scroll-left 18s linear infinite;
+}
+
+/* Dừng khi hover (tuỳ thích) */
+.tos-marquee:hover .tos-marquee-track{
+  animation-play-state: paused;
+}
+
+/* Tôn trọng người dùng không thích animation */
+@media (prefers-reduced-motion: reduce){
+  .tos-marquee-track{
+    animation: none;
+    padding-left: 0;
+  }
+}
+
+@keyframes tos-scroll-left{
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-100%); }  /* chạy qua trái hết nội dung */
+}
+
+/* Giữ nút đứng yên bên phải như trước */
+.tos-banner-actions{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+/* (giữ nguyên style 2 nút bạn đang dùng) */
+/* === Badge số trên đầu icon chuông === */
+.tk-icon-wrap .tk-icon-btn.has-badge {
+  position: relative;
+}
+.tk-icon-wrap .tk-icon-btn.has-badge .tk-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 11px;
+  line-height: 18px;
+  text-align: center;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,.2);
+  pointer-events: none;
+}
+
+/* Drawer list */
+.tk-drawer .tk-drawer-list {
+  padding: 12px;
+}
+.tk-drawer .tk-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 12px;
+}
+.tk-drawer .tk-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+}
+.tk-drawer .tk-item.is-unread {
+  background: #f9fafb;
+}
+.tk-drawer .tk-item .tk-item-title {
+  font-weight: 700;
+  margin-bottom: 3px;
+}
+.tk-drawer .tk-item .tk-item-text {
+  color: #374151;
+  margin-bottom: 6px;
+}
+.tk-drawer .tk-item .tk-item-meta {
+  font-size: 12px;
+  color: #6b7280;
+}
+.tk-drawer .tk-item .tk-item-meta .muted {
+  margin-left: 8px;
+  color: #9CA3AF;
+}
+.tk-drawer .tk-item .tk-item-meta .unread-dot {
+  margin-left: 8px;
+  color: #ef4444;
+}
+/* Hàng action: Xem + Xoá chung một hàng, căn phải */
+.tk-drawer .tk-item .tk-item-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.tk-avatar.sm { width: 36px; height: 36px; border-radius: 999px; object-fit: cover; }
+.tk-item-left { display: flex; align-items: flex-start; }
+
+/* (tuỳ chọn) container toast nếu muốn thêm style ở CSS */
+
+/* Đảm bảo container định vị được pseudo-element */
+.tk-order-item {
+  position: relative;
+}
+
+/* Chấm đỏ góc trên-phải khi CHƯA ĐỌC */
+.tk-order-item.is-unread::after {
+  content: "";
+  position: absolute;
+  top: 8px;         /* chỉnh tuỳ layout */
+  right: 10px;      /* chỉnh tuỳ layout */
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #ef4444;
+  box-shadow: 0 0 0 2px #fff;  /* viền trắng cho nổi bật trên nền */
+}
+/* ===== Drawer: ẩn scrollbar ngoài, chỉ cho vùng list cuộn ===== */
+.tk-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(480px, 100%);
+  height: 100vh;
+
+  background: #fff;
+  border-left: 1px solid #e5e7eb;
+
+  display: flex;
+  flex-direction: column;
+  min-height: 0;           /* quan trọng: cho phép con flex co/scroll */
+
+  transform: translateX(100%);
+  transition: transform .28s ease;
+  z-index: 80;
+
+  /* Ẩn scrollbar lớp ngoài (nếu có) và chặn cuộn ở lớp này */
+  overflow: hidden;
+  scrollbar-width: none;   /* Firefox */
+  -ms-overflow-style: none;/* IE/Edge cũ */
+}
+.tk-drawer.open { transform: translateX(0%); }
+
+/* Ẩn UI scrollbar WebKit của lớp ngoài (phòng trường hợp) */
+.tk-drawer::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Header & actions không cuộn, chiếm độ cao tự nhiên */
+.tk-drawer-head,
+.tk-drawer-actions,
+.tk-drawer-subhead {
+  flex: 0 0 auto;
+}
+
+/* 🔽 Chỉ vùng danh sách cuộn */
+.tk-drawer-list {
+  flex: 1 1 auto;          /* chiếm phần còn lại */
+  min-height: 0;           /* tránh sinh scrollbar cha */
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;  /* mượt trên iOS */
+}
+
+/* (tuỳ chọn) Ẩn luôn UI scrollbar của vùng cuộn list */
+.tk-drawer-list {
+  scrollbar-width: none;    /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge cũ */
+}
+.tk-drawer-list::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* 🔒 body không cuộn khi drawer mở */
+.tk-no-scroll {
+  overflow: hidden !important;
+}
+/* ===== Ẩn TUYỆT ĐỐI scrollbar khi mở drawer ===== */
+/* Gắn trên <html> (documentElement) để mạnh tay, nhưng chỉ bật khi openNotif */
+.tk-hide-scrollbars,
+.tk-hide-scrollbars * {
+  /* Firefox & IE cũ */
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+/* WebKit (Chrome/Edge/Safari) */
+.tk-hide-scrollbars::-webkit-scrollbar,
+.tk-hide-scrollbars *::-webkit-scrollbar {
+  display: none !important;   /* ẩn hoàn toàn UI thanh cuộn */
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+.tk-hide-scrollbars *::-webkit-scrollbar-thumb {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* ===== Drawer: chặn cuộn lớp ngoài, chỉ cho vùng list cuộn ===== */
+.tk-drawer {
+  overflow: hidden !important;   /* không tạo scrollbar ngoài */
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overscroll-behavior: contain;  /* tránh hiệu ứng “bật” cuộn */
+}
+
+/* chỉ danh sách bên trong được cuộn */
+.tk-drawer-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* body không cuộn khi drawer mở */
+.tk-no-scroll {
+  overflow: hidden !important;
+}
+/* ===== ẨN TUYỆT ĐỐI UI SCROLLBAR nhưng vẫn cuộn được ===== */
+.tk-hide-scrollbars,
+.tk-hide-scrollbars * {
+  scrollbar-width: none !important;        /* Firefox */
+  -ms-overflow-style: none !important;     /* IE/Edge cũ */
+  scrollbar-color: transparent transparent !important;
+}
+
+/* WebKit (Chrome/Edge/Safari) */
+.tk-hide-scrollbars::-webkit-scrollbar,
+.tk-hide-scrollbars *::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+  background: transparent !important;
+}
+.tk-hide-scrollbars *::-webkit-scrollbar-thumb {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Khi drawer mở: chặn page scroll ở ngoài (tránh thanh cuộn ngoài xuất hiện) */
+.tk-no-scroll {
+  overflow: hidden !important;
+}
+
+/* Drawer không tạo thanh cuộn ngoài; chỉ phần list cuộn */
+.tk-drawer {
+  overflow: hidden !important;
+  overscroll-behavior: contain;
+}
+.tk-drawer-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  /* Ẩn UI thanh cuộn của vùng list luôn */
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+.tk-drawer-list::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+}
+ :root{
+  /* fallback khi JS chưa đo kịp */
+  --tos-banner-h: 0px;
+  --header-only-h: 72px;
+  /* tổng chiều cao phần cố định trên cùng (banner + header) */
+  --header-h: calc(var(--tos-banner-h) + var(--header-only-h));
+}
+
+/* Banner TOS: luôn dính trên cùng và CHIẾM CHỖ (đẩy header xuống) */
+.tos-snooze-banner{
+  position: sticky;
+  top: 0;
+  z-index: 80;              /* trên header */
+  width: 100%;
+  background: #fff7ed;
+  border-bottom: 1px solid #fde7c7;
+}
+
+/* Header dính ngay dưới banner */
+.tk-header.tk-lg{
+  position: sticky;
+  top: var(--tos-banner-h); /* offset đúng bằng chiều cao banner */
+  z-index: 70;
+  min-height: var(--header-only-h);
+}
+
+/* Khu nội dung seller: nếu đang dùng 100vh cho phần dưới header,
+   phải trừ đúng tổng (banner + header) để không bị cắt nội dung */
+.seller-main{
+  height: calc(100vh - var(--header-h));
+  min-height: 0;            /* quan trọng với flex/grid để cho phép con cuộn */
+}

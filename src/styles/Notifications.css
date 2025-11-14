@@ -1,0 +1,207 @@
+/* ===== CƠ BẢN ===== */
+.btn {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  cursor: pointer;
+  transition: background-color .18s ease, border-color .18s ease, 
+              color .18s ease, box-shadow .18s ease, transform .12s ease;
+}
+.btn:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+/* ===== BUTTON VARIANTS ===== */
+/* Primary - Nền đen chữ trắng */
+.btn--primary {
+  background: #111827;
+  color: #fff;
+  border-color: #111827;
+}
+.btn--primary:hover:not(:disabled) {
+  background: #000;
+  border-color: #000;
+  box-shadow: 0 6px 14px rgba(0,0,0,.25);
+  transform: translateY(-1px);
+}
+.btn--primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 3px 8px rgba(0,0,0,.18);
+}
+
+/* Light - Nền xám nhạt */
+.btn--light {
+  background: #f9fafb;
+}
+.btn--light:hover:not(:disabled) {
+  background: #eef2f7;
+  border-color: #d1d5db;
+}
+
+/* Danger - Đỏ đậm */
+.btn--danger {
+  background: #b91c1c;
+  border-color: #7f1d1d;
+  color: #fff;
+}
+.btn--danger:hover:not(:disabled) {
+  background: #991b1b;
+  border-color: #7f1d1d;
+}
+
+/* Ghost - Trong suốt */
+.btn--ghost {
+  background: transparent;
+  border-color: transparent;
+}
+.btn--ghost:hover:not(:disabled) {
+  background: rgba(17,24,39,.06);
+  border-color: #e5e7eb;
+}
+
+/* ===== NOTIFICATION ITEMS ===== */
+.notif-item.is-unread {
+  border-color: #d1d5db;
+  background: #f9fafb;
+}
+
+/* Số "x chưa đọc" màu đỏ */
+.unread-red {
+  color: #ef4444;
+  font-weight: 700;
+}
+
+/* ===== HOVER CHỈ CHO ĐƠN HÀNG (SYSTEM) ===== */
+.notif-list .notif-item.notif--system:hover {
+  background: #111827 !important;
+  color: #fff !important;
+  border-color: #111827 !important;
+  cursor: pointer;
+}
+.notif-list .notif-item.notif--system:hover span,
+.notif-list .notif-item.notif--system:hover div {
+  color: #fff !important;
+}
+
+/* ===== TIN NHẮN: KHÔNG CÓ HOVER EFFECT ===== */
+.notif-list .notif-item.notif--msg {
+  /* Giữ nguyên style gốc khi hover */
+}
+.notif-list .notif-item.notif--msg:hover {
+  /* Không thay đổi gì */
+}
+
+/* ===== CHAT TOAST ===== */
+.ct-toasts {
+  position: fixed;
+  top: 76px;
+  right: 20px;
+  z-index: 9999;
+  display: grid;
+  gap: 10px;
+}
+
+.ct-toast {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  min-width: 280px;
+  max-width: 360px;
+  padding: 12px 12px 12px 10px;
+  border-radius: 12px;
+  background: #111827;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  animation: ctSlideIn 0.35s ease;
+}
+
+.ct-toast__avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #fff;
+}
+.ct-toast__body {
+  min-width: 0;
+}
+.ct-toast__title {
+  font-weight: 700;
+  font-size: 13px;
+  margin-bottom: 2px;
+}
+.ct-toast__text {
+  font-size: 13px;
+  color: #e5e7eb;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ct-toast__close {
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  font-size: 18px;
+  line-height: 1;
+  padding: 0 4px;
+  cursor: pointer;
+}
+.ct-toast__close:hover {
+  color: #fff;
+}
+
+@keyframes ctSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) translateX(0);
+  }
+}
+
+/* Toast variants */
+.ct-toast--success {
+  background: #065f46;
+}
+.ct-toast--error {
+  background: #991b1b;
+}
+.ct-toast--warning {
+  background: #92400e;
+}
+.ct-toast--info {
+  background: #111827;
+}
+/* Khung trang: cao = full viewport trừ header (chỉnh đúng header cao bao nhiêu) */
+.account-notif-page {
+  height: calc(100vh - var(--header-h, 78px));
+  display: flex;
+  flex-direction: column;
+}
+
+/* Card phải cho phép con overflow */
+.account-notif-page .card {
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* quan trọng */
+}
+
+/* Vùng cuộn duy nhất */
+.notif-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* mượt iOS */
+  scroll-behavior: smooth;
+
+  /* ẨN SCROLLBAR nhưng vẫn cuộn được */
+  scrollbar-width: none;          /* Firefox */
+}
+.notif-scroll::-webkit-scrollbar { display: none; } /* Chrome/Safari/Edge */

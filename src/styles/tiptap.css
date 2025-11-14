@@ -1,0 +1,16 @@
+.tt-wrap { border:1px solid #e5e7eb; border-radius:8px; background:#fff; }
+.tt-toolbar { display:flex; gap:6px; padding:8px; border-bottom:1px solid #e5e7eb; background:#fafafa; border-top-left-radius:8px; border-top-right-radius:8px; }
+.tt-btn { padding:4px 8px; border:1px solid transparent; border-radius:6px; background:#fff; cursor:pointer; }
+.tt-btn.is-active { border-color:#111; }
+.tt-btn:disabled { opacity:.5; cursor:not-allowed; }
+.tt-sep { width:1px; background:#e5e7eb; margin:0 4px; }
+.tt-flex { flex:1; }
+
+.tt-editor { min-height:180px; padding:12px; outline:none; border-bottom-left-radius:8px; border-bottom-right-radius:8px; }
+.tt-editor p { margin:0 0 8px; line-height:1.5; }
+.tt-editor h1 { font-size:1.5rem; margin:14px 0 8px; }
+.tt-editor h2 { font-size:1.25rem; margin:12px 0 6px; }
+.tt-editor h3 { font-size:1.1rem; margin:10px 0 6px; }
+.tt-editor blockquote { border-left:3px solid #ddd; padding-left:10px; color:#555; margin:8px 0; }
+.tt-editor pre { background:#f7f7f7; padding:10px; border-radius:6px; overflow:auto; }
+.tt-editor ul, .tt-editor ol { padding-left:24px; margin:8px 0; }

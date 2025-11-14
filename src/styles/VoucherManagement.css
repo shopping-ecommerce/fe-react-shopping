@@ -1,0 +1,229 @@
+/* src/styles/VoucherManagement.css */
+
+/* ===== Page ===== */
+.vm-page { padding: 24px; background-color: #f9fafb; min-height: 100vh; }
+.vm-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.vm-header h1 { font-size: 24px; font-weight: 600; color: #111827; }
+
+/* ===== Buttons ===== */
+.vm-btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background-color: #ef4444; color: #fff; border: none; padding: 10px 16px; border-radius: 10px;
+  font-weight: 600; cursor: pointer;
+  transition: transform .06s ease, background-color .18s ease, box-shadow .18s ease;
+  box-shadow: 0 6px 12px rgba(239, 68, 68, .18);
+}
+.vm-btn-primary:hover { background-color: #dc2626; transform: translateY(-1px); }
+.vm-btn-primary:active { transform: translateY(0); box-shadow: 0 4px 8px rgba(239, 68, 68, .2); }
+
+.vm-btn-outline, .vm-btn-secondary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background-color: #fff; color: #0f172a; border: 1px solid #e2e8f0;
+  padding: 10px 16px; border-radius: 10px; font-weight: 600; cursor: pointer;
+  transition: transform .06s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.vm-btn-outline:hover, .vm-btn-secondary:hover {
+  transform: translateY(-1px); border-color: #cbd5e1; box-shadow: 0 6px 12px rgba(15, 23, 42, .06);
+}
+
+/* ===== Tabs ===== */
+.vm-tabs { display: flex; border-bottom: 1px solid #e5e7eb; margin-bottom: 24px; }
+.vm-tab-btn {
+  position: relative; padding: 12px 16px; border: none; background: none; cursor: pointer;
+  font-size: 14px; color: #6b7280; border-bottom: 2px solid transparent; margin-bottom: -1px;
+  transition: color .18s ease;
+}
+.vm-tab-btn.active { color: #ef4444; font-weight: 600; border-bottom-color: #ef4444; }
+.vm-tab-btn.active::after, .vm-tab-btn:hover::after {
+  content: ""; position: absolute; left: 12px; right: 12px; bottom: -1px; height: 2px;
+  background: #ef4444; transform: scaleX(1); transition: transform .2s ease;
+}
+.vm-tab-btn::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: -1px; height: 2px; background: #ef4444; transform: scaleX(0); }
+
+/* ===== Table ===== */
+.vm-table-container { background-color: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,.1); overflow: hidden; }
+.vm-table { width: 100%; border-collapse: collapse; }
+.vm-table th, .vm-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid #e5e7eb; font-size: 14px; }
+.vm-table th { background-color: #f9fafb; color: #6b7280; font-weight: 500; }
+.vm-table tbody tr { transition: background-color .15s ease; }
+.vm-table tbody tr:hover { background-color: #fafafa; }
+.vm-loading, .vm-empty { text-align: center; padding: 40px; color: #6b7280; }
+
+.vm-voucher-code { display: flex; align-items: center; gap: 6px; font-weight: 600; color: #1d4ed8; }
+.vm-voucher-name { font-size: 12px; color: #6b7280; margin-top: 4px; }
+
+.vm-status-badge { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; text-transform: capitalize; }
+.status-ongoing { background-color: #dbeafe; color: #1e40af; }
+.status-upcoming { background-color: #fef3c7; color: #92400e; }
+.status-ended { background-color: #e5e7eb; color: #4b5563; }
+
+.vm-actions { display: flex; gap: 8px; }
+.vm-btn-icon { background: none; border: none; cursor: pointer; color: #6b7280; padding: 4px; border-radius: 8px; transition: background-color .15s ease, color .15s ease; }
+.vm-btn-icon:hover { color: #111827; background: #f3f4f6; }
+.vm-btn-icon.danger:hover { color: #ef4444; }
+
+/* ===== Info box ===== */
+.vm-info-box {
+  margin-bottom: 12px; padding: 10px 12px; background: #f1f5f9; color: #0f172a; border: 1px solid #e2e8f0;
+  border-radius: 10px; display: inline-flex; align-items: center; gap: 8px;
+}
+.vm-info-box.error { background: #fef2f2; color: #7f1d1d; border-color: #fecaca; }
+
+/* ===== Modal FX ===== */
+.vm-overlay {
+  position: fixed; inset: 0; display: grid; place-items: center; padding: 24px;
+  background-color: rgba(17, 24, 39, .45);
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  z-index: 1000; opacity: 0; pointer-events: none; transition: opacity .25s ease;
+}
+.vm-overlay.vm-open { opacity: 1; pointer-events: auto; }
+.vm-overlay.vm-closing { opacity: 0; pointer-events: none; }
+
+.vm-modal {
+  width: min(720px, 100%); background: #fff; border-radius: 14px;
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -4px rgba(0,0,0,.1);
+  overflow: hidden; transform: translateY(8px) scale(.98); opacity: 0;
+  position: relative; z-index: 1001;
+}
+.vm-animate-in { animation: vm-pop .28s cubic-bezier(.22,.7,.28,1) forwards; }
+.vm-animate-out { animation: vm-pop-out .22s ease forwards; }
+
+@keyframes vm-pop {
+  0%   { transform: translateY(12px) scale(.96); opacity: 0; }
+  60%  { transform: translateY(0) scale(1.005); opacity: 1; }
+  100% { transform: translateY(0) scale(1); }
+}
+@keyframes vm-pop-out {
+  0%   { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(8px) scale(.98); opacity: 0; }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .vm-overlay, .vm-animate-in, .vm-animate-out { animation: none !important; transition: none !important; }
+  .vm-modal { transform: none !important; opacity: 1 !important; }
+}
+
+/* ===== Modal layout ===== */
+.vm-modal-header {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 14px 18px; border-bottom: 1px solid #eef2f7;
+  background: linear-gradient(180deg, #fff 0%, #fafafa 100%);
+}
+.vm-modal-header h3 { margin: 0; font-size: 17px; font-weight: 700; color: #0f172a; letter-spacing: .2px; }
+.vm-btn-icon.vm-close { border: none; background: transparent; font-size: 20px; line-height: 1; color: #94a3b8; cursor: pointer; transition: transform .15s ease, color .15s ease; }
+.vm-btn-icon.vm-close:hover { color: #0f172a; transform: rotate(90deg); }
+
+.vm-modal-body {
+  padding: 18px; max-height: min(70vh, 760px); overflow: auto; scrollbar-width: thin; scrollbar-color: #f0f2f6 transparent;
+}
+.vm-modal-body::-webkit-scrollbar { height: 10px; width: 10px; }
+.vm-modal-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
+.vm-modal-body::-webkit-scrollbar-track { background: transparent; }
+
+.vm-modal-footer { display: flex; justify-content: flex-end; gap: 10px; padding: 14px 18px; border-top: 1px solid #eef2f7; background: #fafafa; }
+
+/* ===== Form ===== */
+.vm-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.vm-form-group { display: flex; flex-direction: column; }
+.vm-form-group.vm-full { grid-column: 1 / -1; }
+.vm-form-label { font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 6px; }
+
+.vm-form-input, .vm-form-select, .vm-form-textarea {
+  width: 100%; border: 1px solid #e2e8f0; background: #fff; font-size: 14px; border-radius: 10px; padding: 10px 12px; outline: none;
+  transition: box-shadow .18s ease, border-color .18s ease, transform .06s ease;
+}
+.vm-form-textarea { resize: vertical; }
+.vm-form-input:focus, .vm-form-select:focus, .vm-form-textarea:focus {
+  border-color: #ef4444; box-shadow: 0 0 0 3px rgba(239, 68, 68, .15); transform: translateY(-1px);
+}
+.vm-hint { margin-top: 6px; font-size: 12px; color: #64748b; }
+
+/* Mobile */
+@media (max-width: 640px) {
+  .vm-modal { width: 100%; }
+  .vm-form-grid { grid-template-columns: 1fr; }
+  .vm-modal-body { max-height: 70vh; }
+}
+/* === Date/Time Input - Black & White === */
+.vm-form-input--date {
+  border: 1px solid #111 !important;
+  color: #111;
+  background-color: #fff;
+}
+.vm-form-input--date:focus {
+  border-color: #000 !important;
+  box-shadow: 0 0 0 3px rgba(0,0,0,.12) !important;
+}
+
+/* Tối icon lịch/clock trên WebKit để hợp tông đen–trắng */
+.vm-form-input--date::-webkit-calendar-picker-indicator {
+  filter: invert(0.2);
+  opacity: 0.9;
+  cursor: pointer;
+}
+/* ===== Black & White form controls (override) ===== */
+.vm-form-input,
+.vm-form-select,
+.vm-form-textarea {
+  border: 1px solid #111 !important;
+  background-color: #fff !important;
+  color: #111 !important;
+  box-shadow: none !important;
+}
+
+.vm-form-input:focus,
+.vm-form-select:focus,
+.vm-form-textarea:focus {
+  border-color: #000 !important;
+  box-shadow: 0 0 0 3px rgba(0,0,0,.12) !important;
+  transform: translateY(-1px);
+}
+
+/* Riêng datetime-local: viền đen + icon tối */
+.vm-form-input--date,
+input[type="datetime-local"].vm-form-input {
+  border: 1px solid #111 !important;
+  color: #111 !important;
+  background-color: #fff !important;
+}
+
+.vm-form-input--date:focus,
+input[type="datetime-local"].vm-form-input:focus {
+  border-color: #000 !important;
+  box-shadow: 0 0 0 3px rgba(0,0,0,.12) !important;
+}
+
+/* Tối icon calendar/clock (WebKit) để hợp tông đen–trắng */
+.vm-form-input--date::-webkit-calendar-picker-indicator,
+input[type="datetime-local"].vm-form-input::-webkit-calendar-picker-indicator {
+  filter: invert(0.2);
+  opacity: 0.9;
+  cursor: pointer;
+}
+
+/* Tùy chọn: làm viền hàng/cột trong bảng hiển thị đậm hơn (nếu muốn) */
+.vm-table th, .vm-table td {
+  border-bottom: 1px solid #111 !important;
+}
+/* Giữ badge trạng thái trên 1 dòng */
+.vm-status-badge{
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;        /* <- quan trọng */
+  line-height: 1;             /* tránh cao dòng làm wrap */
+  padding: 6px 10px;
+  border-radius: 999px;
+}
+
+/* Cột “Trạng thái” ưu tiên vừa badge, không ép co gây wrap */
+.vm-table td:nth-child(5),
+.vm-table th:nth-child(5){
+  white-space: nowrap;
+  width: 1%;                  /* co vừa nội dung */
+}
+
+/* Nếu vẫn bị wrap do table hẹp, cho phép bảng tràn ngang thay vì wrap text */
+.vm-table-container{
+  overflow-x: auto;
+}

@@ -1,35 +1,48 @@
 // src/services/api.js
-import { API_CONFIG } from '../config/api';
+import { apiUrl } from "../config/api";
 
-const apiCall = async (endpoint, method = 'POST', data = null) => {
-  const url = `${API_CONFIG.baseUrl}${API_CONFIG.endpoints[endpoint]}`;
-  const options = {
-    method,
+async function postJSON(path, body, opts = {}) {
+  const url = typeof apiUrl === "function" ? apiUrl(path) : path;
+  const res = await fetch(url, {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      ...(opts.headers || {}),
     },
-  };
-
-  if (data) {
-    options.body = JSON.stringify(data);
-  }
-
+    credentials: "include",
+    body: JSON.stringify(body),
+  });
+  const text = await res.text();
+  let json;
   try {
-    const response = await fetch(url, options);
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(result.message || 'Request failed');
-    }
-
-    return result;
-  } catch (error) {
-    throw new Error(error.message);
+    json = text ? JSON.parse(text) : {};
+  } catch {
+    json = { message: text };
   }
-};
+  if (!res.ok)
+    throw new Error(json?.message || `Request failed (${res.status})`);
+  return json;
+}
 
-export const register = (data) => apiCall('register', 'POST', data);
-export const verifyOtp = (data) => apiCall('verifyOtp', 'POST', data);
-// Thêm các hàm API khác khi cần, ví dụ: login, logout, etc.
+// Gửi OTP quên mật khẩu
+export function forgotPasswordSendOtp(email) {
+  return postJSON("/authentication/forgot-password/send-otp", { email });
+}
 
-export default apiCall;
+// Xác thực OTP quên mật khẩu (nếu cần dùng)
+export function forgotPasswordVerifyOtp({ email, otp }) {
+  return postJSON("/authentication/forgot-password/verify-otp", { email, otp });
+}
+// === Forgot Password: Reset password ===
+export function forgotPasswordResetPassword({
+  email,
+  new_password,
+  confirm_password,
+}) {
+  return postJSON("/authentication/forgot-password/reset-password", {
+    email,
+    new_password,
+    confirm_password,
+  });
+}

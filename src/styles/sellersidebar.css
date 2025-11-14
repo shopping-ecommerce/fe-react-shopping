@@ -147,3 +147,86 @@
 /* ===== Scrollbar ===== */
 .ssb-nav::-webkit-scrollbar { width: 8px; }
 .ssb-nav::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 999px; }
+/* vùng khoá nhóm khi SUSPENDED */
+.ssb-group.locked,
+.ssb-group.locked .ssb-group-head,
+.ssb-group.locked .ssb-subitem {
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none; /* chặn click */
+}
+
+.ssb-group-head.disabled {
+  background: transparent;
+  border: none;
+}
+
+.ssb-subitem.disabled {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px 8px 28px;
+}
+
+.ssb-lock-tag {
+  margin-left: 8px;
+  font-size: 11px;
+  line-height: 1;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: #ffe6e6;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+}
+/* Một dòng + chống xuống hàng + ellipsis */
+.oneline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;           /* cho phép ellipsis */
+}
+
+.ellip {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ssb-group-head,
+.ssb-item.headlike {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  white-space: nowrap;
+}
+
+/* Nhóm bị khóa */
+.ssb-group.locked .locked-head {
+  cursor: not-allowed;
+  opacity: 0.85;
+  pointer-events: none;  /* chặn mọi tương tác */
+}
+
+/* Tag "Tạm ngưng" gọn gàng */
+.ssb-tag-locked {
+  margin-left: 8px;
+  padding: 2px 8px;
+  font-size: 11px;
+  line-height: 1;
+  border-radius: 999px;
+  background: #fff2f2;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+  white-space: nowrap;
+}
+
+/* Subitem text ellipsis */
+.ssb-subitem .ellip {
+  max-width: 180px;    /* tuỳ UI của bạn */
+}
+
+/* Khi sidebar thu gọn, giữ hàng ngang gọn gàng */
+.seller-sidebar.collapsed .label,
+.seller-sidebar.collapsed .ssb-tag-locked {
+  display: none;
+}

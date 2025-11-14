@@ -1,0 +1,134 @@
+/* Fallback Google Fonts: phải đặt ở ĐẦU file */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+/* ===== SVN-Poppins (local) ===== */
+@font-face {
+  font-family: 'SVN-Poppins';
+  src: url('/fonts/SVN-Poppins-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'SVN-Poppins';
+  src: url('/fonts/SVN-Poppins-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'SVN-Poppins';
+  src: url('/fonts/SVN-Poppins-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'SVN-Poppins';
+  src: url('/fonts/SVN-Poppins-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* (Tuỳ chọn) Nếu CHƯA có file Medium, alias tạm SemiBold cho 500 để tránh chữ “nhạt” */
+/*
+@font-face {
+  font-family: 'SVN-Poppins';
+  src: url('/fonts/SVN-Poppins-SemiBold.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+*/
+
+/* ====== Font & màu chữ mặc định toàn site ====== */
+:root {
+  --app-font: SVN-Poppins, Poppins, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --text-color: #111827; /* gray-900: nhìn sắc nét hơn */
+}
+
+/* Smoothing: chọn cấu hình “đậm” hơn cho Windows */
+html {
+  -webkit-font-smoothing: auto;     /* thay vì antialiased (mảnh) */
+  -moz-osx-font-smoothing: auto;
+  text-rendering: optimizeLegibility;
+}
+
+/* Body mặc định */
+body {
+  font-family: var(--app-font);
+  font-weight: 400;
+  color: var(--text-color);
+}
+
+/* Bảo đảm form controls kế thừa font */
+input, textarea, select, button {
+  font-family: inherit;
+}
+
+/* Buttons */
+button {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--app-font);
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+/* Links */
+a {
+  font-family: var(--app-font);
+  font-weight: 500;
+  color: inherit; /* kế thừa màu hiện tại để không “xám” bất ngờ */
+}
+
+/* Làm các vùng phổ biến kế thừa màu chữ rõ nét */
+.card, .list-group-item, .table, .modal {
+  color: inherit;
+}
+
+/* Giảm hiện tượng chữ “mờ” do opacity ở các class muted */
+.text-muted,
+.text-body-secondary {
+  color: #6b7280 !important; /* gray-500: vẫn nhẹ nhưng rõ hơn */
+  opacity: 1 !important;
+}
+
+/* Ưu tiên áp vào Chat widget */
+.chat-ai-wrap,
+.chat-ai-wrap * {
+  font-family: var(--app-font) !important;
+}
+
+/* Header text weights */
+.chat-ai-title strong { font-weight: 600; }
+.chat-ai-sub { font-weight: 400; }
+
+/* Bubbles & input */
+.chat-ai-bubble .bubble { font-weight: 400; }
+.chat-ai-input textarea { font-weight: 400; }
+
+/* Nút gửi / nút đóng trong chat */
+.send-btn,
+.chat-ai-close {
+  font-family: var(--app-font) !important;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* FAB & các item */
+.fab,
+.fab span,
+.fab-arc .fab-item {
+  font-family: var(--app-font) !important;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}

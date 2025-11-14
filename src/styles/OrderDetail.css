@@ -1,0 +1,192 @@
+/* src/styles/OrderDetail.css */
+
+.od-container{ max-width:960px; margin:20px auto; padding:0 16px; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; color:#111; }
+.od-card{ background:#fff; border:1px solid #e6e6e6; border-radius:12px; padding:16px; margin-bottom:14px; }
+
+/* Header */
+.od-top{ display:flex; justify-content:space-between; align-items:center; gap:12px; }
+.od-top-left{ min-width:0; }
+.od-title{ font-weight:800; font-size:20px; }
+.od-sub{ color:#666; font-size:14px; margin-top:4px; }
+.od-code{ font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+
+/* Right header cluster: status + cancel button inline */
+.od-top-right{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+
+/* Block headers */
+.od-block-hd{ font-weight:700; border-bottom:1px solid #f0f0f0; padding-bottom:8px; margin-bottom:12px; }
+
+/* Items */
+.od-items{ display:flex; flex-direction:column; gap:12px; }
+.od-line{ display:flex; justify-content:space-between; gap:12px; }
+.od-line-left{ display:flex; gap:12px; }
+.od-thumb{ width:72px; height:72px; object-fit:cover; border:1px solid #eee; border-radius:8px; }
+.od-line-meta .od-name{ font-weight:700; }
+.od-variant,.od-qty{ font-size:13px; color:#666; }
+.od-line-right{ display:flex; flex-direction:column; align-items:flex-end; gap:8px; }
+.od-price{ font-weight:700; }
+.od-sm{ padding:6px 10px; font-size:13px; }
+
+/* 2 columns */
+.od-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+@media (max-width: 720px){ .od-grid{ grid-template-columns:1fr; } }
+
+/* Key-Value rows */
+.od-kv{ display:flex; justify-content:space-between; padding:8px 0; align-items:center; }
+.od-kv span{ color:#666; }
+
+/* Total row: label + price on one line */
+.od-total{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:8px;
+  padding-top:8px;
+  border-top:1px solid #f0f0f0;
+}
+.od-pill{ background:#111; color:#fff; padding:6px 10px; border-radius:999px; }
+
+/* Note */
+.od-note{ margin-top:10px; background:#fafafa; border:1px dashed #e6e6e6; padding:10px; border-radius:8px; color:#333; }
+
+/* Bottom actions (không dùng khi đã đưa nút hủy lên header) */
+.od-actions{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:24px; }
+.od-right{ display:flex; gap:8px; }
+
+/* Buttons */
+.od-btn-primary{ background:#111; color:#fff; border:none; padding:8px 14px; border-radius:10px; cursor:pointer; }
+.od-btn-outline{ background:#fff; color:#111; border:1px solid #111; padding:8px 14px; border-radius:10px; cursor:pointer; }
+.od-btn-danger{ background:#fff; color:#e02424; border:1px solid #e02424; padding:8px 14px; border-radius:10px; cursor:pointer; }
+
+/* compact danger button (để đặt cạnh trạng thái) */
+.od-btn-compact{ padding:6px 10px; font-size:13px; border-radius:8px; }
+
+.od-btn-primary:disabled,.od-btn-outline:disabled{ opacity:.6; cursor:not-allowed; }
+
+/* Badges — ép nền đen, chữ trắng cho mọi trạng thái */
+/* Base badge */
+.od-badge{
+  padding:6px 10px; border-radius:999px; font-weight:700; font-size:12px;
+  background:#000; color:#fff; border:1px solid #000;
+}
+
+/* All variants inherit the same black/white style */
+.od-badge.pending,
+.od-badge.confirmed,
+.od-badge.shipping,
+.od-badge.delivered,
+.od-badge.cancelled{
+  background:#000;
+  color:#fff;
+  border-color:#000;
+}
+
+
+/* Empty/Error */
+.od-empty,.od-error{ background:#fff; border:1px solid #e6e6e6; border-radius:12px; padding:20px; text-align:center; color:#444; }
+.od-error{ color:#e02424; }
+
+/* Cancel banner */
+.od-banner-cancel{ background:#fff7f7; border:1px solid #ffe3e3; border-radius:12px; padding:14px 16px; margin-bottom:14px; }
+.od-banner-title{ font-size:18px; font-weight:800; color:#b00020; }
+.od-banner-sub{ color:#666; margin-top:4px; }
+
+/* Modal (review) */
+.od-modal-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,.45); display:flex; align-items:center; justify-content:center; z-index:1100; }
+.od-modal{ width:min(560px,92vw); background:#fff; color:#111; border:1px solid #e6e6e6; border-radius:12px; box-shadow:0 12px 28px rgba(0,0,0,.18); }
+.od-modal-hd,.od-modal-ft{ display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-bottom:1px solid #f0f0f0; }
+.od-modal-ft{ border-top:1px solid #f0f0f0; border-bottom:none; }
+.od-modal-bd{ padding:12px 16px; max-height:65vh; overflow:auto; }
+.od-flex{ display:flex; }
+.od-gap{ gap:12px; }
+.od-strong{ font-weight:700; }
+.od-field{ margin-top:10px; }
+.od-label{ font-weight:600; margin-bottom:6px; }
+.od-stars{ display:flex; gap:6px; }
+.od-star{ border:none; background:transparent; cursor:pointer; font-size:18px; }
+.od-star.on{ color:#ffb400; }
+.od-hint{ font-size:12px; color:#666; }
+.od-media-row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+.od-media{ position:relative; width:72px; height:72px; border:1px solid #eee; border-radius:8px; overflow:hidden; }
+.od-media img{ width:100%; height:100%; object-fit:cover; }
+.od-remove{ position:absolute; top:0; right:0; border:none; background:#111; color:#fff; width:20px; height:20px; border-bottom-left-radius:8px; cursor:pointer; }
+
+/* Top back button row */
+.od-topbar-row{
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  margin-bottom:12px;
+}
+
+/* Back button with icon */
+.od-back-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  border:1px solid #111;
+  border-radius:8px;
+  background:#fff;
+  color:#111;
+  font-weight:600;
+  transition:all .18s ease;
+}
+
+/* Hover đảo màu (đen nền – trắng chữ) */
+.od-invert:hover{
+  background:#111 !important;
+  color:#fff !important;
+  border-color:#111 !important;
+}
+
+/* Action trong từng dòng item */
+.od-line-actions{
+  display:flex;
+  gap:8px;
+  margin-top:8px;
+  justify-content:flex-end;
+}
+
+/* Ellipsis 1 dòng */
+.od-one-line{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+/* === Giữ "Thành tiền" và Giá trên CÙNG MỘT HÀNG === */
+.od-card .od-total{
+  display:flex !important;
+  align-items:center;
+  flex-wrap:nowrap !important;    /* không cho xuống dòng */
+  gap:12px;
+  margin-top:8px;
+  padding-top:8px;
+  border-top:1px solid #f0f0f0;
+  white-space:nowrap;              /* chặn wrap toàn hàng */
+}
+
+.od-card .od-total > span{
+  flex:0 0 auto;
+  white-space:nowrap;              /* "Thành tiền" không wrap */
+}
+
+.od-card .od-total > b,
+.od-card .od-total .od-pill{
+  margin-left:auto;                /* đẩy giá sang phải */
+  flex:0 0 auto;
+  display:inline-flex;             /* ổn định kích thước pill */
+  align-items:center;
+  white-space:nowrap;              /* không cho giá xuống dòng */
+  min-width:max-content;           /* đủ chỗ mới xuống dòng (nhưng ta đã no-wrap) */
+}
+
+/* giữ style pill đen/ trắng */
+.od-pill{
+  background:#111;
+  color:#fff;
+  padding:6px 10px;
+  border-radius:999px;
+}
