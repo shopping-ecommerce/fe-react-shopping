@@ -1,0 +1,635 @@
+/* src/styles/account-addresses.css */
+.addr-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.addr-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.addr-header h1 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.btn-primary {
+  background: #ee4d2d;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-primary:hover {
+  background: #d73211;
+}
+
+.btn-primary:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.addr-card {
+  background: white;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.addr-card h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 20px 0;
+}
+
+.addr-loading, .addr-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+}
+
+.addr-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.addr-item {
+  border-bottom: 1px solid #f0f0f0;
+  padding: 20px 0;
+}
+
+.addr-item:last-child {
+  border-bottom: none;
+}
+
+.addr-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.addr-left {
+  flex: 1;
+}
+
+.addr-line {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.addr-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tag-default {
+  background: #ee4d2d;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.addr-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.link {
+  background: none;
+  border: none;
+  color: #1976d2;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px 0;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.link.danger {
+  color: #d32f2f;
+}
+
+.btn-outline {
+  background: white;
+  border: 1px solid #ddd;
+  color: #333;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn-outline:hover {
+  border-color: #bbb;
+}
+
+.btn-outline:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-outline.small {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+/* Modal styles */
+.addr-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.addr-modal {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.addr-modal-header {
+  padding: 24px 24px 0 24px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.addr-modal-header h3 {
+  margin: 0 0 16px 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+}
+
+.addr-modal-body {
+  padding: 24px;
+}
+
+.form-grid {
+  display: grid;
+  gap: 20px;
+}
+
+.form-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-item.full {
+  grid-column: 1 / -1;
+}
+
+.form-item label {
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.address-select,
+.form-item input,
+.form-item textarea {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.address-select:focus,
+.form-item input:focus,
+.form-item textarea:focus {
+  outline: none;
+  border-color: #ee4d2d;
+}
+
+.address-select:disabled {
+  background: #f5f5f5;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.checkline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.checkline input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+}
+
+.form-error {
+  background: #ffebee;
+  color: #d32f2f;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-top: 16px;
+}
+
+.addr-modal-footer {
+  padding: 0 24px 24px 24px;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .addr-page {
+    padding: 12px;
+  }
+  
+  .addr-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+  
+  .addr-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .addr-actions {
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .addr-modal {
+    width: 95%;
+    margin: 20px;
+  }
+}
+/* Thêm vào src/styles/account-addresses.css */
+
+.address-input-group {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.address-input {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.map-button {
+  background: #4caf50;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+}
+
+.map-button:hover {
+  background: #45a049;
+}
+
+.map-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.map-icon {
+  font-size: 18px;
+}
+
+.address-warning {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 6px;
+  padding: 12px;
+  margin-top: 8px;
+  color: #856404;
+  font-size: 13px;
+}
+
+.warning-icon {
+  margin-right: 4px;
+}
+
+.selected-address {
+  background: #e8f5e8;
+  border: 1px solid #4caf50;
+  border-radius: 6px;
+  padding: 10px;
+  margin-top: 8px;
+  font-size: 13px;
+  color: #2e7d32;
+}
+
+.address-type-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.addr-type-btn {
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.addr-type-btn.active {
+  background: #ee4d2d;
+  color: white;
+  border-color: #ee4d2d;
+}
+
+/* Map Modal */
+.map-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+}
+
+.map-modal {
+  background: white;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.map-modal-header {
+  background: white;
+  padding: 16px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.map-back-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: #333;
+}
+
+.map-modal-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  flex: 1;
+}
+
+.map-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.google-map {
+  width: 100%;
+  height: 100%;
+}
+
+.map-info-overlay {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+
+.map-info-card {
+  background: #ee4d2d;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  position: relative;
+}
+
+.map-info-card::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 10px solid transparent;
+  border-top-color: #ee4d2d;
+}
+
+.map-info-card h4 {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.map-info-card p {
+  margin: 0 0 8px 0;
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.btn-map-view {
+  background: white;
+  color: #ee4d2d;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.map-modal-footer {
+  background: white;
+  padding: 16px;
+  border-top: 1px solid #eee;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .address-input-group {
+    flex-direction: column;
+  }
+  
+  .map-button {
+    min-width: auto;
+    padding: 8px 12px;
+  }
+  
+  .address-type-buttons {
+    flex-wrap: wrap;
+  }
+  
+  .map-modal-header {
+    padding: 12px;
+  }
+  
+  .map-modal-footer {
+    padding: 12px;
+  }
+}
+
+/* Modal bố cục chuẩn để body cuộn được */
+.addr-modal{
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;      /* khung tối đa */
+  border-radius: 12px;
+  overflow: hidden;      /* cắt theo bo góc, KHÔNG chặn cuộn body */
+}
+
+/* Body modal: cho phép cuộn + ẩn scrollbar */
+.addr-modal-body{
+  flex: 1 1 auto;        /* chiếm phần còn lại để có không gian cuộn */
+  min-height: 0;         /* 👈 QUAN TRỌNG với flex để enable scrolling */
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+
+  /* Ẩn scrollbar nhưng vẫn cuộn */
+  scrollbar-width: none;        /* Firefox */
+  -ms-overflow-style: none;     /* IE/Edge cũ */
+}
+.addr-modal-body::-webkit-scrollbar{  /* Chrome/Safari */
+  width: 0;
+  height: 0;
+}
+
+/* Dropdown gợi ý: vẫn cuộn, ẩn scrollbar, cao 320px */
+.predictions-card{
+  max-height: 320px;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.predictions-card::-webkit-scrollbar{
+  width: 0;
+  height: 0;
+}
+/* ===== Autocomplete suggestions ===== */
+.predictions-card {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  z-index: 30;
+  background: #ffffff;
+  border: 1px solid #111;            /* viền đen */
+  border-radius: 10px;
+  box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+  overflow: hidden;
+  max-height: 216px; /* ~ 3 item x ~72px, nếu item cao hơn thì auto-scroll */
+  overflow-y: auto;
+}
+
+.prediction-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 14px;
+  background: #fff;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color .12s ease, transform .06s ease;
+}
+
+.prediction-item:not(:last-child) {
+  border-bottom: 1px dashed #e5e7eb;
+}
+
+.prediction-item:hover,
+.prediction-item:focus-visible {
+  background: #f7f7f7;
+  outline: none;
+}
+
+.prediction-icon {
+  flex: 0 0 auto;
+  line-height: 1;
+  font-size: 16px;
+  margin-top: 2px;
+}
+
+.prediction-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0; /* để text có thể xuống dòng */
+}
+
+.prediction-main {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.prediction-second {
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Nhóm input + nút map để làm anchor cho dropdown */
+.address-input-group {
+  position: relative; /* giữ dropdown bám vào group */
+}

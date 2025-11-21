@@ -1,4 +1,11 @@
-import React, { useMemo, useState } from "react";
+// src/components/seller/SellerSidebar.jsx
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+  useContext,
+  useCallback,
+} from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
   faHouse,
@@ -7,36 +14,122 @@ import {
   faWarehouse,
   faChartLine,
   faBullhorn,
-  faPalette,
   faStore,
   faChevronDown,
   faChevronRight,
   faHeadphones,
   faChevronLeft,
   faMagnifyingGlass,
-  faReceipt,
   faListCheck,
   faFileInvoiceDollar,
   faFileLines,
   faClockRotateLeft,
   faUpload,
+  faComments,
+  faTriangleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { AuthContext } from "../../contexts/AuthContext";
+import { API_CONFIG, apiUrl } from "../../config/api";
 import "../../styles/sellersidebar.css";
 
-export default function SellerSidebar({ isOpen = true, onToggle }) {
-  const { pathname } = useLocation();
-  const [query, setQuery] = useState("");
+const safeJson = async (res) => {
+  const t = await res.text();
+  if (!t) return {};
+  try {
+    return JSON.parse(t);
+  } catch {
+    return { message: t };
+  }
+};
 
-  // MENU GIỮ NGUYÊN THEO CODE CỦA BẠN
-  const menu = useMemo(
+export default function SellerSidebar({
+  isOpen = true,
+  onToggle,
+  sellerStatus: sellerStatusProp,
+}) {
+  const { pathname } = useLocation();
+  const { authFetch } = useContext(AuthContext);
+
+  const [query, setQuery] = useState("");
+  const [sellerStatus, setSellerStatus] = useState(
+    typeof sellerStatusProp === "string" ? sellerStatusProp.toUpperCase() : null
+  );
+
+  // Tự fetch sellerStatus nếu không truyền prop
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        if (typeof sellerStatusProp === "string") return;
+        if (!authFetch) return;
+
+        const r1 = await authFetch(apiUrl(API_CONFIG.endpoints.getMyProfile), {
+          method: "GET",
+          headers: { Accept: "application/json" },
+        });
+        const j1 = await safeJson(r1);
+        const userId = (j1.result ?? j1)?.id;
+        if (!userId) return;
+
+        const r2 = await authFetch(
+          apiUrl(API_CONFIG.endpoints.searchSellerByUserId(userId)),
+          { method: "GET", headers: { Accept: "application/json" } }
+        );
+        if (!r2.ok) return;
+        const j2 = await safeJson(r2);
+        const status = (j2.result?.status || "").toString().toUpperCase();
+        if (!cancelled) setSellerStatus(status || null);
+      } catch {
+        if (!cancelled) setSellerStatus(null);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [authFetch, sellerStatusProp]);
+
+  const isSuspended = (sellerStatus || "").toUpperCase() === "SUSPENDED";
+
+  // ===== MENU =====
+  const baseMenu = useMemo(
     () => [
+      // 1) Trang chủ
       { type: "item", label: "Trang chủ", icon: faHouse, to: "/seller/home" },
+
+      // 2) Sản phẩm (⛔ lock khi SUSPENDED)
+      {
+        type: "group",
+        label: "Sản phẩm",
+        icon: faBoxArchive,
+        key: "products",
+        locked: isSuspended,
+        children: [
+          {
+            label: "Tạo sản phẩm",
+            to: "/seller/create-products",
+            icon: faUpload,
+          },
+          {
+            label: "Danh sách sản phẩm",
+            to: "/seller/products",
+            icon: faListCheck,
+          },
+          {
+            label: "Sản phẩm tạm ngưng",
+            to: "/seller/products-suspended",
+            icon: faClockRotateLeft,
+          },
+        ],
+      },
+
+      // 3) Đơn hàng
       {
         type: "group",
         label: "Đơn hàng",
         icon: faBuilding,
         key: "orders",
+        locked: false,
         children: [
           {
             label: "Danh sách đơn hàng",
@@ -50,59 +143,69 @@ export default function SellerSidebar({ isOpen = true, onToggle }) {
           },
         ],
       },
-      {
-        type: "group",
-        label: "Sản phẩm",
-        icon: faBoxArchive,
-        key: "products",
-        children: [
-          {
-            label: "Danh sách sản phẩm",
-            to: "/seller/products",
-            icon: faListCheck,
-          },
-          { label: "Tạo sản phẩm", to: "/seller/create-products", icon: faUpload },
-          {
-            label: "Quản lý đánh giá",
-            to: "/seller/reviews",
-            icon: faFileLines,
-          },
-          {
-            label: "Xuất sản phẩm",
-            to: "/seller/products/export",
-            icon: faReceipt,
-          },
-          {
-            label: "Lịch sử thay đổi",
-            to: "/seller/products/history",
-            icon: faClockRotateLeft,
-          },
-          {
-            label: "Tạo mới/ cập nhật hàng loạt",
-            to: "/seller/products/bulk",
-            icon: faUpload,
-          },
-        ],
-      },
+
+      // 4) Kho & hàng tồn (⛔ lock khi SUSPENDED)
       {
         type: "group",
         label: "Kho & hàng tồn",
         icon: faWarehouse,
         key: "inventory",
+        locked: isSuspended,
+        children: [{ label: "Tồn kho", to: "/seller/inventory" }],
+      },
+
+      // 5) Chat khách hàng
+      {
+        type: "item",
+        label: "Chat khách hàng",
+        icon: faComments,
+        to: "/seller/chat-customers",
+      },
+
+      // 6) Báo cáo vi phạm → đổi thành group với 2 mục con
+      {
+        type: "group",
+        label: "Báo cáo vi phạm",
+        icon: faTriangleExclamation,
+        key: "violations",
+        locked: false,
         children: [
-          { label: "Tồn kho", to: "/seller/inventory" },
-          { label: "Phiếu nhập/xuất", to: "/seller/stock-moves" },
+          // trang hiện tại đổi tên thành Lịch sử báo cáo và GIỮ đường dẫn cũ
+          { label: "Lịch sử báo cáo", to: "/seller/violations" },
+          // trang lịch sử khiếu nại
+          { label: "Lịch sử khiếu nại", to: "/seller/appeals-history" },
         ],
       },
+
+      // 7) Quản lý tài chính
+      {
+        type: "item",
+        label: "Quản lý tài chính",
+        icon: faStore,
+        to: "/seller/finance",
+      },
+
+      // 8) Trung tâm marketing (⛔ lock khi SUSPENDED)
+      {
+        type: "group",
+        label: "Trung tâm marketing",
+        icon: faBullhorn,
+        key: "marketing",
+        locked: isSuspended,
+        children: [{ label: "Mã giảm giá", to: "/seller/vouchers" }],
+      },
+
+      // 9) Trung tâm phát triển
       {
         type: "group",
         label: "Trung tâm phát triển",
         icon: faChartLine,
         key: "growth",
+        locked: false,
         children: [
           {
             label: "Hiệu quả kinh doanh",
-            to: "/seller/performance",
+            to: "/seller/business-efficiency",
             icon: faChartLine,
           },
           {
@@ -112,58 +215,63 @@ export default function SellerSidebar({ isOpen = true, onToggle }) {
           },
         ],
       },
-      {
-        type: "group",
-        label: "Trung tâm marketing",
-        icon: faBullhorn,
-        key: "marketing",
-        children: [
-          { label: "Chiến dịch", to: "/seller/campaigns" },
-          { label: "Mã giảm giá", to: "/seller/vouchers" },
-        ],
-      },
-      {
-        type: "group",
-        label: "Thiết kế gian hàng",
-        icon: faPalette,
-        key: "design",
-        children: [
-          {
-            label: "Trang trí gian hàng",
-            to: "/seller/storefront",
-            icon: faPalette,
-          },
-        ],
-      },
+
+      // 10) Chính sách bán hàng
       {
         type: "item",
-        label: "Quản lý tài chính",
-        icon: faStore,
-        to: "/seller/finance",
+        label: "Chính sách bán hàng",
+        icon: faFileLines,
+        to: "/seller/policy",
       },
     ],
-    []
+    [isSuspended]
   );
 
+  // Nếu SUSPENDED: đẩy phần locked xuống cuối; nếu không: giữ nguyên
+  const menu = useMemo(() => {
+    const withIndex = baseMenu.map((m, i) => ({ ...m, _i: i }));
+    const unlocked = withIndex.filter((m) => !m.locked);
+    const locked = withIndex.filter((m) => m.locked);
+    return [...unlocked, ...locked];
+  }, [baseMenu]);
+
+  // mở sẵn groups thường dùng (thêm "violations")
   const [openKeys, setOpenKeys] = useState(
-    () => new Set(["orders", "products"])
+    () => new Set(["orders", "products", "violations"])
   );
 
-  const toggleGroup = (key) => {
-    if (!isOpen) return; // đang thu gọn thì không xổ
+  // Nếu một key đang mở mà bị khoá → đóng lại
+  useEffect(() => {
     setOpenKeys((prev) => {
       const next = new Set(prev);
-      next.has(key) ? next.delete(key) : next.add(key);
+      menu.forEach((m) => {
+        if (m.type === "group" && m.locked && next.has(m.key))
+          next.delete(m.key);
+      });
       return next;
     });
-  };
+  }, [menu]);
+
+  const toggleGroup = useCallback(
+    (key, locked) => {
+      if (!isOpen || locked) return;
+      setOpenKeys((prev) => {
+        const next = new Set(prev);
+        next.has(key) ? next.delete(key) : next.add(key);
+        return next;
+      });
+    },
+    [isOpen]
+  );
 
   const showItem = (label = "") =>
     label.toLowerCase().includes(query.trim().toLowerCase());
+  const lockTooltip =
+    "Tài khoản đang bị tạm ngưng. Vui lòng khôi phục để sử dụng.";
 
   return (
     <aside className={`seller-sidebar ${isOpen ? "open" : "collapsed"}`}>
-      {/* Top: Search (fixed) */}
+      {/* Top: Search */}
       <div className="ssb-search">
         <FontAwesomeIcon icon={faMagnifyingGlass} />
         <input
@@ -177,21 +285,21 @@ export default function SellerSidebar({ isOpen = true, onToggle }) {
       {/* Middle: Scrollable menu */}
       <nav className="ssb-nav">
         {menu.map((m) => {
-          // ===== ITEM (Trang chủ, Quản lý tài chính) =====
+          // ===== ITEM =====
           if (m.type === "item") {
             return showItem(m.label) ? (
               <NavLink
                 key={m.label}
                 to={m.to}
-                end={m.to === "/seller/home"} // << chỉ active khi đúng /seller
+                end={m.to === "/seller/home"}
                 className={({ isActive }) =>
                   `ssb-item headlike ${isActive ? "active" : ""}`
                 }
                 title={!isOpen ? m.label : undefined}
               >
-                <div className="left">
+                <div className="left oneline">
                   <FontAwesomeIcon className="ssb-icon" icon={m.icon} />
-                  {isOpen && <span className="label">{m.label}</span>}
+                  {isOpen && <span className="label ellip">{m.label}</span>}
                 </div>
                 {isOpen && <span className="chev-spacer" />}
               </NavLink>
@@ -202,13 +310,36 @@ export default function SellerSidebar({ isOpen = true, onToggle }) {
           const filteredChildren =
             m.children?.filter((c) => showItem(m.label) || showItem(c.label)) ??
             [];
-          if (filteredChildren.length === 0) return null;
+          if (filteredChildren.length === 0 && !m.locked) return null;
 
           const open = openKeys.has(m.key);
           const groupActive = filteredChildren.some((c) =>
             pathname.startsWith(c.to)
           );
 
+          // 🔒 Nhóm bị khoá: chỉ head, không children
+          if (m.locked) {
+            return (
+              <div
+                key={m.key}
+                className={`ssb-group locked ${groupActive ? "active" : ""}`}
+                title={lockTooltip}
+              >
+                <div
+                  className="ssb-group-head locked-head"
+                  aria-disabled="true"
+                >
+                  <div className="left oneline">
+                    <FontAwesomeIcon className="ssb-icon" icon={m.icon} />
+                    {isOpen && <span className="label ellip">{m.label}</span>}
+                  </div>
+                  {isOpen && <span className="ssb-tag-locked">Tạm ngưng</span>}
+                </div>
+              </div>
+            );
+          }
+
+          // Nhóm bình thường
           return (
             <div
               key={m.key}
@@ -216,12 +347,12 @@ export default function SellerSidebar({ isOpen = true, onToggle }) {
             >
               <button
                 className="ssb-group-head"
-                onClick={() => toggleGroup(m.key)}
+                onClick={() => toggleGroup(m.key, m.locked)}
                 title={!isOpen ? m.label : undefined}
               >
-                <div className="left">
+                <div className="left oneline">
                   <FontAwesomeIcon className="ssb-icon" icon={m.icon} />
-                  {isOpen && <span className="label">{m.label}</span>}
+                  {isOpen && <span className="label ellip">{m.label}</span>}
                 </div>
                 {isOpen && (
                   <FontAwesomeIcon
@@ -241,7 +372,7 @@ export default function SellerSidebar({ isOpen = true, onToggle }) {
                       }
                     >
                       <span className="dot" />
-                      <span>{c.label}</span>
+                      <span className="ellip">{c.label}</span>
                     </NavLink>
                   ))}
                 </div>

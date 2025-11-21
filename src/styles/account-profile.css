@@ -1,0 +1,337 @@
+.account-profile {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.profile-title { 
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 30px;
+  margin-top: -10px;
+}
+
+.profile-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+.profile-section {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+/* Avatar Section */
+.profile-avatar-section {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.avatar-container {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.avatar-placeholder {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #2196f3;
+  overflow: hidden; /* Added overflow hidden for image display */
+}
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%; /* Added styles for avatar image */
+}
+
+.avatar-icon {
+  width: 60px;
+  height: 60px;
+  color: #2196f3;
+}
+
+.edit-avatar-btn {
+  position: absolute;
+  top: 50%; /* Positioned button in middle of right edge */
+  right: -8px;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #666;
+  border: 2px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.edit-avatar-btn:hover {
+  background: #555;
+}
+
+.edit-avatar-btn svg {
+  width: 16px;
+  height: 16px;
+  color: white;
+}
+
+.profile-fields {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Form Fields */
+.field-group {
+  margin-bottom: 20px;
+}
+
+.field-group label {
+  display: block;
+  font-weight: 500;
+  color: #555;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.profile-input,
+select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background: white;
+}
+
+.profile-input:focus,
+select:focus {
+  outline: none;
+  border-color: #2196f3;
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+}
+
+.profile-input::placeholder {
+  color: #999;
+}
+
+/* Date Selectors */
+.date-selectors {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+
+/* Gender Options */
+.gender-options {
+  display: flex;
+  gap: 32px; /* increased gap from 24px to 32px */
+  justify-content: center; /* added center alignment */
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.radio-option input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+
+/* Save Button */
+.save-btn {
+  background: #0f1011;
+  color: white;
+  border: none;
+  padding: 12px 32px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 20px;
+}
+
+.save-btn:hover {
+  background: #b33131;
+}
+
+/* Contact Items */
+.contact-section {
+  height: fit-content;
+  max-height: 300px;
+}
+
+.contact-item,
+.security-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.contact-item:last-child,
+.security-item:last-child {
+  border-bottom: none;
+}
+
+.contact-icon,
+.security-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.contact-icon svg,
+.security-icon svg {
+  width: 20px;
+  height: 20px;
+  color: #666;
+}
+
+.contact-info,
+.security-info {
+  flex: 1;
+}
+
+.contact-label,
+.security-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.contact-value {
+  font-size: 14px;
+  color: #666;
+}
+
+.contact-value.placeholder {
+  color: #999;
+  font-style: italic;
+}
+
+.update-btn {
+  background: #000;
+  color: #edf2f8;
+  border: 1px solid #e4e7ea;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  margin-top: 28px;
+}
+
+.update-btn:hover {
+  background: #bc2c2c;
+  color: white;
+}
+
+.update-btn.danger {
+  color: #f44336;
+  border-color: #f44336;
+}
+
+.update-btn.danger:hover {
+  background: #f44336;
+  color: white;
+}
+
+.security-item.danger .security-icon {
+  background: #ffebee;
+}
+
+.security-item.danger .security-icon svg {
+  color: #f44336;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .profile-content {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .profile-avatar-section {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .avatar-container {
+    align-self: center;
+  }
+
+  .date-selectors {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .gender-options {
+    flex-direction: column;
+    gap: 12px;
+    align-items: center; /* center alignment for mobile */
+  }
+}
+
+@media (max-width: 480px) {
+  .account-profile {
+    padding: 16px;
+  }
+
+  .profile-section {
+    padding: 16px;
+  }
+
+  .avatar-placeholder {
+    width: 100px;
+    height: 100px;
+  }
+
+  .avatar-icon {
+    width: 50px;
+    height: 50px;
+  }
+}

@@ -1,0 +1,327 @@
+/* src/styles/OrderSuccess.css - THE CIU (Black & White) Enhanced */
+
+.theciu-success {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  color: #1a1a1a;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Fireworks animation */
+.firework {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: #ff6b6b;
+  border-radius: 50%;
+  animation: firework-launch 1.2s ease-out forwards;
+  z-index: 1000;
+  box-shadow: 0 0 20px currentColor, 0 0 40px currentColor;
+}
+
+.firework-particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: particle-explode 2s ease-out forwards;
+  z-index: 1000;
+  box-shadow: 0 0 15px currentColor, 0 0 30px currentColor;
+}
+
+@keyframes firework-launch {
+  0% {
+    transform: translateY(0) scale(0.5);
+    opacity: 1;
+  }
+  70% {
+    transform: translateY(-70vh) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-70vh) scale(1.2);
+    opacity: 0;
+  }
+}
+
+@keyframes particle-explode {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--dx), var(--dy)) scale(0);
+    opacity: 0;
+  }
+}
+
+.theciu-success__container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 40px 20px 80px;
+  position: relative;
+  z-index: 10;
+}
+
+.theciu-success__card {
+  border: 1px solid #e6e6e6;
+  border-radius: 20px;
+  padding: 40px 32px;
+  background: #fff;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  /* Add entrance animation */
+  animation: cardEntrance 0.8s ease-out forwards;
+  transform: translateY(30px);
+  opacity: 0;
+}
+
+@keyframes cardEntrance {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.theciu-success__icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 3px solid #1a1a1a;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: 800;
+  margin-bottom: 20px;
+  /* Add icon animations */
+  animation: iconBounce 1s ease-out 0.5s forwards, iconRotate 0.6s ease-out 0.3s forwards;
+  transform: scale(0) rotate(-180deg);
+  background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
+  color: white;
+}
+
+@keyframes iconBounce {
+  0% {
+    transform: scale(0) rotate(-180deg);
+  }
+  60% {
+    transform: scale(1.1) rotate(0deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes iconRotate {
+  from {
+    transform: scale(1) rotate(0deg);
+  }
+  to {
+    transform: scale(1) rotate(360deg);
+  }
+}
+
+.theciu-success__title {
+  margin: 0 0 12px 0;
+  font-size: 32px;
+  font-weight: 700;
+  /* Add title slide animation */
+  animation: slideUp 0.6s ease-out 0.8s forwards;
+  transform: translateY(20px);
+  opacity: 0;
+  background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@keyframes slideUp {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.theciu-success__subtitle {
+  margin: 0 0 24px 0;
+  font-size: 16px;
+  color: #555;
+  /* Add subtitle animation */
+  animation: slideUp 0.6s ease-out 1s forwards;
+  transform: translateY(20px);
+  opacity: 0;
+}
+
+.theciu-success__meta {
+  text-align: left;
+  margin: 0 auto 24px;
+  max-width: 520px;
+  /* Add meta animation */
+  animation: slideUp 0.6s ease-out 1.2s forwards;
+  transform: translateY(20px);
+  opacity: 0;
+}
+
+.theciu-success__row {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px dashed #eee;
+  transition: all 0.3s ease;
+}
+
+.theciu-success__row:hover {
+  background: rgba(0, 0, 0, 0.02);
+  padding-left: 8px;
+  padding-right: 8px;
+  border-radius: 8px;
+  border-bottom: 1px dashed #ddd;
+}
+
+.theciu-success__row:last-child {
+  border-bottom: none;
+}
+
+.theciu-success__label {
+  color: #666;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.theciu-success__value {
+  color: #111;
+  font-weight: 600;
+  font-size: 14px;
+  word-break: break-word;
+}
+
+.theciu-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  background: #7e6262;
+  border: 1px solid #e6e6e6;
+  border-radius: 20px;
+  padding: 6px 10px;
+  font-weight: 700;
+  color: #fff;
+  width: 100px;
+}
+
+.theciu-success__divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, #e6e6e6 50%, transparent 100%);
+  margin: 12px 0;
+}
+
+.theciu-success__actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin: 24px 0 16px;
+  flex-wrap: wrap;
+  /* Add actions animation */
+  animation: slideUp 0.6s ease-out 1.4s forwards;
+  transform: translateY(20px);
+  opacity: 0;
+}
+
+.theciu-btn {
+  padding: 14px 24px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #d9d9d9;
+  color: #111;
+  background: #fff;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.theciu-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.5s;
+}
+
+.theciu-btn:hover::before {
+  left: 100%;
+}
+
+.theciu-btn:hover {
+  background: #f5f5f5;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.theciu-btn--primary {
+  color: #fff;
+  background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
+  border-color: #1a1a1a;
+}
+
+.theciu-btn--primary:hover {
+  background: linear-gradient(135deg, #333 0%, #555 100%);
+  border-color: #333;
+}
+
+.theciu-btn--ghost {
+  background: #fff;
+  color: #111;
+  border-color: #1a1a1a;
+}
+
+.theciu-btn--ghost:hover {
+  background: #1a1a1a;
+  color: #fff;
+}
+
+.theciu-success__hint {
+  margin: 16px 0 0;
+  color: #777;
+  font-size: 13px;
+  /* Add hint animation */
+  animation: slideUp 0.6s ease-out 1.6s forwards;
+  transform: translateY(20px);
+  opacity: 0;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .theciu-success__row {
+    grid-template-columns: 120px 1fr;
+    gap: 12px;
+  }
+
+  .theciu-success__card {
+    padding: 32px 24px;
+  }
+
+  .theciu-success__title {
+    font-size: 28px;
+  }
+
+  .theciu-success__icon {
+    width: 70px;
+    height: 70px;
+    font-size: 28px;
+  }
+
+  .theciu-success__actions {
+    flex-direction: column;
+    gap: 12px;
+  }
+}

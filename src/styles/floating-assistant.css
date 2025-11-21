@@ -1,0 +1,1129 @@
+/* floating-assistant.css */
+
+/* ====== ROOT VARS ====== */
+:root {
+  --fab-main: 60px;
+  --fab-item: 64px;
+  --fab-gap: 10px;
+  --fab-vgap: 8px;
+  --fab-lift: 5px;
+  --fab-bottom: 17vh;
+}
+
+/* ====== FAB CONTAINER ====== */
+.fab-wrap {
+  position: fixed;
+  right: 18px;
+  bottom: var(--fab-bottom);
+  transform: translateY(50%);
+  z-index: 1000;
+  transition: opacity 0.15s ease, visibility 0.15s ease, transform 0.15s ease;
+}
+
+.fab-wrap.fab-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(8px);
+}
+
+/* ====== FAB MAIN BUTTON ====== */
+.fab {
+  width: var(--fab-main);
+  height: var(--fab-main);
+  border-radius: 50%;
+  border: none;
+  background: #000;
+  color: #fff;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  transition: transform 0.15s ease, filter 0.2s ease;
+  position: relative;
+  z-index: 2;
+  transform: translateY(calc(-1 * var(--fab-lift)));
+}
+.fab span {
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  text-transform: lowercase;
+  line-height: 1;
+  white-space: nowrap;
+}
+.fab:hover {
+  filter: brightness(1.08);
+}
+.fab.active {
+  transform: translateY(calc(-1 * var(--fab-lift))) scale(0.98);
+}
+.fab svg {
+  transition: transform 0.2s ease;
+}
+
+/* ====== ARC CONTAINER ====== */
+.fab-arc {
+  position: absolute;
+  right: calc(var(--fab-main) / 2);
+  bottom: calc(var(--fab-main) / 2);
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.fab-arc .fab-item {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  transform: translate(0, 0);
+  opacity: 0;
+  pointer-events: none;
+  width: var(--fab-item);
+  height: var(--fab-item);
+  border-radius: 50%;
+  background: #fff;
+  color: #333;
+  display: grid;
+  place-items: center;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.18), 0 3px 6px rgba(0, 0, 0, 0.12);
+  transition: transform 0.28s cubic-bezier(0.2, 0.75, 0.25, 1.2), opacity 0.22s ease, background 0.2s ease, box-shadow
+    0.2s ease;
+  transition-delay: calc(var(--i) * 25ms);
+}
+.fab-arc.open {
+  pointer-events: auto;
+}
+.fab-arc.open .fab-item {
+  opacity: 1;
+  pointer-events: auto;
+  transform: rotate(var(--angle)) translateX(var(--radius)) rotate(calc(-1 * var(--angle)));
+}
+
+.fab-arc .fab-item:hover {
+  transform: rotate(var(--angle)) translateX(calc(var(--radius) + 6px)) rotate(calc(-1 * var(--angle)));
+  background: #f6f6f6;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.22), 0 4px 8px rgba(0, 0, 0, 0.16);
+}
+.fab-arc .fab-item:active {
+  transform: rotate(var(--angle)) translateX(calc(var(--radius) + 2px)) rotate(calc(-1 * var(--angle))) scale(0.96);
+}
+
+.fab-item svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+  transition: transform 0.2s ease;
+}
+.fab-item:hover svg {
+  transform: scale(1.1);
+}
+
+.fab-item:nth-child(1) {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+.fab-item:nth-child(2) {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+}
+.fab-item:nth-child(3) {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
+}
+
+.fab:not(.active)::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #000, #333);
+  z-index: -1;
+  animation: pulse 2s infinite;
+  opacity: 0.7;
+}
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+}
+
+.fab-arc.loading .fab-item {
+  animation: loading-bounce 1s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 0.1s);
+}
+@keyframes loading-bounce {
+  0%,
+  100% {
+    transform: rotate(var(--angle)) translateX(var(--radius)) rotate(calc(-1 * var(--angle))) translateY(0);
+  }
+  50% {
+    transform: rotate(var(--angle)) translateX(var(--radius)) rotate(calc(-1 * var(--angle))) translateY(-4px);
+  }
+}
+
+/* ===================================================== */
+/* ================== CHAT AI WIDGET =================== */
+/* ===================================================== */
+
+.chat-ai-wrap {
+  position: fixed;
+  right: calc(18px + var(--fab-main) + 12px);
+  bottom: var(--fab-bottom);
+  transform: translateY(calc(50% - var(--fab-lift)));
+  z-index: 1001;
+  margin-bottom: 150px;
+  /* Thêm animation mượt mà khi xuất hiện */
+  animation: slideInFromRight 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateY(calc(50% - var(--fab-lift))) translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(calc(50% - var(--fab-lift))) translateX(0);
+  }
+}
+
+.chat-ai-card {
+  width: 400px;
+  height: 450px;
+  background: #fff;
+  color: #000;
+  border-radius: 16px; /* Bo tròn nhiều hơn */
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 1px rgba(0, 0, 0, 0.1); /* Shadow đẹp hơn */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #000;
+  /* Thêm backdrop blur effect */
+  backdrop-filter: blur(10px);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.chat-ai-card:hover {
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.35), 0 0 1px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.chat-ai-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px; /* Padding lớn hơn */
+  background: #000;
+  color: #fff;
+  /* Thêm gradient subtle */
+  background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
+}
+.chat-ai-title {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.chat-ai-title strong {
+  font-size: 15px;
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+.chat-ai-sub {
+  font-size: 12px;
+  opacity: 0.75;
+  font-weight: 400;
+}
+.chat-ai-close {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  transition: all 0.2s ease;
+}
+.chat-ai-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: rotate(90deg);
+}
+
+.chat-ai-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 12px;
+  background: #fff;
+  color: #000;
+  /* Custom scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+.chat-ai-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-ai-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-ai-body::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  transition: background 0.2s ease;
+}
+
+.chat-ai-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.chat-ai-bubble {
+  display: flex;
+  margin: 8px 0;
+  /* Animation khi tin nhắn xuất hiện */
+  animation: messageSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes messageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.chat-ai-bubble.user {
+  justify-content: flex-end;
+}
+.chat-ai-bubble.assistant {
+  justify-content: flex-start;
+}
+
+.chat-ai-bubble .bubble {
+  max-width: 85%;
+  font-size: 13px;
+  line-height: 1.4;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid #000;
+  background: #fff;
+  color: #000;
+  /* Thêm transition mượt */
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.chat-ai-bubble .bubble:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.chat-ai-bubble.user .bubble {
+  background: #000;
+  color: #fff;
+  border-radius: 12px 12px 2px 12px;
+}
+
+.chat-ai-bubble.assistant .bubble {
+  border-radius: 12px 12px 12px 2px;
+}
+
+.bubble.typing {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  padding: 12px 16px;
+}
+.bubble.typing .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #000;
+  animation: dotty 1.2s infinite ease-in-out;
+}
+.bubble.typing .dot:nth-child(2) {
+  animation-delay: .2s;
+}
+.bubble.typing .dot:nth-child(3) {
+  animation-delay: .4s;
+}
+@keyframes dotty {
+  0%,
+  80%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.8) translateY(0);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.1) translateY(-3px);
+  }
+}
+
+/* Cải thiện input area với nút file */
+.chat-ai-input {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 12px;
+  background: #fff;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  /* Thêm shadow nhẹ */
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.03);
+}
+
+/* Nút chọn file mới */
+.file-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: #f5f5f5;
+  color: #000;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.file-btn:hover {
+  background: #e8e8e8;
+  border-color: rgba(0, 0, 0, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.file-btn:active {
+  transform: translateY(0) scale(0.95);
+}
+
+.file-btn input[type="file"] {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  left: 0;
+  top: 0;
+}
+
+.file-btn svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.2s ease;
+}
+
+.file-btn:hover svg {
+  transform: scale(1.1);
+}
+
+.chat-ai-input textarea {
+  flex: 1;
+  resize: none;
+  min-height: 36px;
+  max-height: 80px;
+  font-size: 13px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: #f9f9f9;
+  color: #000;
+  outline: none;
+  font-family: inherit;
+  line-height: 1.4;
+  transition: all 0.2s ease;
+}
+
+.chat-ai-input textarea:focus {
+  background: #fff;
+  border-color: #000;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+}
+
+.chat-ai-input textarea::placeholder {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.send-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: #000;
+  color: #fff;
+  border: 1px solid #000;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.send-btn:hover:not(:disabled) {
+  background: #1a1a1a;
+  transform: translateY(-1px) scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.send-btn:active:not(:disabled) {
+  transform: translateY(0) scale(0.95);
+}
+
+.send-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.send-btn svg {
+  transition: transform 0.2s ease;
+}
+
+.send-btn:hover:not(:disabled) svg {
+  transform: translateX(1px);
+}
+
+/* ========== Product list ========== */
+.chat-ai-products {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 6px;
+}
+
+.chat-ai-product {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #fff;
+  color: #000;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  text-decoration: none;
+  overflow: hidden;
+  padding: 10px;
+  min-height: unset;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.chat-ai-product .thumb {
+  width: 93px;
+  height: 100px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f5f5f5;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.chat-ai-product .thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.chat-ai-product:hover .thumb img {
+  transform: scale(1.08);
+}
+
+.chat-ai-product .info {
+  width: 100%;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+}
+
+.chat-ai-product .name {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: calc(1.3em * 2);
+}
+
+.chat-ai-product .price {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chat-ai-product .discount {
+  margin-left: 6px;
+  font-weight: 700;
+  color: #e74c3c;
+}
+
+.chat-ai-product:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px);
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .chat-ai-card {
+    width: 340px;
+  }
+  .chat-ai-wrap {
+    right: calc(16px + var(--fab-main) + 8px);
+  }
+}
+
+@media (max-width: 420px) {
+  :root {
+    --fab-main: 56px;
+    --fab-item: 58px;
+    --fab-gap: 6px;
+    --fab-vgap: 4px;
+    --fab-bottom: 45vh;
+  }
+  .fab-wrap {
+    right: 16px;
+  }
+  .fab span {
+    font-size: 9px;
+  }
+  .fab-item svg {
+    width: 18px;
+    height: 18px;
+  }
+  .chat-ai-card {
+    width: 320px;
+    height: 420px;
+  }
+}
+
+@media (max-width: 380px) {
+  .chat-ai-products {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 320px) {
+  :root {
+    --fab-main: 52px;
+    --fab-item: 54px;
+    --fab-gap: 5px;
+    --fab-vgap: 3px;
+  }
+  .fab-wrap {
+    right: 12px;
+  }
+  .chat-ai-card {
+    width: 280px;
+  }
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .fab-arc .fab-item {
+    background: #2a2a2a;
+    color: #fff;
+    box-shadow: 0 10px 20px rgba(255, 255, 255, 0.05), 0 3px 6px rgba(255, 255, 255, 0.1);
+  }
+  .fab-arc .fab-item:hover {
+    background: #3a3a3a;
+    box-shadow: 0 12px 24px rgba(255, 255, 255, 0.08), 0 4px 8px rgba(255, 255, 255, 0.12);
+  }
+
+  .chat-ai-card {
+    background: #1a1a1a;
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 1px rgba(255, 255, 255, 0.1);
+  }
+  .chat-ai-header {
+    background: linear-gradient(135deg, #000 0%, #0a0a0a 100%);
+  }
+  .chat-ai-body {
+    background: #1a1a1a;
+    color: #fff;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  }
+  .chat-ai-body::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+  }
+  .chat-ai-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+  .chat-ai-bubble .bubble {
+    background: #2a2a2a;
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+  .chat-ai-bubble.user .bubble {
+    background: #fff;
+    color: #000;
+    border-color: #fff;
+  }
+  .chat-ai-input {
+    background: #1a1a1a;
+    border-top-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+  }
+  .file-btn {
+    background: #2a2a2a;
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+  .file-btn:hover {
+    background: #333;
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+  .chat-ai-input textarea {
+    background: #2a2a2a;
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+  .chat-ai-input textarea:focus {
+    background: #2a2a2a;
+    border-color: #fff;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+  }
+  .chat-ai-input textarea::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+  }
+  .send-btn {
+    background: #fff;
+    color: #000;
+    border-color: #fff;
+  }
+  .send-btn:hover:not(:disabled) {
+    background: #e8e8e8;
+  }
+  .chat-ai-product {
+    background: #2a2a2a;
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+  .chat-ai-product .thumb {
+    background: #1a1a1a;
+  }
+  .chat-ai-product:hover {
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .fab,
+  .fab-arc .fab-item,
+  .chat-ai-wrap,
+  .chat-ai-bubble,
+  .chat-ai-product,
+  .file-btn,
+  .send-btn {
+    transition: none;
+    animation: none;
+  }
+  .fab:not(.active)::before {
+    animation: none;
+  }
+  .fab-arc.loading .fab-item {
+    animation: none;
+  }
+}
+
+/* High contrast */
+@media (prefers-contrast: high) {
+  .fab {
+    border: 2px solid #fff;
+  }
+  .fab-arc .fab-item {
+    border: 2px solid #000;
+  }
+  .fab-arc .fab-item:hover {
+    border-color: #333;
+  }
+  .chat-ai-card {
+    border-width: 2px;
+  }
+}
+
+/* Focus styles */
+.fab:focus-visible {
+  outline: 3px solid #4a90e2;
+  outline-offset: 2px;
+}
+.fab-arc .fab-item:focus-visible {
+  outline: 3px solid #4a90e2;
+  outline-offset: 2px;
+}
+.chat-ai-close:focus-visible {
+  outline: 2px solid #4a90e2;
+  outline-offset: 2px;
+}
+.file-btn:focus-within {
+  outline: 2px solid #4a90e2;
+  outline-offset: 2px;
+}
+.send-btn:focus-visible {
+  outline: 2px solid #4a90e2;
+  outline-offset: 2px;
+}
+
+/* Print */
+@media print {
+  .fab-wrap,
+  .chat-ai-wrap {
+    display: none;
+  }
+}
+/* Nút chọn ảnh trong vùng input */
+.chat-ai-input .file-btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #000;
+  background: #fff;
+  color: #000;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.chat-ai-input .file-btn input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.chat-ai-input .file-btn:hover {
+  box-shadow: 0 4px 10px rgba(0,0,0,.12);
+}
+/* ====== Attach bar (trên ô nhập) ====== */
+.chat-ai-attachbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+  background: #fff;
+  width: 285px;
+  margin-left: 45px;
+}
+
+.chat-ai-attachbar .attach-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0; /* cho text ellipsis */
+}
+
+.chat-ai-attachbar .attach-thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  object-fit: cover;
+  display: block;
+  border: 1px solid #000;
+  background: #f5f5f5;
+}
+
+.chat-ai-attachbar .attach-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.chat-ai-attachbar .attach-name {
+  font-size: 12px;
+  font-weight: 600;
+  max-width: 210px;        /* tránh quá dài */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chat-ai-attachbar .attach-size {
+  font-size: 11px;
+  opacity: .7;
+}
+
+.chat-ai-attachbar .attach-remove {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 1px solid #000;
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .chat-ai-attachbar {
+    background: #1f1f1f;
+    border-color: #fff;
+  }
+  .chat-ai-attachbar .attach-thumb { border-color: #fff; background: #2a2a2a; }
+  .chat-ai-attachbar .attach-remove { border-color: #fff; color: #fff; }
+}
+/* ========== Product list inside chat (image top, text bottom) ========== */
+.chat-ai-products {
+  display: grid;
+  grid-template-columns: 1fr 1fr;  /* 2 cột */
+  gap: 8px;
+  padding: 4px;
+}
+.chat-ai-product {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #fff;
+  color: #000;
+  border: 1px solid #000;
+  border-radius: 8px;
+  text-decoration: none;
+  overflow: hidden;
+  padding: 8px 8px 10px;
+}
+.chat-ai-product .thumb {
+  width: 93px;
+  height: 100px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #f5f5f5;
+  display: block;
+}
+.chat-ai-product .thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.chat-ai-product .info {
+  width: 100%;
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* căn trái */
+  gap: 4px;
+}
+.chat-ai-product .name {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;   /* cắt 2 dòng */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: calc(1.3em * 2);
+}
+.chat-ai-product .price {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chat-ai-product .discount {
+  margin-left: 6px;
+  font-weight: 700;
+}
+.chat-ai-product:hover {
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+  transform: translateY(-1px);
+}
+@media (max-width: 380px) {
+  .chat-ai-products { grid-template-columns: 1fr; }
+}
+@media (prefers-color-scheme: dark) {
+  .chat-ai-product {
+    background: #1f1f1f;
+    color: #fff;
+    border-color: #fff;
+  }
+  .chat-ai-product .thumb { background: #2a2a2a; }
+}
+
+/* ====== Attach bar bên trong chat-ai-input ====== */
+.chat-ai-input { position: relative; }
+.chat-ai-input.has-attach { padding-top: 58px; } /* chừa chỗ cho attach bar */
+
+.chat-ai-attachbar.in-input {
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  top: 6px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px;
+  border: 1px solid #000;
+  border-radius: 8px;
+  background: #fff;
+}
+.chat-ai-attachbar.in-input .attach-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.chat-ai-attachbar.in-input .attach-thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  object-fit: cover;
+  display: block;
+  border: 1px solid #000;
+  background: #f5f5f5;
+}
+.chat-ai-attachbar.in-input .attach-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.chat-ai-attachbar.in-input .attach-name {
+  font-size: 12px;
+  font-weight: 600;
+  max-width: 210px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chat-ai-attachbar.in-input .attach-size {
+  font-size: 11px;
+  opacity: .7;
+}
+.chat-ai-attachbar.in-input .attach-remove {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 1px solid #000;
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+}
+@media (prefers-color-scheme: dark) {
+  .chat-ai-attachbar.in-input {
+    background: #1f1f1f;
+    border-color: #fff;
+  }
+  .chat-ai-attachbar.in-input .attach-thumb { border-color: #fff; background: #2a2a2a; }
+  .chat-ai-attachbar.in-input .attach-remove { border-color: #fff; color: #fff; }
+}
+
+/* Nút chọn ảnh trong vùng input (nếu chưa có) */
+.chat-ai-input .file-btn {
+  width: 32px; height: 32px;
+  border: 1px solid #000;
+  background: #fff; color: #000;
+  border-radius: 6px;
+  display: grid; place-items: center;
+  cursor: pointer; position: relative; overflow: hidden;
+}
+.chat-ai-input .file-btn input[type="file"] {
+  position: absolute; inset: 0; opacity: 0; cursor: pointer;
+}
+.chat-ai-input .file-btn:hover { box-shadow: 0 4px 10px rgba(0,0,0,.12); }
+/* ====== ROOT VARS ====== */
+:root {
+  --fab-main: 60px;
+  --fab-item: 64px;
+  --fab-gap: 10px;
+  --fab-vgap: 8px;
+  --fab-lift: 5px;
+  --fab-bottom: 17vh;
+}
+
+/* ====== FAB CONTAINER ====== */
+.fab-wrap{position:fixed;right:18px;bottom:var(--fab-bottom);transform:translateY(50%);z-index:1000;transition:opacity .15s ease,visibility .15s ease,transform .15s ease;}
+.fab-wrap.fab-hidden{opacity:0;visibility:hidden;pointer-events:none;transform:translateY(8px);}
+
+/* ====== FAB MAIN BUTTON ====== */
+.fab{width:var(--fab-main);height:var(--fab-main);border-radius:50%;border:none;background:#000;color:#fff;display:grid;place-items:center;box-shadow:0 10px 24px rgba(0,0,0,.35);cursor:pointer;transition:transform .15s ease,filter .2s ease;position:relative;z-index:2;transform:translateY(calc(-1 * var(--fab-lift)));}
+.fab span{font-size:10.5px;font-weight:800;letter-spacing:.2px;text-transform:lowercase;line-height:1;white-space:nowrap;}
+.fab:hover{filter:brightness(1.08);}
+.fab.active{transform:translateY(calc(-1 * var(--fab-lift))) scale(.98);}
+.fab svg{transition:transform .2s ease;}
+
+/* ====== ARC CONTAINER ====== */
+.fab-arc{position:absolute;right:calc(var(--fab-main)/2);bottom:calc(var(--fab-main)/2);width:0;height:0;pointer-events:none;}
+.fab-arc .fab-item{
+  position:absolute;right:0;bottom:0;transform:translate(0,0);
+  opacity:0;pointer-events:none;width:var(--fab-item);height:var(--fab-item);
+  border-radius:50%;
+  background:#fff; /* nền gốc sẽ bị lớp gradient override bên dưới theo nth-child */
+  color:#333;
+  display:grid;place-items:center;text-decoration:none;border:none;cursor:pointer;
+  box-shadow:0 10px 20px rgba(0,0,0,.18),0 3px 6px rgba(0,0,0,.12);
+  transition:transform .28s cubic-bezier(.2,.75,.25,1.2),opacity .22s ease,box-shadow .2s ease;
+  transition-delay:calc(var(--i)*25ms);
+}
+.fab-arc.open{pointer-events:auto;}
+.fab-arc.open .fab-item{opacity:1;pointer-events:auto;transform:rotate(var(--angle)) translateX(var(--radius)) rotate(calc(-1 * var(--angle)));}
+
+/* ⛔ KHÔNG đổi màu khi hover – chỉ phóng to nhẹ & tăng shadow */
+.fab-arc .fab-item:hover{
+  transform:rotate(var(--angle)) translateX(calc(var(--radius) + 6px)) rotate(calc(-1 * var(--angle)));
+  box-shadow:0 12px 24px rgba(0,0,0,.22),0 4px 8px rgba(0,0,0,.16);
+}
+.fab-arc .fab-item:active{
+  transform:rotate(var(--angle)) translateX(calc(var(--radius) + 2px)) rotate(calc(-1 * var(--angle))) scale(.96);
+}
+
+/* Icon size & scale */
+.fab-item svg{width:22px;height:22px;fill:currentColor;transition:transform .2s ease;}
+.fab-item:hover svg{transform:scale(1.1);}
+
+/* 3 màu nền giữ nguyên */
+.fab-arc .fab-item:nth-child(1){background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;}
+.fab-arc .fab-item:nth-child(2){background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);color:#fff;}
+.fab-arc .fab-item:nth-child(3){background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%);color:#fff;}
+
+/* Vòng sáng cho nút chính */
+.fab:not(.active)::before{content:"";position:absolute;top:-2px;left:-2px;right:-2px;bottom:-2px;border-radius:50%;background:linear-gradient(45deg,#000,#333);z-index:-1;animation:pulse 2s infinite;opacity:.7;}
+@keyframes pulse{0%{transform:scale(1);opacity:.7}50%{transform:scale(1.05);opacity:.3}100%{transform:scale(1);opacity:.7}}
+
+/* Loading anim (giữ nguyên) */
+.fab-arc.loading .fab-item{animation:loading-bounce 1s ease-in-out infinite;animation-delay:calc(var(--i)*.1s)}
+@keyframes loading-bounce{0%,100%{transform:rotate(var(--angle)) translateX(var(--radius)) rotate(calc(-1 * var(--angle))) translateY(0)}50%{transform:rotate(var(--angle)) translateX(var(--radius)) rotate(calc(-1 * var(--angle))) translateY(-4px)}}
+
+/* …toàn bộ phần CSS của Chat AI widget & responsive của bạn giữ nguyên … */

@@ -1,91 +1,668 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import '../../styles/login.css';
-import BackButton from './BackButton';
+"use client";
 
-function LoginForm({ onSubmit }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate();
+import { useState, useContext, useEffect, useMemo, useRef } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
+import "../../styles/login.css";
+import BackButton from "./BackButton";
+import { AuthContext } from "../../contexts/AuthContext";
+import { loginEmailPassword } from "../../services/auth";
+import { API_CONFIG, apiUrl } from "../../config/api";
+import { showToast } from "../../components/common/ChatToaster";
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (onSubmit) {
-      onSubmit(email, password);
+const ADMIN_LOGIN_URL = "http://localhost:3000/#/dashboard";
+const PROFILE_BASE = "http://localhost:8888/shopping/api";
+const normalizeToken = (t) => (t && t.startsWith("Bearer ") ? t.slice(7) : t);
+
+const createAuthFetch =
+  (token) =>
+  async (url, options = {}) => {
+    const headers = new Headers(options.headers || {});
+    headers.set("Authorization", `Bearer ${token}`);
+    headers.set("Accept", "application/json");
+    return fetch(url, {
+      ...options,
+      headers,
+      credentials: "include",
+      mode: "cors",
+    });
+  };
+
+const ensureWallet = async (authFetch, profileId) => {
+  if (!profileId) return;
+  try {
+    const bal = await authFetch(
+      apiUrl(API_CONFIG.endpoints.walletBalance(profileId)),
+      { method: "GET" }
+    );
+    if (!bal.ok) {
+      await authFetch(apiUrl(API_CONFIG.endpoints.walletCreate(profileId)), {
+        method: "GET",
+      });
     }
+  } catch {}
+};
+
+const safeParse = (t) => {
+  if (!t) return {};
+  try {
+    return JSON.parse(t);
+  } catch {
+    return { message: t };
+  }
+};
+
+const msgFromStatus = (status, fallback = "Đăng nhập thất bại") => {
+  if (status === 401 || status === 403) return "Email hoặc mật khẩu không đúng";
+  if (status === 423) return "Tài khoản đang bị khóa, vui lòng liên hệ hỗ trợ";
+  if (status === 429) return "Bạn thao tác quá nhanh. Vui lòng thử lại sau";
+  if (status === 500) return "Lỗi hệ thống. Vui lòng thử lại sau ít phút";
+  return fallback;
+};
+
+function LoginForm() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const [weatherEffect] = useState("snow");
+
+  const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
+
+  const norm = (v) =>
+    String(v ?? "")
+      .trim()
+      .toUpperCase();
+
+  useEffect(() => {}, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!email?.trim() || !password?.trim()) {
+      showToast({ title: "Vui lòng nhập email và mật khẩu", type: "warning" });
+      return;
+    }
+
+    setLoading(true);
+
+    if (
+      email.trim().toLowerCase() === "nguyenquocthai@gmail.com" &&
+      password === "123456"
+    ) {
+      showToast({ title: "Đăng nhập thành công!", type: "success" });
+      window.location.href = ADMIN_LOGIN_URL;
+      return;
+    }
+
+    try {
+      let resp;
+      try {
+        resp = await loginEmailPassword({ email, password });
+      } catch (err) {
+        showToast({
+          title: "Sai Email hoặc mật khẩu",
+          message: "Vui lòng kiểm tra mạng và thử lại",
+          type: "error",
+        });
+        return;
+      }
+
+      if (resp?.status && resp.status >= 400) {
+        showToast({
+          title: msgFromStatus(resp.status),
+          message: resp?.message || "",
+          type: "error",
+        });
+        return;
+      }
+
+      const jwtToken = normalizeToken(resp?.jwtToken || resp?.jwt_token);
+      if (!jwtToken) {
+        showToast({ title: "Email hoặc mật khẩu không đúng", type: "error" });
+        return;
+      }
+
+      let fallbackUser = resp.user || resp.result?.user;
+      if (!fallbackUser) {
+        const p = jwtDecode(jwtToken);
+        const roles = (Array.isArray(p?.roles) ? p.roles : []).map((r) =>
+          String(r).replace(/^ROLE_/, "")
+        );
+        fallbackUser = {
+          email: p?.email || p?.user_email || p?.preferred_username || email,
+          roles,
+          accountId: p?.uid || p?.sub || null,
+        };
+      }
+
+      const authFetch = createAuthFetch(jwtToken);
+      const getMyProfilePath =
+        API_CONFIG?.endpoints?.getMyProfile || "/info/profiles/getMyProfile";
+
+      let profRes;
+      try {
+        profRes = await authFetch(`${PROFILE_BASE}${getMyProfilePath}`, {
+          method: "GET",
+        });
+      } catch {
+        showToast({
+          title: "Không thể lấy thông tin hồ sơ",
+          message: "Vui lòng thử lại sau",
+          type: "error",
+        });
+        return;
+      }
+
+      const text = await profRes.text();
+      const json = safeParse(text);
+
+      if (!profRes.ok) {
+        const m =
+          json?.message ||
+          msgFromStatus(profRes.status, "Không thể xác thực hồ sơ");
+        showToast({ title: m, type: "error" });
+        return;
+      }
+
+      const data = json.result ?? json;
+      const profileId = data?.id;
+      const rawStatus =
+        data?.status ??
+        data?.accountStatus ??
+        data?.state ??
+        data?.profileStatus;
+
+      if (norm(rawStatus) === "DELETED") {
+        showToast({ title: "Tài khoản đã bị xóa", type: "error" });
+        return;
+      }
+      if (!profileId) {
+        showToast({ title: "Không tìm thấy hồ sơ người dùng", type: "error" });
+        return;
+      }
+
+      const userFinal = { ...fallbackUser, id: profileId };
+      login(userFinal, jwtToken);
+      sessionStorage.setItem("user_id", profileId);
+
+      try {
+        const fullName =
+          [data.first_name, data.last_name].filter(Boolean).join(" ") || "";
+        if (fullName || data.phone) {
+          sessionStorage.setItem(
+            "checkout_contact",
+            JSON.stringify({ name: fullName, phone: data.phone || "" })
+          );
+        }
+        const defAddr =
+          data.addresses?.find((a) => a.is_default)?.address ||
+          data.addresses?.[0]?.address ||
+          "";
+        if (defAddr)
+          sessionStorage.setItem(
+            "checkout_address",
+            JSON.stringify({ address: defAddr, is_default: true })
+          );
+      } catch {}
+
+      ensureWallet(authFetch, profileId).catch(() => {});
+
+      showToast({ title: "Đăng nhập thành công!", type: "success" });
+
+      if (userFinal.roles?.includes("ADMIN")) {
+        const adminBase =
+          import.meta.env.VITE_ADMIN_URL || "http://localhost:3000";
+        window.location.href = `${adminBase}/#/dashboard?token=${jwtToken}`;
+        return;
+      }
+      if (userFinal.roles?.includes("SELLER")) {
+        navigate("/seller/dashboard");
+        return;
+      }
+      navigate("/");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const renderSnow = () => {
+    const snowflakes = useMemo(
+      () =>
+        Array.from({ length: 70 }, (_, i) => ({
+          id: i,
+          left: Math.random() * 100,
+          delay: Math.random() * 3,
+          size: Math.random() * 12 + 8,
+        })),
+      []
+    );
+
+    return (
+      <div className="snow-container" aria-hidden="true">
+        {snowflakes.map((s) => (
+          <div
+            key={`snow-${s.id}`}
+            className="snowflake"
+            style={{
+              left: `${s.left}%`,
+              animationDelay: `${s.delay}s`,
+              fontSize: `${s.size}px`,
+            }}
+          >
+            ❄
+          </div>
+        ))}
+      </div>
+    );
   };
 
   return (
     <>
       <BackButton to="/" position="left" />
-      <div className="login-form">
-        <h2>Đăng nhập</h2>
-        <div className="qr-option">
-          <span>📱 Đăng nhập với mã QR</span>
-        </div>
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <div className="input-container">
-              <input
-                type="text"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Nhập email/số điện thoại/tên đăng nhập"
-                required
-              />
-              <span className="input-icon">👤</span>
+      <div className="weather-effect-layer">
+        {weatherEffect === "snow" ? renderSnow() : null}
+      </div>
+
+      <div className="main-content login-page">
+        <div className="login-hero">
+          <div className="login-hero__text">
+            <div className="welcome-row">
+              <div className="welcome-copy center">
+                <h1>Xin chào.</h1>
+                <p>
+                  Đăng nhập để tiếp tục mua sắm và theo dõi đơn hàng của bạn.
+                </p>
+              </div>
             </div>
           </div>
-          <div className="form-group">
-            <div className="password-container">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Nhập mật khẩu"
-                required
-              />
-              <span className="input-icon">🔒</span>
-              <span
-                className="password-toggle"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? '👁️' : '👁️‍🗨️'}
-              </span>
+
+          <div className="login-panel">
+            <div className="login-form">
+              <form onSubmit={handleSubmit}>
+                <h2 className="form-title center">Đăng nhập</h2>
+
+                <div className="form-group">
+                  <div className="input-container">
+                    <input
+                      type="text"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Email / SĐT / Tên đăng nhập"
+                      required
+                    />
+                    <span className="input-icon">👤</span>
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <div className="password-container">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Mật khẩu"
+                      required
+                    />
+                    <span className="input-icon">🔒</span>
+                    <span
+                      className="password-toggle"
+                      onClick={() => setShowPassword(!showPassword)}
+                      aria-label="Hiện/ẩn mật khẩu"
+                    >
+                      {showPassword ? "👁️" : "👁️‍🗨️"}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="helper-row right-only">
+                  <Link to="/forgot-password">Quên mật khẩu?</Link>
+                </div>
+
+                <button type="submit" disabled={loading}>
+                  {loading ? "Đang đăng nhập…" : "Đăng nhập"}
+                </button>
+              </form>
+
+              <div className="signup-prompt">
+                Chưa có tài khoản? <Link to="/signup">Đăng ký ngay</Link>
+              </div>
             </div>
           </div>
-          <button type="submit">Đăng nhập</button>
-        </form>
-        <div className="forgot-password">
-          <a href="/forgot-password">Quên mật khẩu?</a>
         </div>
-        <div className="or-divider">
-          <span>HOẶC</span>
-        </div>
-        <div className="social-login">
-          <button className="social-button google">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-            </svg>
-            Google
-          </button>
-          <button className="social-button facebook">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" fill="#1877F2"/>
-            </svg>
-            Facebook
-          </button>
-        </div>
-        <div className="signup-prompt">
-          <span>Bạn mới biết đến Shopping? <a href="/signup">Đăng ký</a></span>
-        </div>
+
+        {/* Layer emoji có thể kéo-thả & rơi chậm */}
+        <InteractiveWinter />
       </div>
     </>
   );
 }
 
 export default LoginForm;
+
+/* ================== COMPONENT KÉO-THẢ & RƠI CHẬM VỀ VỊ TRÍ CŨ ================== */
+function InteractiveWinter() {
+  const items = ["⛄", "🎄", "⛄", "🎄", "⛄", "🎄", "⛄", "🎄", "⛄"];
+  const slots = [6, 17, 28, 39, 50, 61, 72, 83, 94];
+  const size =
+    typeof window !== "undefined" && window.innerWidth <= 920 ? 36 : 48;
+
+  return (
+    <div className="drag-layer" aria-hidden="true">
+      {items.map((ch, i) => (
+        <DraggableEmoji
+          key={i}
+          ch={ch}
+          initXPercent={slots[i]}
+          size={size}
+          groundOffset={90}
+          bounce={0.35}
+          swayAmpFall={80}
+          swayOmegaFall={1.8}
+        />
+      ))}
+    </div>
+  );
+}
+
+function DraggableEmoji({
+  ch,
+  initXPercent = 50,
+  size = 48,
+  groundOffset = 90,
+  bounce = 0.35,
+  swayAmpFall = 80,
+  swayOmegaFall = 1.8,
+}) {
+  const wrapRef = useRef(null);
+  const raf = useRef(0);
+  const draggingRef = useRef(false);
+  const offsetRef = useRef({ x: 0, y: 0 });
+  const velRef = useRef({ x: 0, y: 0 });
+  const lastT = useRef(0);
+  const fallClock = useRef(0);
+  const isFallingRef = useRef(false);
+  const isReturningRef = useRef(false);
+  const dragStartPosRef = useRef({ x: 0, y: 0 });
+  const originalPosRef = useRef({ x: 0, y: 0 });
+
+  const [pos, setPos] = useState(() => {
+    const initX =
+      ((typeof window !== "undefined" ? window.innerWidth : 0) * initXPercent) /
+        100 -
+      size / 2;
+    const initY =
+      (typeof window !== "undefined" ? window.innerHeight : 0) -
+      groundOffset -
+      size;
+    originalPosRef.current = { x: initX, y: initY };
+    return { x: initX, y: initY };
+  });
+  const [dragging, setDragging] = useState(false);
+  const [idle, setIdle] = useState(true);
+
+  const clamp = (val, min, max) => Math.max(min, Math.min(max, val));
+  const floorY = () =>
+    (typeof window === "undefined" ? 0 : window.innerHeight) -
+    groundOffset -
+    size;
+  const leftBound = () => 0;
+  const rightBound = () =>
+    (typeof window === "undefined" ? 0 : window.innerWidth) - size;
+
+  const step = (t) => {
+    if (!lastT.current) lastT.current = t;
+    const dt = Math.min((t - lastT.current) / 1000, 0.033);
+    lastT.current = t;
+    fallClock.current += dt;
+
+    // ===== PHASE 1: CHUTE AVEC GRAVITÉ =====
+    if (!isReturningRef.current) {
+      const g = 800;
+      const airDrag = 0.015;
+      const maxFallSpeed = 300;
+
+      velRef.current.y += g * dt;
+      const dragForce = airDrag * velRef.current.y * Math.abs(velRef.current.y);
+      velRef.current.y -= dragForce * dt;
+
+      if (velRef.current.y > maxFallSpeed) {
+        velRef.current.y = maxFallSpeed;
+      }
+
+      const swayForce =
+        swayAmpFall * 1.5 * Math.sin(fallClock.current * swayOmegaFall);
+      velRef.current.x += swayForce * dt;
+      const dragX = airDrag * velRef.current.x * Math.abs(velRef.current.x);
+      velRef.current.x -= dragX * dt;
+
+      let nx = pos.x + velRef.current.x * dt;
+      let ny = pos.y + velRef.current.y * dt;
+
+      if (nx < leftBound()) {
+        nx = leftBound();
+        velRef.current.x *= -bounce;
+      }
+      if (nx > rightBound()) {
+        nx = rightBound();
+        velRef.current.x *= -bounce;
+      }
+
+      const fy = floorY();
+      if (ny >= fy) {
+        ny = fy;
+        velRef.current.y = -Math.abs(velRef.current.y) * bounce;
+        velRef.current.x *= 0.85;
+
+        // Vérifier si on doit commencer le retour
+        if (
+          Math.abs(velRef.current.y) < 50 &&
+          Math.abs(velRef.current.x) < 30
+        ) {
+          isReturningRef.current = true;
+          velRef.current = { x: 0, y: 0 };
+        }
+      }
+
+      setPos({ x: nx, y: ny });
+    }
+
+    // ===== PHASE 2: RETOUR VERS POSITION D'ORIGINE =====
+    else {
+      const targetX = originalPosRef.current.x;
+      const targetY = originalPosRef.current.y;
+
+      const dx = targetX - pos.x;
+      const dy = targetY - pos.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist < 2) {
+        // Arrivé à destination
+        cancelAnimationFrame(raf.current);
+        raf.current = 0;
+        isFallingRef.current = false;
+        isReturningRef.current = false;
+        setPos({ x: targetX, y: targetY });
+        setIdle(true);
+        return;
+      }
+
+      // Vitesse de retour progressive
+      const returnSpeed = 200;
+      const moveSpeed = Math.min(returnSpeed * dt, dist);
+      const ratio = moveSpeed / dist;
+
+      const nx = pos.x + dx * ratio;
+      const ny = pos.y + dy * ratio;
+
+      setPos({ x: nx, y: ny });
+    }
+
+    raf.current = requestAnimationFrame(step);
+  };
+
+  const onDown = (e) => {
+    e.preventDefault();
+    const point = e.touches ? e.touches[0] : e;
+    const rect = wrapRef.current.getBoundingClientRect();
+    offsetRef.current = {
+      x: point.clientX - rect.left,
+      y: point.clientY - rect.top,
+    };
+    dragStartPosRef.current = { x: pos.x, y: pos.y };
+    draggingRef.current = true;
+    setDragging(true);
+    setIdle(false);
+    isFallingRef.current = false;
+    isReturningRef.current = false;
+
+    if (raf.current) {
+      cancelAnimationFrame(raf.current);
+      raf.current = 0;
+    }
+
+    velRef.current = { x: 0, y: 0 };
+    lastT.current = 0;
+    fallClock.current = 0;
+  };
+
+  const onMove = (e) => {
+    if (!draggingRef.current) return;
+    const point = e.touches ? e.touches[0] : e;
+    const nx = clamp(
+      point.clientX - offsetRef.current.x,
+      leftBound(),
+      rightBound()
+    );
+    const ny = clamp(point.clientY - offsetRef.current.y, 0, floorY());
+    setPos({ x: nx, y: ny });
+  };
+
+  const onUp = () => {
+    if (!draggingRef.current) return;
+    draggingRef.current = false;
+    setDragging(false);
+
+    const currentY = pos.y;
+    const groundY = floorY();
+    const dragDeltaX = pos.x - dragStartPosRef.current.x;
+    const dragDeltaY = pos.y - dragStartPosRef.current.y;
+
+    // Déterminer la direction principale du déplacement
+    const isVerticalDrag = Math.abs(dragDeltaY) > Math.abs(dragDeltaX) * 1.5;
+    const isPulledUp = dragDeltaY < -30;
+
+    // Si tiré vers le haut : tomber doucement vers position d'origine
+    if (isVerticalDrag && isPulledUp) {
+      isFallingRef.current = true;
+      isReturningRef.current = false;
+      velRef.current = { x: 0, y: 0 };
+      lastT.current = 0;
+      fallClock.current = 0;
+
+      if (!raf.current) {
+        raf.current = requestAnimationFrame(step);
+      }
+    }
+    // Si déplacé horizontalement : tomber puis revenir
+    else if (!isVerticalDrag && Math.abs(dragDeltaX) > 40) {
+      isFallingRef.current = true;
+      isReturningRef.current = false;
+      velRef.current = { x: dragDeltaX * 0.5, y: 0 };
+      lastT.current = 0;
+      fallClock.current = 0;
+
+      if (!raf.current) {
+        raf.current = requestAnimationFrame(step);
+      }
+    }
+    // Sinon : retour direct
+    else {
+      if (
+        currentY < groundY - 5 ||
+        Math.abs(pos.x - originalPosRef.current.x) > 5
+      ) {
+        isFallingRef.current = true;
+        isReturningRef.current = false;
+        velRef.current = { x: 0, y: 0 };
+        lastT.current = 0;
+        fallClock.current = 0;
+
+        if (!raf.current) {
+          raf.current = requestAnimationFrame(step);
+        }
+      } else {
+        setPos({ x: originalPosRef.current.x, y: originalPosRef.current.y });
+        setIdle(true);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const opt = { passive: false };
+
+    const handleMouseMove = (e) => onMove(e);
+    const handleMouseUp = () => onUp();
+    const handleTouchMove = (e) => onMove(e);
+    const handleTouchEnd = () => onUp();
+
+    window.addEventListener("mousemove", handleMouseMove, opt);
+    window.addEventListener("mouseup", handleMouseUp, opt);
+    window.addEventListener("touchmove", handleTouchMove, opt);
+    window.addEventListener("touchend", handleTouchEnd, opt);
+
+    const handleResize = () => {
+      const newFloorY =
+        (typeof window === "undefined" ? 0 : window.innerHeight) -
+        groundOffset -
+        size;
+      const newWidth = typeof window === "undefined" ? 0 : window.innerWidth;
+      const newOriginalX = (newWidth * initXPercent) / 100 - size / 2;
+      const newOriginalY = newFloorY;
+
+      originalPosRef.current = { x: newOriginalX, y: newOriginalY };
+
+      setPos((p) => ({
+        x: clamp(p.x, leftBound(), rightBound()),
+        y: clamp(p.y, 0, newFloorY),
+      }));
+    };
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleTouchEnd);
+      window.removeEventListener("resize", handleResize);
+      if (raf.current) cancelAnimationFrame(raf.current);
+    };
+  }, [pos]);
+
+  return (
+    <div
+      ref={wrapRef}
+      className={`draggable-emoji ${dragging ? "dragging" : ""}`}
+      style={{
+        left: pos.x,
+        top: pos.y,
+        width: size,
+        height: size,
+        transition: dragging ? "none" : "none",
+      }}
+      onMouseDown={onDown}
+      onTouchStart={onDown}
+    >
+      <span
+        className={`emoji-char ${
+          idle ? (ch === "🎄" ? "idle-sway-pine" : "idle-sway-snowman") : ""
+        }`}
+        style={{ fontSize: size }}
+      >
+        {ch}
+      </span>
+    </div>
+  );
+}

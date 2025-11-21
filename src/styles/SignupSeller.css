@@ -1,400 +1,257 @@
-/* Container chính */
-.seller-signup-page {
-  min-height: 150vh;
-  background-color: #f5f5fa;
-  font-family: -apple-system, BlinkMacMacFont, 'Segoe UI', Roboto, sans-serif;
+:root{
+  --sl-blue:#1890FF;
+  --sl-teal:#329494;
+  --sl-ink:#0f172a;
+  --sl-muted:#64748b;
+  --sl-bg:#f6f7fb;
+  --sl-card:#ffffff;
+  --sl-br:#eef1f6;
+}
+*{ box-sizing:border-box; }
+html,body{ margin:0; padding:0; }
+.seller-landing{
+  min-height:100vh;
+  background: var(--sl-bg);
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, sans-serif;
+  color: var(--sl-ink);
 }
 
-.seller-signup-content {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  min-height: 100vh;
+/* NAV */
+.sl-nav{
+  max-width:1200px; margin:0 auto; padding:16px 16px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.sl-logo{ display:flex; align-items:center; gap:10px; color:var(--sl-ink); text-decoration:none; font-weight:800; }
+.sl-logo img{ width:36px; height:36px; object-fit:contain; }
+
+/* Buttons */
+.sl-btn{
+  border:1px solid var(--sl-br);
+  background:#fff;
+  color:var(--sl-ink);
+  padding:10px 14px;
+  border-radius:12px;
+  font-weight:800;
+  cursor:pointer;
+  transition:.18s ease;
+}
+.sl-btn.cta{
+  background: linear-gradient(135deg, var(--sl-blue) 0%, #0066cc 100%);
+  color:#fff; border-color:transparent;
+  box-shadow:0 10px 26px rgba(24,144,255,.30);
+}
+.sl-btn.cta:hover{ filter:brightness(.98); transform:translateY(-1px); }
+.sl-btn.huge{ padding:16px 26px; font-size:18px; }
+
+/* HERO */
+.sl-hero{
+  position:relative; overflow:hidden;
+  border-top:1px solid var(--sl-br);
+  background:
+    radial-gradient(1200px 260px at 0% -10%, rgba(24,144,255,.12), transparent 60%),
+    radial-gradient(800px 240px at 100% 0%, rgba(16,185,129,.12), transparent 60%),
+    linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
+  isolation:isolate;
+}
+.sl-hero-inner{ max-width:1200px; margin:0 auto; padding:64px 16px 46px; text-align:center; position:relative; z-index:2; }
+.sl-hero-badge{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:6px 10px; border-radius:999px; margin-bottom:12px;
+  border:1px solid #e5f1ff; color:#1769ff; background:#f4f9ff; font-weight:800; font-size:12px;
+}
+.sl-hero-title{
+  margin:0; line-height:1.06; letter-spacing:.2px;
+  font-size: clamp(30px, 5.2vw, 48px);
+  font-weight:900;
+  background: linear-gradient(90deg,#0f172a 0%, #0f172a 60%, #1d4ed8 120%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.sl-hero-title span{
+  background: linear-gradient(90deg, var(--sl-blue) 0%, var(--sl-teal) 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.sl-hero-subtitle{
+  margin:14px auto 20px; max-width:860px; color:var(--sl-muted); font-size:16px;
+}
+.sl-hero-cta{ margin-top:8px; }
+
+/* Floating blobs */
+.sl-floaters{ position:absolute; inset:0; z-index:1; pointer-events:none; }
+.blob{
+  position:absolute; filter: blur(40px); opacity:.5; border-radius:50%;
+  animation: floatY 8s ease-in-out infinite alternate;
+}
+.blob.b1{ width:280px; height:280px; background:rgba(24,144,255,.22); top:-40px; left:-40px; animation-delay:0s; }
+.blob.b2{ width:240px; height:240px; background:rgba(50,148,148,.22); bottom:-60px; right:-20px; animation-delay:.5s; }
+.blob.b3{ width:180px; height:180px; background:rgba(99,102,241,.18); top:20%; right:20%; animation-delay:1s; }
+@keyframes floatY{
+  0%{ transform: translateY(0) translateX(0); }
+  100%{ transform: translateY(22px) translateX(8px) scale(1.03); }
 }
 
-/* Left Banner */
-.seller-signup-banner {
-  background-color: #329494; /* Màu cam của Shopee */
-  display: flex;
-  flex-direction: column; /* Đặt các phần tử theo cột */
-  align-items: flex-start; /* Căn lề trái theo chiều ngang */
-  justify-content: flex-start; /* Căn lề trên theo chiều dọc */
-  padding: 40px;
-  color: white;
-  position: relative; /* Để định vị logo tuyệt đối */
-  overflow: hidden; /* Đảm bảo các hình nền bên dưới không tràn ra */
+/* Marquee */
+.sl-marquee{ margin-top:24px; overflow:hidden; mask-image: linear-gradient(90deg,transparent, #000 10%, #000 90%, transparent); }
+.sl-marquee .track{
+  display:flex; gap:28px; white-space:nowrap; padding:10px 0;
+  animation: marquee 18s linear infinite;
+  color:#3b82f6; font-weight:800; letter-spacing:.2px;
+}
+.sl-marquee .track span{ opacity:.9; }
+@keyframes marquee{
+  0%{ transform: translateX(0); }
+  100%{ transform: translateX(-50%); }
 }
 
-/* Background shapes for the banner - Optional, but helps match the image more closely */
-.seller-signup-banner::before {
-  content: '';
+/* Sections */
+.sl-section{ max-width:1200px; margin:0 auto; padding:48px 16px; }
+.sl-section h2{ text-align:center; font-size:26px; margin:0 0 12px; }
+
+/* Reveal effect */
+.reveal{ opacity:0; transform: translateY(14px); transition: .6s ease; }
+.reveal.in{ opacity:1; transform:none; }
+
+/* Intro long copy */
+.sl-intro .sl-intro-body{
+  max-width:920px; margin:0 auto; color:#0f172a; line-height:1.7; font-size:16px;
+}
+.sl-intro .sl-intro-body p{ margin:0 0 14px; }
+
+/* Pillars */
+.sl-pillars .sl-grid-4{ display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-top:8px; }
+.sl-card{
+  background:var(--sl-card); border:1px solid var(--sl-br); border-radius:14px; padding:18px;
+  box-shadow:0 6px 22px rgba(24,39,75,.06), 0 2px 6px rgba(0,0,0,.04);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.sl-card:hover{ transform: translateY(-2px); box-shadow:0 14px 30px rgba(24,39,75,.10); }
+.sl-ico{ font-size:22px; }
+.sl-card h3{ margin:8px 0 8px; font-size:18px; }
+.sl-card p{ margin:0; color:var(--sl-muted); }
+
+/* Stats */
+.sl-stats-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+.sl-stat{
+  background:#fff; border:1px solid var(--sl-br); border-radius:12px; padding:18px; text-align:center;
+}
+.sl-stat .num{ font-size:28px; font-weight:900; color:#111827; min-height: 34px; }
+.sl-stat .lab{ color:var(--sl-muted); font-weight:600; }
+
+/* Journey / Timeline */
+.sl-journey .sl-timeline{ list-style:none; padding:0; margin:14px auto 0; max-width:920px; }
+.sl-journey .sl-timeline li{
+  position:relative; background:#fff; border:1px solid var(--sl-br); border-radius:14px; padding:18px 18px 18px 56px;
+  box-shadow:0 6px 22px rgba(24,39,75,.06), 0 2px 6px rgba(0,0,0,.04);
+  margin-bottom:12px;
+}
+.sl-journey .dot{
+  position:absolute; left:14px; top:16px; width:30px; height:30px; border-radius:50%;
+  background:#e9efff; color:#1d4ed8; font-weight:800; display:flex; align-items:center; justify-content:center;
+}
+.sl-journey h4{ margin:0 0 6px; }
+.sl-journey p{ margin:0; color:var(--sl-muted); }
+
+/* Testimonial */
+.sl-testimonial .sl-quote{
+  background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
+  border:1px solid var(--sl-br); border-radius:16px; padding:22px;
+  max-width:900px; margin:0 auto; text-align:center;
+}
+.sl-quote p{ margin:0 0 12px; color:#0f172a; font-size:16px; }
+.sl-quote .person{ display:flex; gap:12px; align-items:center; justify-content:center; }
+.sl-quote img{ width:48px; height:48px; border-radius:50%; object-fit:cover; }
+.sl-quote .name{ font-weight:800; }
+.sl-quote .role{ color:var(--sl-muted); font-size:13px; }
+
+/* Footer */
+.sl-footer{ background:#fff; border-top:1px solid var(--sl-br); margin-top:28px; }
+.sl-footer-inner{ max-width:1200px; margin:0 auto; padding:18px 16px; display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap; }
+.sl-footer .text{ color:#0f172a; font-weight:600; }
+
+/* Responsive */
+@media (max-width:1100px){
+  .sl-pillars .sl-grid-4{ grid-template-columns:1fr 1fr; }
+}
+@media (max-width:820px){
+  .sl-stats-grid{ grid-template-columns:1fr 1fr; }
+}
+@media (max-width:640px){
+  .sl-pillars .sl-grid-4{ grid-template-columns:1fr; }
+  .sl-hero-title{ font-size: clamp(28px, 6vw, 38px); }
+  .sl-hero-subtitle{ padding: 0 8px; }
+}
+/* ===== INTRO PAINT OVERLAY ===== */
+.intro-overlay{
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;        /* chặn click trong lúc intro */
+  transition: opacity .26s ease;
+}
+.intro-overlay.is-fading{ opacity: 0; }
+
+/* Vùng chưa sơn: che nội dung phía sau — cao theo biến --intro-cover (vh) */
+.intro-cover{
   position: absolute;
-  bottom: -50px; /* Adjust to move shapes up/down */
-  left: 0;
-  width: 100%;
-  height: 200px; /* Height of the shape area */
-  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path fill="%23e74c3c" opacity="0.2" d="M0,100 L0,70 Q25,50 50,70 T100,70 L100,100 Z" /></svg>'),
-              url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path fill="%23f1c40f" opacity="0.1" d="M0,100 L0,80 Q25,60 50,80 T100,80 L100,100 Z" /></svg>');
-  background-repeat: no-repeat;
-  background-size: 150% 100px, 120% 80px; /* Size of each shape */
-  background-position: left bottom, right bottom; /* Position of each shape */
-  transform: scaleY(-1); /* Flip vertically if needed */
+  top: 0; left: 0; right: 0;
+  height: calc(var(--intro-cover, 100) * 1vh);
+  background: #f6f7fb;        /* cùng tone nền trang để che */
 }
 
-
-/* Logo styling */
-.seller-signup-banner .logo {
-  position: absolute; /* Đặt logo tuyệt đối */
-  top: 30px; /* Cách lề trên 40px */
-  left: 40px; /* Cách lề trái 40px */
-  z-index: 10; /* Đảm bảo logo nằm trên cùng */
-}
-
-.seller-signup-banner .logo-img {
-  width: 120px; /* Kích thước logo */
-  height: auto;
-}
-
-.seller-banner-content {
-  max-width: 400px;
-  text-align: left; /* Căn trái toàn bộ nội dung */
-  margin-top: 80px; /* Đẩy nội dung xuống dưới logo */
-  margin-left: 40px; /* Căn lề trái cho nội dung */
-  position: relative;
-  z-index: 5;
-}
-
-.seller-banner-heading {
-  font-size: 1.8rem;
-  font-weight: 600; /* Đậm hơn */
-  margin-bottom: 0.5rem; /* Giảm khoảng cách */
-  line-height: 1.2;
-  margin-top: 2rem;
-}
-
-.seller-banner-subheading {
-  font-size: 2.5rem; /* To hơn */
-  font-weight: 400; /* Không quá đậm */
-  margin-bottom: 2rem;
-  opacity: 1; /* Đảm bảo hiện rõ */
-}
-
-.seller-features {
-  list-style: none; /* Bỏ dấu chấm mặc định của ul/li */
-  padding: 0;
-  margin: 0;
-}
-
-.seller-feature-item {
-  display: flex;
-  align-items: flex-start; /* Căn trên đầu icon và text */
-  margin-bottom: 1.5rem; /* Khoảng cách giữa các mục */
-  font-size: 1.1rem;
-  line-height: 1.4;
-  font-weight: 300; /* Nhẹ hơn */
-}
-
-.seller-feature-icon {
-  margin-right: 15px; /* Khoảng cách giữa icon và text */
-  color: white; /* Màu icon */
-  flex-shrink: 0; /* Ngăn icon bị co lại */
-}
-
-.seller-feature-icon svg {
-  width: 28px; /* Kích thước icon */
-  height: 28px;
-  stroke-width: 2.5; /* Độ dày nét vẽ của icon */
-}
-
-.seller-brand-name {
-  color: #fff; /* Vẫn giữ màu trắng cho tên thương hiệu nếu có */
-  font-weight: 600;
-}
-
-.seller-banner-image { /* Xóa hoặc ẩn nếu không dùng */
-  display: none;
-}
-
-/* Right Form - Giữ nguyên các phần này hoặc điều chỉnh nếu cần */
-.seller-signup-form-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 60px 80px;
-  background: white;
-}
-
-.seller-form-header h2 {
-  font-size: 1.8rem;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 2rem;
-}
-
-/* Form Styles */
-.seller-signup-form {
-  max-width: 500px; /* Tăng chiều ngang từ 400px lên 500px */
-}
-
-.seller-form-group {
-  margin-bottom: 1.5rem;
-  margin-top: 1.5rem;
-}
-
-.seller-form-row {
-  display: flex;
-  gap: 1rem;
-}
-
-.seller-form-group-half {
-  flex: 1;
-  font-weight: 600;
-  color: #333;
-  font-size: 1.2rem;
-}
-
-.seller-form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-  color: #333;
-  font-size: 1.1rem; /* Tăng từ 0.9rem lên 1.1rem để to hơn */
-  line-height: 1.4; /* Điều chỉnh line-height để đẹp hơn */
-}
-
-.seller-required {
-  color: #ff4757;
-}
-
-.seller-tooltip {
-  color: #74b9ff;
-  margin-left: 0.25rem;
-  cursor: help;
-}
-
-.seller-field-description {
-  font-size: 0.8rem;
-  color: #666;
-  margin: 0.25rem 0 0.5rem 0;
-}
-
-/* Input Styles */
-.seller-form-group input,
-.seller-select-wrapper select {
-  width: 100%;
-  padding: 12px 16px;
-  border: 2px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: all 0.2s ease;
-  background: white;
-  box-sizing: border-box;
-}
-
-.seller-form-group input:focus,
-.seller-select-wrapper select:focus {
-  outline: none;
-  border-color: #1a91da;
-  box-shadow: 0 0 0 3px rgba(26, 145, 218, 0.1);
-}
-
-.seller-form-group input::placeholder {
-  color: #a0aec0;
-}
-
-/* Select Wrapper */
-.seller-select-wrapper {
-  position: relative;
-}
-
-.seller-select-wrapper select {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-  background-position: right 12px center;
-  background-repeat: no-repeat;
-  background-size: 16px;
-  padding-right: 40px;
-}
-
-/* Phone Input */
-.seller-phone-input {
-  display: flex;
-  border: 2px solid #e2e8f0;
-  border-radius: 8px;
-  overflow: hidden;
-  transition: all 0.2s ease;
-}
-
-.seller-phone-input:focus-within {
-  border-color: #1a91da;
-  box-shadow: 0 0 0 3px rgba(26, 145, 218, 0.1);
-}
-
-.seller-country-code {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 12px 16px;
-  background: #f8fafc;
-  border-right: 1px solid #e2e8f0;
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-.seller-phone-input input {
-  border: none;
-  flex: 1;
-  padding: 12px 16px;
-}
-
-.seller-phone-input input:focus {
-  box-shadow: none;
-}
-
-/* Name Input */
-.seller-name-input {
-  display: flex;
-  border: 2px solid #e2e8f0;
-  border-radius: 8px;
-  overflow: hidden;
-  transition: all 0.2s ease;
-}
-
-.seller-name-input input {
-  width: 100%;
-  padding: 12px 16px;
-  border: none;
-  font-size: 1rem;
-  background: white;
-}
-
-.seller-name-input input:focus {
-  outline: none;
-  box-shadow: inset 0 0 0 2px #1a91da;
-}
-
-/* Password Container */
-.seller-password-container {
-  position: relative;
-}
-
-.seller-password-container input {
-  padding-right: 50px;
-}
-
-.seller-password-toggle {
+/* Vệt sơn (màu #2A93B4) chạy theo rìa dưới vùng che */
+.intro-strip{
   position: absolute;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
-  font-size: 1.2rem;
-  color: #74b9ff;
-  transition: color 0.2s ease;
+  left: 0; right: 0;
+  top: calc(var(--intro-cover, 100) * 1vh);
+  height: 120px;
+  background: #2A93B4;
+  /* hiệu ứng bóng nhẹ */
+  box-shadow: 0 8px 24px rgba(0,0,0,.12);
+  /* mép dưới lượn nhẹ (mask) */
+  -webkit-mask-image: radial-gradient(120px 16px at 20% 0, #000 60%, transparent 61%),
+                      radial-gradient(140px 18px at 60% 0, #000 60%, transparent 61%),
+                      linear-gradient(#000, #000);
+  -webkit-mask-size: 40% 18px, 50% 20px, 100% calc(100% - 18px);
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: 0 100%, 100% 100%, 0 0;
+          mask-image: radial-gradient(120px 16px at 20% 0, #000 60%, transparent 61%),
+                      radial-gradient(140px 18px at 60% 0, #000 60%, transparent 61%),
+                      linear-gradient(#000, #000);
+  mask-size: 40% 18px, 50% 20px, 100% calc(100% - 18px);
+  mask-repeat: no-repeat;
+  mask-position: 0 100%, 100% 100%, 0 0;
 }
 
-.seller-password-toggle:hover {
-  color: #1a91da;
+/* Mép sơn highlight */
+.intro-edge{
+  position: absolute; left:0; right:0; top:-10px; height:12px;
+  background: linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,0));
+  opacity:.65;
 }
 
-/* Submit Button */
-.seller-signup-button {
-  width: 100%;
-  padding: 16px;
-  background: linear-gradient(135deg, #1a91da 0%, #0066cc 100%);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  margin-top: 1rem;
-  width: 100%; /* Đảm bảo nút chiếm toàn bộ chiều ngang của form */
+/* Cây lăn sơn nằm sát mép vệt sơn, hơi lắc ngang */
+.intro-roller{
+  position: absolute;
+  top: calc(var(--intro-cover, 100) * 1vh - 40px); /* nhô lên một chút so với vệt sơn */
+  right: 24px;
+  width: 160px; height: 90px;
+  animation: roller-x 1.6s ease-in-out infinite alternate;
+}
+@keyframes roller-x{
+  0%{ transform: translateX(0) rotate(0deg); }
+  100%{ transform: translateX(-10px) rotate(0deg); }
 }
 
-.seller-signup-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(26, 145, 218, 0.3);
+/* Bánh lăn quay nhẹ */
+.roller-svg .roller-wheel{
+  transform-origin: 75px 68px; /* gần tâm ống lăn */
+  animation: roll 0.9s linear infinite;
+}
+@keyframes roll{
+  from{ transform: rotate(0deg); }
+  to{   transform: rotate(360deg); }
 }
 
-.seller-signup-button:active {
-  transform: translateY(0);
-}
-
-/* Login Link */
-.seller-login-link {
-  text-align: center;
-  margin-top: 2rem;
-  padding-top: 2rem;
-  border-top: 1px solid #e2e8f0;
-  color: #666;
-}
-
-.seller-login-link a {
-  color: #1a91da;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.seller-login-link a:hover {
-  text-decoration: underline;
-}
-
-/* Responsive Design */
-@media (max-width: 1024px) {
-  .seller-signup-content {
-    grid-template-columns: 1fr;
-  }
-
-  .seller-signup-banner {
-    display: none;
-  }
-
-  .seller-signup-form-container {
-    padding: 40px;
-    justify-content: flex-start;
-    padding-top: 80px;
-  }
-}
-
-@media (max-width: 768px) {
-  .seller-signup-form-container {
-    padding: 20px;
-    padding-top: 40px;
-  }
-
-  .seller-form-row {
-    flex-direction: column;
-  }
-
-  .seller-phone-input {
-    flex-direction: column;
-  }
-
-  .seller-country-code {
-    border-right: none;
-    border-bottom: 1px solid #e2e8f0;
-  }
-
-  .seller-name-input {
-    flex-direction: column;
-  }
-}
-
-@media (max-width: 480px) {
-  .seller-signup-form-container {
-    padding: 15px;
-  }
-
-  .seller-form-header h2 {
-    font-size: 1.5rem;
-  }
-
-  .seller-signup-form {
-    max-width: 100%; /* Đảm bảo form chiếm toàn bộ chiều ngang trên mobile */
-  }
-
-  .seller-form-group label {
-    font-size: 1rem; /* Giảm một chút trên mobile để không quá lớn */
-  }
+/* Giảm chuyển động nếu người dùng chọn reduce motion */
+@media (prefers-reduced-motion: reduce){
+  .intro-roller, .roller-svg .roller-wheel{ animation: none !important; }
 }

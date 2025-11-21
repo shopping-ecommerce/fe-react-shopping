@@ -232,3 +232,24 @@
 }
 .seller-step-card.clickable { cursor: pointer; }
 .seller-step-card.clickable:hover { box-shadow: 0 0 0 2px rgba(37,99,235,.22) inset; }
+/* SellerHome.css */
+.seller-step-card.locked {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: auto; /* vẫn nhận hover để hiện tooltip title */
+}
+
+.seller-step-card.locked .icon-circle {
+  background: #eee;
+}
+
+.seller-step-card.clickable { cursor: pointer; }
+/* SellerHome.css */
+.seller-step-card[aria-disabled="true"] {
+  cursor: default;
+}
+.seller-step-card.clickable {
+  cursor: pointer;
+}
+
+/* thongke.css */

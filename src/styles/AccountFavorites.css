@@ -1,0 +1,148 @@
+.favorites-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.favorites-header {
+  margin-bottom: 30px;
+}
+
+.favorites-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  padding-bottom: 10px;
+  margin-top: -10px;
+}
+
+.favorites-content {
+  background: white;
+  border-radius: 8px;
+  padding: 40px 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  min-height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: -10px;
+}
+
+.favorites-empty-state {
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+}
+
+.favorites-illustration {
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+.favorites-illustration svg {
+  filter: drop-shadow(0 4px 8px rgba(0, 180, 216, 0.2));
+}
+
+.favorites-message {
+  margin-bottom: 30px;
+}
+
+.favorites-text {
+  font-size: 16px;
+  color: #666;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.favorites-heart {
+  color: #ff4757;
+  font-size: 18px;
+}
+
+.favorites-continue-btn {
+  background: linear-gradient(135deg, #ffd32a 0%, #ffb800 100%);
+  color: #333;
+  border: none;
+  padding: 14px 32px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(255, 184, 0, 0.3);
+}
+
+.favorites-continue-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 184, 0, 0.4);
+}
+
+.favorites-continue-btn:active {
+  transform: translateY(0);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .favorites-container {
+    padding: 15px;
+  }
+
+  .favorites-title {
+    font-size: 20px;
+  }
+
+  .favorites-content {
+    padding: 30px 15px;
+  }
+
+  .favorites-illustration svg {
+    width: 100px;
+    height: 100px;
+  }
+
+  .favorites-text {
+    font-size: 14px;
+  }
+
+  .favorites-continue-btn {
+    padding: 12px 24px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .favorites-container {
+    padding: 10px;
+  }
+
+  .favorites-content {
+    padding: 20px 10px;
+  }
+
+  .favorites-illustration svg {
+    width: 80px;
+    height: 80px;
+  }
+}
+
+/* ===== Favorites Grid: 3 sản phẩm / hàng (override) ===== */
+.favorites-content .favorites-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+@media (max-width: 1024px) {
+  .favorites-content .favorites-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 640px) {
+  .favorites-content .favorites-grid {
+    grid-template-columns: 1fr;
+  }
+}

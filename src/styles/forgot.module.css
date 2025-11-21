@@ -1,0 +1,147 @@
+/* src/styles/forgot.module.css */
+/* Đồng bộ giao diện với Login/Signup (CSS Modules để không trùng) */
+
+/* ===== PAGE & BG ===== */
+.page{
+  min-height:100vh; width:100%;
+  display:grid; place-items:center;
+  padding:24px; position:relative; overflow:hidden;
+  background:
+    radial-gradient(1200px 600px at 65% 45%, rgba(255,255,255,.06), transparent 60%),
+    radial-gradient(900px 500px at 35% 60%, rgba(255,255,255,.04), transparent 55%),
+    radial-gradient(600px 600px at 28% 35%, rgba(255,255,255,.05), transparent 60%),
+    linear-gradient(135deg,#5b2be0 0%,#7a27d0 22%,#a225c9 48%,#c326b8 68%,#ee2ead 100%);
+  border-radius:18px; box-shadow:0 18px 60px rgba(0,0,0,.15);
+}
+
+/* Weather */
+.weatherLayer{ position:fixed; inset:0; pointer-events:none; z-index:8; overflow:hidden; }
+.snowContainer{ position:absolute; inset:0; overflow:hidden; }
+.snowflake{
+  position:absolute; top:-10px; color:rgba(255,255,255,.9);
+  user-select:none; filter:drop-shadow(0 0 2px rgba(255,255,255,.35));
+  animation: snowFall 7s linear infinite;
+}
+@keyframes snowFall{
+  0%   { transform: translateY(-10px) translateX(0) rotate(0deg); opacity:1; }
+  25%  { transform: translateY(25vh) translateX(30px) rotate(45deg); }
+  50%  { transform: translateY(50vh) translateX(0) rotate(90deg); }
+  75%  { transform: translateY(75vh) translateX(-30px) rotate(135deg); }
+  100% { transform: translateY(70vh) translateX(0) rotate(180deg); opacity:0; }
+}
+
+/* Winter line */
+.winterLine{
+  position:absolute; left:0; right:0; bottom:0; height:120px;
+  display:flex; align-items:flex-end; justify-content:space-around;
+  padding-bottom:20px; pointer-events:none; z-index:6;
+}
+.winterItem{ font-size:48px; user-select:none; filter:drop-shadow(0 2px 4px rgba(0,0,0,.2)); }
+.snowman{ animation: snowmanSway 3s ease-in-out infinite; }
+@keyframes snowmanSway{
+  0%,100%{ transform: translateX(0) rotate(-2deg); }
+  50%    { transform: translateX(4px) rotate(2deg); }
+}
+.pine{ transform-origin:bottom center; animation: pineSway 5.5s ease-in-out infinite; }
+@keyframes pineSway{
+  0%,100%{ transform: rotate(0deg) translateY(0); }
+  50%    { transform: rotate(1.2deg) translateY(1px); }
+}
+
+/* Layout */
+.hero{
+  width:min(1200px,96vw);
+  display:grid; grid-template-columns:1fr 480px; gap:36px; align-items:center;
+  padding:28px 36px;
+}
+.heroText{}
+.welcome{ color:#fff; }
+.center{ text-align:center; }
+.welcome h1{
+  margin:0 0 2px; font-size:clamp(28px,4.8vw,56px);
+  font-weight:800; color:#fff; letter-spacing:-.02em;
+  text-shadow:0 6px 22px rgba(0,0,0,.25);
+}
+.welcome p{ margin:0; color:rgba(255,255,255,.9); font-size:15px; }
+
+/* Panel */
+.panel{
+  position:relative; z-index:20;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.35);
+  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  border-radius:22px; width:460px; min-height:360px;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 18px 40px rgba(0,0,0,.18); padding:0 20px;
+}
+
+/* Form */
+.form{ width:100%; }
+.formTitle{ margin:0 0 12px; color:#fff; font-weight:800; font-size:20px; letter-spacing:.3px; text-align:center; }
+
+.field{ margin-bottom:14px; }
+.inputContainer{ position:relative; }
+.inputContainer input{
+  width:100%; height:46px; border-radius:999px;
+  border:1.5px solid rgba(255,255,255,.7);
+  background:rgba(255,255,255,.06); color:#fff;
+  padding:0 48px 0 44px; font-size:15px;
+  transition: box-shadow .15s ease, border-color .15s ease, background .15s ease;
+}
+.inputContainer input::placeholder{ color:rgba(255,255,255,.8); }
+.inputContainer input:focus{
+  outline:none; border-color:#fff; background:rgba(255,255,255,.12);
+  box-shadow:0 0 0 4px rgba(255,255,255,.18);
+}
+.inputIcon{
+  position:absolute; left:16px; top:50%; transform:translateY(-50%);
+  color:#fff; font-size:18px; opacity:.9;
+}
+
+/* button */
+.button{
+  width:100%; height:48px; border-radius:999px; border:0; background:#fff; color:#c026d3;
+  font-weight:900; letter-spacing:.6px; font-size:15px; cursor:pointer; box-shadow:0 10px 24px rgba(0,0,0,.18);
+  transition: transform .06s ease, box-shadow .18s ease, filter .15s ease;
+  margin-top:16px;
+}
+.button:hover{ filter:brightness(1.02); box-shadow:0 16px 34px rgba(0,0,0,.22); }
+.button:active{ transform:translateY(1px); }
+.button[disabled]{ opacity:.75; cursor:not-allowed; }
+
+/* Auth switch (link chữ thường) */
+.authSwitch{
+  margin-top:12px; display:flex; align-items:center; justify-content:center; gap:8px;
+}
+.authText{ color:rgba(255,255,255,.85); font-size:13px; }
+.authLinkPlain{
+  color:#fff; font-weight:700; font-size:13px; text-decoration:none;
+}
+.authLinkPlain:hover{ text-decoration:underline; }
+
+/* notes */
+.note{ margin:6px 8px 12px; color:#fff; font-size:14px; }
+.info{ color:#d9fff7; }
+
+/* responsive */
+@media (max-width:920px){
+  .hero{ grid-template-columns:1fr; gap:22px; }
+  .panel{ width:100%; min-height:auto; padding:16px 18px; }
+  .winterLine{ height:80px; padding-bottom:10px; }
+  .winterItem{ font-size:36px; }
+}
+
+/* ====== Ghi đè wrapper global nếu trang đang có CSS cũ ====== */
+:global(.main-content.signup-page){
+  background: transparent !important;
+  background-image: none !important;
+  justify-content: flex-start !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+}
+:global(.main-content){
+  background-color: #efeef3 !important;
+}
+
+/* đẩy nhẹ trái cho đồng bộ */
+.leftNudge{ transform: translateX(-12px); }

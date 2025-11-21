@@ -1,98 +1,96 @@
+// src/pages/seller/orders/OrderManagement.jsx
 "use client";
 
-import { useMemo, useRef, useState, useEffect } from "react";
-import { NavLink } from "react-router-dom";
+import React, { useMemo, useRef, useState, useEffect, useContext } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import "../../../styles/OrderManagement.css";
+import { AuthContext } from "../../../contexts/AuthContext";
 
-/** MOCK DATA - bạn có thể thay bằng API thật sau */
-const mockOrders = [
-  {
-    id: "DH001234567",
-    orderDate: "2025-01-18",
-    status: "pending",
-    confirmDeadline: "2025-01-19 14:00",
-    quantity: 2,
-    revenue: 450000,
-    orderValue: 500000,
-    customerName: "Nguyễn Văn A",
-    labels: ["cần thu tiền", "chưa in phiếu"],
-    isOverdue: false,
-    isNearDeadline: true,
-  },
-  {
-    id: "DH001234568",
-    orderDate: "2025-01-17",
-    status: "pending",
-    confirmDeadline: "2025-01-18 10:00",
-    quantity: 1,
-    revenue: 200000,
-    orderValue: 250000,
-    customerName: "Trần Thị B",
-    labels: ["cần thu tiền", "cần xuất hóa đơn"],
-    isOverdue: true,
-    isNearDeadline: false,
-  },
-  {
-    id: "DH001234569",
-    orderDate: "2025-01-16",
-    status: "processing",
-    confirmDate: "2025-01-16 15:30",
-    quantity: 3,
-    revenue: 750000,
-    orderValue: 800000,
-    customerName: "Lê Văn C",
-    labels: ["đã xuất hóa đơn"],
-    isOverdue: false,
-    isNearDeadline: false,
-  },
-  {
-    id: "DH001234570",
-    orderDate: "2025-01-15",
-    status: "shipping",
-    confirmDate: "2025-01-15 09:15",
-    quantity: 1,
-    revenue: 300000,
-    orderValue: 350000,
-    customerName: "Phạm Thị D",
-    labels: ["đã xuất hóa đơn"],
-    isOverdue: false,
-    isNearDeadline: false,
-  },
-  {
-    id: "DH001234571",
-    orderDate: "2025-01-14",
-    status: "delivered",
-    confirmDate: "2025-01-14 11:20",
-    quantity: 2,
-    revenue: 600000,
-    orderValue: 650000,
-    customerName: "Hoàng Văn E",
-    labels: ["đã xuất hóa đơn"],
-    isOverdue: false,
-    isNearDeadline: false,
-  },
-  {
-    id: "DH001234572",
-    orderDate: "2025-01-13",
-    status: "cancelled",
-    confirmDate: "2025-01-13 16:45",
-    quantity: 1,
-    revenue: 0,
-    orderValue: 400000,
-    customerName: "Vũ Thị F",
-    labels: [],
+// ⚠️ DÙNG service đúng tên file đã chuẩn hóa statuses
+import { fetchOrdersBySeller } from "../../../services/sellerOrders";
+import { updateOrder } from "../../../services/orderActions"; // dùng chung cho confirm/cancel
+import { ConfirmOrderModal, CancelOrderModal } from "./OrderModals";
+
+// API config để gọi profile & seller
+import { API_CONFIG, apiUrl } from "../../../config/api";
+
+import Portal from "../product/Portal";
+
+/** Map tab -> status backend (Enum từ BE) */
+const STATUS_MAP = {
+  all: null,
+  pending: "PENDING",
+  processing: "CONFIRMED",
+  shipping: "SHIPPED",
+  delivered: "DELIVERED",
+  cancelled: "CANCELLED",
+};
+
+/** Chuẩn hóa status BE -> UI key */
+const normalizeStatusForUI = (s) => {
+  switch (s) {
+    case "CONFIRMED":
+      return "processing";
+    case "SHIPPED":
+      return "shipping";
+    case "DELIVERED":
+      return "delivered";
+    case "CANCELLED":
+      return "cancelled";
+    case "PENDING":
+    default:
+      return "pending";
+  }
+};
+
+/** Map 1 record BE -> model UI cho bảng */
+const toUiOrder = (o) => {
+  const items = Array.isArray(o.orderItems) ? o.orderItems : [];
+  const quantity = items.reduce(
+    (sum, it) => sum + (Number(it?.quantity) || 0),
+    0
+  );
+
+  // Null-safe tiền tệ
+  const subtotal = Number(o.subtotal ?? 0);
+  const discountAmount = Number(o.discountAmount ?? 0);
+  const shippingFee = Number(o.shippingFee ?? 0);
+  const revenue = subtotal - discountAmount;
+  const orderValue =
+    (o.totalAmount ?? null) != null
+      ? Number(o.totalAmount)
+      : revenue + shippingFee;
+
+  return {
+    id: o.id,
+    orderDate: o.createdTime?.slice(0, 10) || "", // YYYY-MM-DD
+    status: normalizeStatusForUI(o.status),
+    quantity,
+    revenue,
+    orderValue,
+    customerName: o.recipientName || "",
+    labels: [], // nếu có nhãn thì map vào
     isOverdue: false,
     isNearDeadline: false,
-  },
-];
+    _raw: o, // giữ lại bản gốc
+  };
+};
 
 export default function OrderManagement() {
+  const { authFetch } = useContext(AuthContext) || {};
+  const navigate = useNavigate();
+
+  // sellerId động (thay vì hardcode)
+  const [sellerId, setSellerId] = useState("");
+  const [resolvingSeller, setResolvingSeller] = useState(false);
+  const [sellerErr, setSellerErr] = useState("");
+
   // UI state
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showFilterSidebar, setShowFilterSidebar] = useState(false);
 
   // Ngày đặt hàng
-  const [selectedDateRange, setSelectedDateRange] = useState("all"); // mặc định "Toàn thời gian"
+  const [selectedDateRange, setSelectedDateRange] = useState("all");
   const [customDateStart, setCustomDateStart] = useState("");
   const [customDateEnd, setCustomDateEnd] = useState("");
   const [headerChecked, setHeaderChecked] = useState(false);
@@ -107,46 +105,23 @@ export default function OrderManagement() {
   const [selectedIds, setSelectedIds] = useState(new Set());
   const headerCheckboxRef = useRef(null);
 
-  // Tabs data + counts
-  const tabs = useMemo(() => {
-    const allOrders = mockOrders;
-    const pendingOrders = allOrders.filter((o) => o.status === "pending");
-    const overdueCount = pendingOrders.filter((o) => o.isOverdue).length;
-
-    return [
-      { key: "all", label: "Tất cả", count: allOrders.length },
-      {
-        key: "pending",
-        label: "Chờ xác nhận",
-        count: pendingOrders.length,
-        overdueCount,
-      },
-      {
-        key: "processing",
-        label: "Đang xử lý",
-        count: allOrders.filter((o) => o.status === "processing").length,
-      },
-      {
-        key: "shipping",
-        label: "Đang vận chuyển",
-        count: allOrders.filter((o) => o.status === "shipping").length,
-      },
-      {
-        key: "delivered",
-        label: "Đã giao hàng",
-        count: allOrders.filter((o) => o.status === "delivered").length,
-      },
-      {
-        key: "cancelled",
-        label: "Đã hủy",
-        count: allOrders.filter((o) => o.status === "cancelled").length,
-      },
-    ];
-  }, []);
+  // Data từ API
+  const [allOrders, setAllOrders] = useState([]); // đếm từng tab
+  const [tableOrders, setTableOrders] = useState([]); // render theo tab
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState("");
 
   const [tab, setTab] = useState("pending");
   const [q, setQ] = useState("");
-  const [dateType] = useState("order"); // để sẵn nếu mở rộng
+
+  // Phân trang
+  const [pageSize, setPageSize] = useState(10); // 10 dòng / trang
+  const [page, setPage] = useState(1); // trang hiện tại
+
+  // Modal state
+  const [orderForConfirm, setOrderForConfirm] = useState(null);
+  const [orderForCancel, setOrderForCancel] = useState(null);
+  const [orderForShip, setOrderForShip] = useState(null);
 
   // Options
   const dateRangeOptions = [
@@ -170,6 +145,253 @@ export default function OrderManagement() {
     ],
   };
 
+  // --- Helpers chuẩn hoá & thu thập option (hỗ trợ object & array) ---
+  const normalizeOptionKey = (key) => {
+    const raw = String(key || "").trim();
+    const lower = raw.toLowerCase();
+    if (
+      ["size", "kích cỡ", "kích thước", "kich co", "kich thuoc"].includes(lower)
+    )
+      return "Kích cỡ";
+    if (["color", "màu", "màu sắc", "mau", "mau sac"].includes(lower))
+      return "Màu sắc";
+    return raw.charAt(0).toUpperCase() + raw.slice(1);
+  };
+
+  const collectItemOptions = (item) => {
+    const out = [];
+
+    // 1) Dạng object: { "Dung tích": "1000ML", "Khối lượng": "10kg" }
+    if (
+      item &&
+      item.options &&
+      typeof item.options === "object" &&
+      !Array.isArray(item.options)
+    ) {
+      for (const [k, v] of Object.entries(item.options)) {
+        const val = String(v ?? "").trim();
+        if (!val) continue;
+        out.push([normalizeOptionKey(k), val]);
+      }
+    }
+
+    // 2) Dạng mảng: [{ optionKey, optionValue }] hoặc [{ key, value }]
+    if (Array.isArray(item?.options)) {
+      for (const node of item.options) {
+        const k = node?.optionKey ?? node?.key;
+        const v = node?.optionValue ?? node?.value;
+        const key = normalizeOptionKey(k);
+        const val = String(v ?? "").trim();
+        if (!key || !val) continue;
+        out.push([key, val]);
+      }
+    }
+
+    // 3) Tương thích ngược nếu BE cũ để riêng size/color
+    const size = item?.size ?? item?.variantSize ?? null;
+    const color = item?.color ?? item?.colorName ?? null;
+    if (size && !out.some(([k]) => k === "Kích cỡ"))
+      out.push(["Kích cỡ", String(size)]);
+    if (color && !out.some(([k]) => k === "Màu sắc"))
+      out.push(["Màu sắc", String(color)]);
+
+    // Loại trùng key-value
+    const seen = new Set();
+    return out.filter(([k, v]) => {
+      const key = `${k}::${v}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  };
+
+  // Helper lấy giá trị màu (để vẽ swatch)
+  const getColorValue = (item) => {
+    const pairs = collectItemOptions(item);
+    const found = pairs.find(([k]) => k === "Màu sắc");
+    if (found) return found[1];
+    return item?.color ?? item?.colorName ?? null;
+  };
+
+  // Map tên màu thường gặp -> mã màu
+  const colorNameToCss = (name) => {
+    if (!name) return null;
+    const t = String(name).trim().toLowerCase();
+    const map = {
+      đen: "#111111",
+      trắng: "#ffffff",
+      nâu: "#8b4513",
+      "xanh navy": "#001f3f",
+      "xanh dương": "#1e88e5",
+      "xanh lá": "#2e7d32",
+      đỏ: "#d32f2f",
+      xám: "#9e9e9e",
+      be: "#f5f5dc",
+      black: "#111111",
+      white: "#ffffff",
+      navy: "#001f3f",
+      blue: "#1e88e5",
+      green: "#2e7d32",
+      red: "#d32f2f",
+      gray: "#9e9e9e",
+      grey: "#9e9e9e",
+      brown: "#8b4513",
+    };
+    return map[t] || null;
+  };
+
+  const extractSizeColor = (item) => {
+    const opts = item?.options || {};
+    const size =
+      opts["Kích cỡ"] ??
+      opts["Kich cỡ"] ??
+      opts["Kich co"] ??
+      opts["Size"] ??
+      item.size ??
+      item.variantSize ??
+      null;
+    const color =
+      opts["Màu sắc"] ??
+      opts["Mau sac"] ??
+      opts["Color"] ??
+      item.color ??
+      item.colorName ??
+      null;
+    return { size, color };
+  };
+
+  // Thu gọn/mở rộng danh sách phân loại theo từng order
+  const [expandedVariants, setExpandedVariants] = useState(() => new Set());
+  const toggleExpandVariants = (orderId) => {
+    setExpandedVariants((prev) => {
+      const next = new Set(prev);
+      if (next.has(orderId)) next.delete(orderId);
+      else next.add(orderId);
+      return next;
+    });
+  };
+
+  const renderVariantChips = (items, orderId, max = 1) => {
+    const list = Array.isArray(items) ? items : [];
+    if (!list.length) {
+      return (
+        <div className="variants-wrap">
+          <div className="variant-row">
+            <span className="chip none">Không phân loại</span>
+          </div>
+        </div>
+      );
+    }
+
+    const expanded = expandedVariants.has(orderId);
+    const visible = expanded ? list : list.slice(0, max);
+
+    return (
+      <div className="variants-wrap">
+        {visible.map((it, idx) => {
+          const pairs = collectItemOptions(it); // [[key, value], ...]
+          const colorVal = getColorValue(it);
+          const swatch = colorNameToCss(colorVal);
+
+          return (
+            <div className="variant-row" key={idx}>
+              {pairs.length === 0 ? (
+                <span className="chip none">Không phân loại</span>
+              ) : (
+                pairs.map(([k, v], i) => {
+                  if (k === "Màu sắc") {
+                    return (
+                      <span className="chip color" key={`${k}-${i}`}>
+                        {swatch ? (
+                          <span className="sw" style={{ background: swatch }} />
+                        ) : null}
+                        {k}: {v}
+                      </span>
+                    );
+                  }
+                  return (
+                    <span className="chip size" key={`${k}-${i}`}>
+                      {k}: {v}
+                    </span>
+                  );
+                })
+              )}
+              <span className="chip qty">x{it.quantity}</span>
+            </div>
+          );
+        })}
+
+        {list.length > max && (
+          <button
+            type="button"
+            className="variants-toggle"
+            onClick={() => toggleExpandVariants(orderId)}
+            aria-expanded={expanded}
+            title={expanded ? "Thu gọn" : "Xem tất cả"}
+          >
+            {expanded ? "Thu gọn ▲" : `Xem tất cả ▼`}
+          </button>
+        )}
+      </div>
+    );
+  };
+
+  // ====== Resolve sellerId theo user đang đăng nhập ======
+  useEffect(() => {
+    if (!authFetch) return;
+    let cancelled = false;
+
+    (async () => {
+      try {
+        setResolvingSeller(true);
+        setSellerErr("");
+
+        // 1) Lấy profile (GET /info/profiles/getMyProfile)
+        const resProf = await authFetch(
+          apiUrl(API_CONFIG.endpoints.getMyProfile),
+          {
+            method: "GET",
+            headers: { Accept: "application/json" },
+          }
+        );
+        const dataProf = await resProf.json().catch(() => ({}));
+        if (!resProf.ok)
+          throw new Error(dataProf?.message || `HTTP ${resProf.status}`);
+
+        const userId = dataProf?.result?.id;
+        if (!userId) throw new Error("Không lấy được userId từ profile.");
+
+        // 2) Lấy seller theo userId (GET /info/sellers/searchByUserId/{userId})
+        const resSeller = await authFetch(
+          apiUrl(API_CONFIG.endpoints.searchSellerByUserId(userId)),
+          {
+            method: "GET",
+            headers: { Accept: "application/json" },
+          }
+        );
+        const dataSeller = await resSeller.json().catch(() => ({}));
+        if (!resSeller.ok)
+          throw new Error(dataSeller?.message || `HTTP ${resSeller.status}`);
+
+        const seller = dataSeller?.result;
+        const sid = seller?.id || seller?.sellerId;
+        if (!sid) throw new Error("Tài khoản hiện chưa có sellerId.");
+
+        if (!cancelled) setSellerId(sid);
+      } catch (e) {
+        if (!cancelled) {
+          setSellerErr(e?.message || "Không xác định được sellerId.");
+        }
+      } finally {
+        if (!cancelled) setResolvingSeller(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [authFetch]);
+
   // ====== Utils ngày ======
   const startOfToday = () => {
     const d = new Date();
@@ -192,15 +414,11 @@ export default function OrderManagement() {
 
   const getSelectedRange = () => {
     const today = startOfToday();
-    if (selectedDateRange === "today") {
-      return { from: today, to: today };
-    }
-    if (selectedDateRange === "7days") {
+    if (selectedDateRange === "today") return { from: today, to: today };
+    if (selectedDateRange === "7days")
       return { from: addDays(today, -6), to: today };
-    }
-    if (selectedDateRange === "30days") {
+    if (selectedDateRange === "30days")
       return { from: addDays(today, -29), to: today };
-    }
     if (selectedDateRange === "custom" && customDateStart && customDateEnd) {
       const from = new Date(customDateStart);
       const to = new Date(customDateEnd);
@@ -225,42 +443,118 @@ export default function OrderManagement() {
     )} - ${formatDateObj(rng.to)})`;
   };
 
-  // ====== Lọc dữ liệu (tab/search/filters/date) ======
-  const filteredOrders = useMemo(() => {
-    let orders = mockOrders;
+  // ====== FETCH TẤT CẢ (đếm tab) ======
+  useEffect(() => {
+    if (!authFetch || !sellerId) return;
+    let stop = false;
+    (async () => {
+      try {
+        setErr("");
+        const raw = await fetchOrdersBySeller(authFetch, sellerId, null);
+        if (stop) return;
+        const converted = raw.map(toUiOrder);
+        setAllOrders(converted);
+      } catch (e) {
+        if (!stop) setErr(e.message || "Không tải được đơn hàng");
+      }
+    })();
+    return () => {
+      stop = true;
+    };
+  }, [authFetch, sellerId]);
 
-    if (tab !== "all") {
-      orders = orders.filter((order) => order.status === tab);
-    }
+  // ====== FETCH THEO TAB (render bảng) ======
+  useEffect(() => {
+    if (!authFetch || !sellerId) return;
+    let stop = false;
+    (async () => {
+      try {
+        setLoading(true);
+        setErr("");
+        const backendStatus = STATUS_MAP[tab]; // null => all
+        const raw = await fetchOrdersBySeller(
+          authFetch,
+          sellerId,
+          backendStatus
+        );
+        if (stop) return;
+        const converted = raw.map(toUiOrder);
+        setTableOrders(converted);
+      } catch (e) {
+        if (!stop) setErr(e.message || "Không tải được danh sách theo tab");
+        setTableOrders([]);
+      } finally {
+        if (!stop) setLoading(false);
+      }
+    })();
+    return () => {
+      stop = true;
+    };
+  }, [authFetch, sellerId, tab]);
+
+  // ====== Tabs data + counts ======
+  const tabs = useMemo(() => {
+    const all = allOrders;
+    return [
+      { key: "all", label: "Tất cả", count: all.length },
+      {
+        key: "pending",
+        label: "Chờ xác nhận",
+        count: all.filter((o) => o.status === "pending").length,
+        overdueCount: 0,
+      },
+      {
+        key: "processing",
+        label: "Đã xác nhận",
+        count: all.filter((o) => o.status === "processing").length,
+      },
+      {
+        key: "shipping",
+        label: "Đang vận chuyển",
+        count: all.filter((o) => o.status === "shipping").length,
+      },
+      {
+        key: "delivered",
+        label: "Đã giao hàng",
+        count: all.filter((o) => o.status === "delivered").length,
+      },
+      {
+        key: "cancelled",
+        label: "Đã hủy",
+        count: all.filter((o) => o.status === "cancelled").length,
+      },
+    ];
+  }, [allOrders]);
+
+  // ====== Lọc dữ liệu cho bảng ======
+  const filteredOrders = useMemo(() => {
+    let orders = tableOrders;
 
     if (q.trim()) {
+      const t = q.trim().toLowerCase();
       orders = orders.filter(
-        (order) =>
-          order.id.toLowerCase().includes(q.toLowerCase()) ||
-          order.customerName.toLowerCase().includes(q.toLowerCase())
+        (o) =>
+          o.id.toLowerCase().includes(t) ||
+          (o.customerName || "").toLowerCase().includes(t)
       );
     }
 
     if (activeFilters.labels.length > 0) {
-      orders = orders.filter((order) =>
-        activeFilters.labels.some((label) => order.labels.includes(label))
+      orders = orders.filter((o) =>
+        activeFilters.labels.some((label) => o.labels.includes(label))
       );
     }
 
     if (activeFilters.deadlines.length > 0) {
-      orders = orders.filter((order) => {
-        if (activeFilters.deadlines.includes("quá hạn") && order.isOverdue)
+      orders = orders.filter((o) => {
+        if (activeFilters.deadlines.includes("quá hạn") && o.isOverdue)
           return true;
-        if (
-          activeFilters.deadlines.includes("sắp quá hạn") &&
-          order.isNearDeadline
-        )
+        if (activeFilters.deadlines.includes("sắp quá hạn") && o.isNearDeadline)
           return true;
         return false;
       });
     }
 
-    // Lọc theo Ngày đặt hàng
     const rng = getSelectedRange();
     if (rng) {
       const fromTime = rng.from.getTime();
@@ -273,7 +567,7 @@ export default function OrderManagement() {
 
     return orders;
   }, [
-    tab,
+    tableOrders,
     q,
     activeFilters,
     selectedDateRange,
@@ -281,13 +575,30 @@ export default function OrderManagement() {
     customDateEnd,
   ]);
 
-  // ====== Chọn đơn (header checkbox indeterminate) ======
-  const visiblePendingIds = useMemo(
-    () => filteredOrders.filter((o) => o.status === "pending").map((o) => o.id),
-    [filteredOrders]
+  // Tổng số trang
+  const totalPages = useMemo(
+    () => Math.max(1, Math.ceil(filteredOrders.length / pageSize)),
+    [filteredOrders.length, pageSize]
   );
 
-  // tính toán như cũ
+  // Reset về trang 1 khi filter thay đổi hoặc pageSize đổi
+  useEffect(() => {
+    setPage(1);
+  }, [pageSize, selectedDateRange, customDateStart, customDateEnd, q, tab]);
+
+  // Dữ liệu sau khi phân trang
+  const paginatedOrders = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return filteredOrders.slice(start, start + pageSize);
+  }, [filteredOrders, page, pageSize]);
+
+  // ====== Chọn đơn (header checkbox indeterminate) ======
+  const visiblePendingIds = useMemo(
+    () =>
+      paginatedOrders.filter((o) => o.status === "pending").map((o) => o.id),
+    [paginatedOrders]
+  );
+
   const allVisiblePendingSelected =
     visiblePendingIds.length > 0 &&
     visiblePendingIds.every((id) => selectedIds.has(id));
@@ -296,24 +607,19 @@ export default function OrderManagement() {
     visiblePendingIds.some((id) => selectedIds.has(id)) &&
     !allVisiblePendingSelected;
 
-  // vẫn dùng indeterminate để hiển thị UI
   useEffect(() => {
     if (headerCheckboxRef.current) {
       headerCheckboxRef.current.indeterminate = someVisiblePendingSelected;
     }
   }, [someVisiblePendingSelected]);
 
-  // NHƯNG trạng thái "checked" của header lấy từ headerChecked, không dựa vào allVisiblePendingSelected
-
   const toggleHeaderSelect = (checked) => {
-    setHeaderChecked(checked); // <-- nhớ trạng thái header checkbox
+    setHeaderChecked(checked);
     setSelectedIds((prev) => {
       const next = new Set(prev);
       if (checked) {
-        // chọn tất cả đơn CHỜ XÁC NHẬN đang hiển thị
         visiblePendingIds.forEach((id) => next.add(id));
       } else {
-        // bỏ chọn các đơn CHỜ XÁC NHẬN đang hiển thị
         visiblePendingIds.forEach((id) => next.delete(id));
       }
       return next;
@@ -327,7 +633,6 @@ export default function OrderManagement() {
       else next.add(order.id);
       return next;
     });
-    // KHÔNG setHeaderChecked ở đây -> tick lẻ không unlock bulk
   };
 
   // ====== Buttons logic ======
@@ -356,11 +661,8 @@ export default function OrderManagement() {
     setSelectedDateRange(range);
     if (range !== "custom") {
       setShowDatePicker(false);
-      // reset custom nếu rời khỏi custom
-      if (range !== "custom") {
-        setCustomDateStart("");
-        setCustomDateEnd("");
-      }
+      setCustomDateStart("");
+      setCustomDateEnd("");
     }
   };
 
@@ -379,17 +681,77 @@ export default function OrderManagement() {
     new Intl.NumberFormat("vi-VN", {
       style: "currency",
       currency: "VND",
-    }).format(amount);
+      maximumFractionDigits: 0,
+    }).format(Math.round(Number(amount || 0)));
 
   const getStatusLabel = (status) => {
     const statusMap = {
       pending: "Chờ xác nhận",
-      processing: "Đang xử lý",
+      processing: "Đã xác nhận",
       shipping: "Đang vận chuyển",
       delivered: "Đã giao hàng",
       cancelled: "Đã hủy",
     };
     return statusMap[status] || status;
+  };
+
+  // ====== Modal handlers ======
+  const onConfirmOrder = (order) => setOrderForConfirm(order._raw);
+  const onDeleteOrder = (order) => setOrderForCancel(order._raw);
+  const onViewOrder = (order) => navigate(`/seller/orders/${order.id}`);
+
+  const refreshLists = async () => {
+    if (!sellerId) return;
+    const backendStatus = STATUS_MAP[tab];
+    const raw = await fetchOrdersBySeller(authFetch, sellerId, backendStatus);
+    setTableOrders(raw.map(toUiOrder));
+    const rawAll = await fetchOrdersBySeller(authFetch, sellerId, null);
+    setAllOrders(rawAll.map(toUiOrder));
+  };
+
+  // dùng cho nút "Xác nhận" trong toast
+  const onShipOrder = async () => {
+    if (!orderForShip) return;
+    try {
+      await updateOrder(authFetch, {
+        orderId: orderForShip.id,
+        sellerId,
+        status: "SHIPPED",
+        reason: "",
+      });
+      setOrderForShip(null);
+      await refreshLists();
+    } catch (e) {
+      alert(e?.message || "Chuyển sang vận chuyển thất bại");
+    }
+  };
+
+  // Handler phân trang
+  const handlePrevPage = () => {
+    setPage((p) => Math.max(1, p - 1));
+  };
+
+  const handleNextPage = () => {
+    setPage((p) => Math.min(totalPages, p + 1));
+  };
+
+  const handlePageSizeChange = (e) => {
+    const value = Number(e.target.value) || 10;
+    setPageSize(value);
+    setPage(1);
+  };
+
+  const handlePageInputChange = (e) => {
+    const raw = e.target.value;
+    if (raw === "") {
+      setPage(1);
+      return;
+    }
+    let num = Number(raw);
+    if (Number.isNaN(num)) return;
+    if (num < 1) num = 1;
+    if (num > totalPages) num = totalPages;
+    setPage(num);
   };
 
   return (
@@ -431,6 +793,7 @@ export default function OrderManagement() {
                 onClick={() => {
                   setTab(t.key);
                   setSelectedIds(new Set());
+                  setHeaderChecked(false);
                 }}
               >
                 <span className="order-mgmt-tab-top">
@@ -449,29 +812,26 @@ export default function OrderManagement() {
         </div>
       </div>
 
+      {/* THÔNG BÁO SELLER */}
+      {!sellerId && (
+        <div className="order-mgmt-section">
+          {resolvingSeller ? (
+            <div className="om-note">🔎 Đang xác định Seller ID…</div>
+          ) : sellerErr ? (
+            <div className="om-note om-warn">⚠️ {sellerErr}</div>
+          ) : null}
+        </div>
+      )}
+
       {/* BỘ LỌC & TÌM KIẾM */}
       <div className="order-mgmt-section orders-filter">
         <div className="filter-row">
-          <div className="id-box">
-            <div className="select-like">
-              <span>Mã đơn hàng</span>
-              <span className="chev">▾</span>
-            </div>
-            <input
-              className="q-input"
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Nhập tối đa 20 mã đơn hàng (cách nhau bằng dấu ;)"
-            />
-          </div>
-
           <div className="date-select">
             <button
               className="date-btn"
               onClick={() => setShowDatePicker(!showDatePicker)}
             >
-              Ngày đặt hàng
-              <span className="dropdown-arrow">▾</span>
+              Ngày đặt hàng <span className="dropdown-arrow">▾</span>
             </button>
 
             {showDatePicker && (
@@ -540,7 +900,6 @@ export default function OrderManagement() {
           <div className="date-tag">
             <span className="tag-label">Dạng lọc:</span>
 
-            {/* Tag Ngày đặt hàng (chỉ hiển thị khi KHÔNG phải "Toàn thời gian") */}
             {dateRangeLabel() && (
               <span className="date-range-tag">
                 <span className="tag-content">
@@ -560,50 +919,26 @@ export default function OrderManagement() {
               </span>
             )}
 
-            {/* Tag lọc khác */}
-            {hasActiveFilters && (
-              <div className="active-filters">
-                {activeFilters.labels.map((label) => (
-                  <span key={label} className="filter-tag">
-                    {label}
-                    <button
-                      onClick={() =>
-                        setActiveFilters((prev) => ({
-                          ...prev,
-                          labels: prev.labels.filter((l) => l !== label),
-                        }))
-                      }
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-                {activeFilters.deadlines.map((deadline) => (
-                  <span key={deadline} className="filter-tag">
-                    {deadline}
-                    <button
-                      onClick={() =>
-                        setActiveFilters((prev) => ({
-                          ...prev,
-                          deadlines: prev.deadlines.filter(
-                            (d) => d !== deadline
-                          ),
-                        }))
-                      }
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-              </div>
-            )}
-
-            {/* Chỉ hiện "Xóa tất cả" khi có lọc đang áp dụng */}
-            {showClearAll && (
-              <button className="clear-filter" onClick={handleClearAllFilters}>
-                Xóa tất cả
-              </button>
-            )}
+            {(() => {
+              const hasActiveFilters =
+                activeFilters.labels.length > 0 ||
+                activeFilters.deadlines.length > 0;
+              const showClearAll =
+                hasActiveFilters ||
+                selectedDateRange !== "all" ||
+                (selectedDateRange === "custom" &&
+                  customDateStart &&
+                  customDateEnd);
+              if (!showClearAll) return null;
+              return (
+                <button
+                  className="clear-filter"
+                  onClick={handleClearAllFilters}
+                >
+                  Xóa tất cả
+                </button>
+              );
+            })()}
           </div>
         </div>
 
@@ -615,7 +950,6 @@ export default function OrderManagement() {
           <div className="summary-actions">
             <button className="order-mgmt-btn ghost">Xuất đơn hàng</button>
 
-            {/* Nút Xác nhận hàng loạt */}
             <button
               className={`order-mgmt-btn confirm-bulk ${
                 canBulkConfirm ? "" : "disabled"
@@ -663,29 +997,16 @@ export default function OrderManagement() {
                     <span>Trạng thái</span>
                   </div>
                 </th>
-                <th>
-                  <div className="order-mgmt-th-content">
-                    <div className="order-mgmt-th-text">
-                      <span>Hạn xác nhận</span>
-                    </div>
-                  </div>
-                </th>
+                {/* ❌ BỎ cột Hạn xác nhận */}
                 <th>
                   <div className="order-mgmt-th-content">
                     <div className="order-mgmt-th-text">
                       <span>Số lượng/</span>
-                      <span>DT/GTĐH</span>
+                      <span>Phân loại/GTĐH</span>
                     </div>
                   </div>
                 </th>
-                <th>
-                  <div className="order-mgmt-th-content">
-                    <div className="order-mgmt-th-text">
-                      <span className="red-dot">●</span>
-                      <span>Nhận đơn hàng</span>
-                    </div>
-                  </div>
-                </th>
+                {/* ❌ BỎ luôn cột Nhận đơn hàng */}
                 <th>
                   <div className="order-mgmt-th-content">
                     <span>Thao tác</span>
@@ -695,9 +1016,29 @@ export default function OrderManagement() {
             </thead>
 
             <tbody>
-              {filteredOrders.length === 0 ? (
+              {!sellerId ? (
                 <tr>
-                  <td colSpan={7} className="empty-state">
+                  <td colSpan={5} className="empty-state">
+                    {resolvingSeller
+                      ? "Đang xác định Seller..."
+                      : sellerErr || "Chưa xác định được Seller"}
+                  </td>
+                </tr>
+              ) : loading ? (
+                <tr>
+                  <td colSpan={5} className="empty-state">
+                    Đang tải…
+                  </td>
+                </tr>
+              ) : err ? (
+                <tr>
+                  <td colSpan={5} className="empty-state">
+                    {err}
+                  </td>
+                </tr>
+              ) : filteredOrders.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="empty-state">
                     <div className="no-data">
                       <div className="no-data-text">Không có đơn hàng nào</div>
                       <div className="no-data-subtitle">
@@ -707,141 +1048,214 @@ export default function OrderManagement() {
                   </td>
                 </tr>
               ) : (
-                filteredOrders.map((order) => {
-                  const isChecked = selectedIds.has(order.id);
-                  const canConfirmThis =
-                    order.status === "pending" && isChecked;
+                paginatedOrders.map((order) => (
+                  <tr key={order.id} className="order-row">
+                    <td>
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.has(order.id)}
+                        onChange={() => toggleRowSelect(order)}
+                        title={
+                          order.status === "pending"
+                            ? "Chọn để xác nhận"
+                            : "Không thể xác nhận đơn không ở trạng thái chờ"
+                        }
+                      />
+                    </td>
 
-                  return (
-                    <tr
-                      key={order.id}
-                      className={`order-row ${
-                        order.isOverdue ? "overdue-row" : ""
-                      }`}
-                    >
-                      <td>
-                        <input
-                          type="checkbox"
-                          checked={isChecked}
-                          onChange={() => toggleRowSelect(order)}
-                          title={
-                            order.status === "pending"
-                              ? "Chọn để xác nhận"
-                              : "Không thể xác nhận đơn không ở trạng thái chờ"
-                          }
-                        />
-                      </td>
-                      <td>
-                        <div className="order-info">
-                          <div className="order-id">{order.id}</div>
-                          <div className="order-date">
-                            {formatDate(order.orderDate)}
-                          </div>
-                          <div className="customer-name">
-                            {order.customerName}
-                          </div>
+                    <td>
+                      <div className="order-info">
+                        <div className="order-id">{order.id}</div>
+                        <div className="order-date">
+                          {formatDate(order.orderDate)}
                         </div>
-                      </td>
-                      <td>
-                        <span className={`status-badge status-${order.status}`}>
-                          <span className="status-icon">
-                            {order.status === "pending" && "⏳"}
-                            {order.status === "processing" && "⚙️"}
-                            {order.status === "shipping" && "🚚"}
-                            {order.status === "delivered" && "✅"}
-                            {order.status === "cancelled" && "❌"}
-                          </span>
-                          {getStatusLabel(order.status)}
+                        <div className="customer-name">
+                          {order.customerName}
+                        </div>
+                      </div>
+                    </td>
+
+                    <td>
+                      <span className={`status-badge status-${order.status}`}>
+                        <span className="status-icon">
+                          {order.status === "pending" && "⏳"}
+                          {order.status === "processing" && "⚙️"}
+                          {order.status === "shipping" && "🚚"}
+                          {order.status === "delivered" && "✅"}
+                          {order.status === "cancelled" && "❌"}
                         </span>
+                        {getStatusLabel(order.status)}
+                      </span>
 
-                        {order.labels.length > 0 && (
-                          <div className="order-labels">
-                            {order.labels.map((label) => (
-                              <span key={label} className="label-tag">
-                                {label}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </td>
-                      <td>
-                        {order.confirmDeadline && (
-                          <div
-                            className={`deadline ${
-                              order.isOverdue
-                                ? "overdue"
-                                : order.isNearDeadline
-                                ? "near-deadline"
-                                : ""
-                            }`}
-                          >
-                            <span className="deadline-icon">
-                              {order.isOverdue
-                                ? "🚨"
-                                : order.isNearDeadline
-                                ? "⚠️"
-                                : "⏰"}
+                      {order.labels.length > 0 && (
+                        <div className="order-labels">
+                          {order.labels.map((label) => (
+                            <span key={label} className="label-tag">
+                              {label}
                             </span>
-                            {formatDate(order.confirmDeadline.split(" ")[0])}{" "}
-                            {order.confirmDeadline.split(" ")[1]}
-                          </div>
-                        )}
-                        {order.confirmDate && (
-                          <div className="confirm-date">
-                            Đã xác nhận:{" "}
-                            {formatDate(order.confirmDate.split(" ")[0])}
-                          </div>
-                        )}
-                      </td>
-                      <td>
-                        <div className="quantity-revenue">
-                          <div className="quantity-item">
-                            SL: {order.quantity}
-                          </div>
-                          <div className="revenue-item">
-                            DT: {formatCurrency(order.revenue)}
-                          </div>
-                          <div className="value-item">
-                            GTĐH: {formatCurrency(order.orderValue)}
-                          </div>
+                          ))}
                         </div>
-                      </td>
-                      <td>
-                        <div className="receive-order">
-                          <span className="receive-status">Đã nhận</span>
-                        </div>
-                      </td>
-                      <td className="action-cell">
-                        <div className="action-buttons-cell">
-                          <button
-                            className="action-btn primary"
-                            onClick={() =>
-                              alert(`Xem chi tiết đơn hàng ${order.id}`)
-                            }
-                          >
-                            Xem chi tiết
-                          </button>
+                      )}
+                    </td>
 
-                          {/* Chỉ hiện khi chọn riêng đơn đang chờ */}
-                          {canConfirmThis && (
-                            <button
-                              className="action-btn secondary"
-                              onClick={() =>
-                                alert(`Xem & xác nhận đơn ${order.id}`)
-                              }
-                            >
-                              Xem & xác nhận
-                            </button>
-                          )}
+                    {/* ❌ BỎ cột deadline */}
+
+                    <td>
+                      <td>
+                        <div className="order-col-qty">
+                          {/* Meta tổng quan: SL tổng + GTĐH dạng chip */}
+                          <div className="variant-meta-row">
+                            <span className="chip qty total">
+                              SL: {order.quantity}
+                            </span>
+                            <span className="chip value">
+                              Giá: {formatCurrency(order.orderValue)}
+                            </span>
+                          </div>
+
+                          {/* Phân loại (mặc định chỉ 1 sản phẩm; bấm để xem hết) */}
+                          <div className="variant-item">
+                            {renderVariantChips(
+                              order._raw?.orderItems || [],
+                              order.id,
+                              1
+                            )}
+                          </div>
                         </div>
                       </td>
-                    </tr>
-                  );
-                })
+                    </td>
+
+                    <td className="action-cell">
+                      <div className="action-buttons-cell">
+                        {/* ✅ Xem chi tiết: dùng cho MỌI trạng thái */}
+                        <NavLink
+                          to={`/seller/orders/${order.id}`}
+                          className="icon-btn icon-view"
+                          title="Xem chi tiết"
+                          aria-label="Xem chi tiết"
+                        >
+                          {/* Eye icon */}
+                          <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path
+                              fill="currentColor"
+                              d="M12 5c5.05 0 9.27 3.11 10.8 7.5C21.27 16.89 17.05 20 12 20S2.73 16.89 1.2 12.5C2.73 8.11 6.95 5 12 5zm0 2C7.89 7 4.36 9.44 3.03 12.5 4.36 15.56 7.89 18 12 18s7.64-2.44 8.97-5.5C19.64 9.44 16.11 7 12 7zm0 2.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7z"
+                            />
+                          </svg>
+                        </NavLink>
+
+                        {/* 🔵 Các nút chỉ dành cho trạng thái CHỜ & ĐÃ XÁC NHẬN */}
+                        {order.status === "pending" && (
+                          <>
+                            {/* Xác nhận: nền xanh dương, icon trắng */}
+                            <button
+                              className="icon-btn icon-confirm"
+                              onClick={() => onConfirmOrder(order)}
+                              disabled={!sellerId}
+                              title="Xác nhận đơn"
+                              aria-label="Xác nhận đơn"
+                            >
+                              {/* Check icon */}
+                              <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path
+                                  fill="currentColor"
+                                  d="M9 16.2 4.8 12l-1.4 1.4L9 19l12-12-1.4-1.4z"
+                                />
+                              </svg>
+                            </button>
+
+                            {/* Hủy: nền đỏ, icon trắng */}
+                            <button
+                              className="icon-btn icon-cancel"
+                              onClick={() => onDeleteOrder(order)}
+                              disabled={!sellerId}
+                              title="Hủy đơn hàng"
+                              aria-label="Hủy đơn hàng"
+                            >
+                              {/* X icon */}
+                              <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path
+                                  fill="currentColor"
+                                  d="M18.3 5.7 12 12l6.3 6.3-1.4 1.4L10.6 13.4 4.3 19.7 2.9 18.3 9.2 12 2.9 5.7 4.3 4.3l6.3 6.3 6.3-6.3z"
+                                />
+                              </svg>
+                            </button>
+                          </>
+                        )}
+
+                        {order.status === "processing" && (
+                          <>
+                            {/* Chuyển sang Đang vận chuyển */}
+                            <button
+                              className="icon-btn icon-confirm"
+                              onClick={() => setOrderForShip(order._raw)}
+                              disabled={!sellerId}
+                              title="Chuyển sang Đang vận chuyển"
+                              aria-label="Chuyển sang Đang vận chuyển"
+                            >
+                              <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path
+                                  fill="currentColor"
+                                  d="M3 6h11v7h2l3 3v2h-2a2 2 0 11-4 0H9a2 2 0 11-4 0H3zM7 19a1 1 0 100-2 1 1 0 000 2zm10 0a1 1 0 100-2 1 1 0 000 2z"
+                                />
+                              </svg>
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))
               )}
             </tbody>
           </table>
         </div>
+        {filteredOrders.length > 0 && (
+          <div className="order-pager">
+            <div className="order-pg-group">
+              <button
+                className="order-pg-btn"
+                disabled={page <= 0 || filteredOrders.length === 0}
+                onClick={() => setPage((p) => Math.max(0, p - 1))}
+              >
+                ← Trước
+              </button>
+
+              <div className="order-pg-status">
+                <input
+                  type="number"
+                  className="order-page-input"
+                  value={page}
+                  min={1}
+                  max={totalPages}
+                  onChange={handlePageInputChange}
+                />
+                <span>/ {totalPages}</span>
+              </div>
+
+              <button
+                className="order-pg-btn"
+                disabled={page >= totalPages - 1 || filteredOrders.length === 0}
+                onClick={() => setPage((p) => (p < totalPages - 1 ? p + 1 : p))}
+              >
+                Sau →
+              </button>
+            </div>
+
+            <div className="order-pg-size">
+              <span className="order-size-label">Trang:</span>
+              <select
+                className="order-size-select"
+                value={pageSize}
+                onChange={handlePageSizeChange}
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+              </select>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* SIDEBAR LỌC KHÁC */}
@@ -866,12 +1280,87 @@ export default function OrderManagement() {
               <FilterSidebar
                 filterOptions={filterOptions}
                 activeFilters={activeFilters}
-                onApply={handleApplyFilters}
-                onClose={() => setShowFilterSidebar(false)}
+                onApply={(f) => {
+                  handleApplyFilters(f);
+                }}
               />
             </div>
           </div>
         </>
+      )}
+
+      {/* ===== Modals ===== */}
+      {orderForConfirm && (
+        <ConfirmOrderModal
+          order={orderForConfirm}
+          onClose={() => setOrderForConfirm(null)}
+          onSubmit={async () => {
+            try {
+              await updateOrder(authFetch, {
+                orderId: orderForConfirm.id,
+                sellerId,
+                status: "CONFIRMED",
+                reason: "",
+              });
+              setOrderForConfirm(null);
+              await refreshLists();
+            } catch (e) {
+              alert(e?.message || "Xác nhận đơn thất bại");
+            }
+          }}
+        />
+      )}
+
+      {orderForCancel && (
+        <CancelOrderModal
+          order={orderForCancel}
+          onClose={() => setOrderForCancel(null)}
+          onSubmit={async (reason) => {
+            try {
+              if (!reason) return alert("Vui lòng chọn hoặc nhập lý do hủy.");
+              await updateOrder(authFetch, {
+                orderId: orderForCancel.id,
+                sellerId,
+                status: "CANCELLED",
+                reason,
+              });
+              setOrderForCancel(null);
+              await refreshLists();
+            } catch (e) {
+              alert(e?.message || "Hủy đơn thất bại");
+            }
+          }}
+        />
+      )}
+
+      {/* Toast xác nhận chuyển sang Đang vận chuyển */}
+      {/* Toast xác nhận chuyển sang Đang vận chuyển */}
+      {orderForShip && (
+        <Portal>
+          <div className="center-toast-overlay">
+            <div className="center-toast">
+              <h3>Chuyển đơn sang trạng thái "Đang vận chuyển"?</h3>
+              <p className="center-toast-text">
+                Bạn chắc chắn là đã chuẩn bị hàng xong và sẵn sàng bàn giao cho
+                đơn vị vận chuyển?
+              </p>
+              <div className="center-toast-actions">
+                <button
+                  className="center-toast-btn primary"
+                  onClick={onShipOrder}
+                >
+                  Xác nhận
+                </button>
+                <button
+                  className="center-toast-btn"
+                  onClick={() => setOrderForShip(null)}
+                >
+                  Hủy
+                </button>
+              </div>
+            </div>
+          </div>
+        </Portal>
       )}
     </div>
   );
@@ -899,9 +1388,7 @@ function FilterSidebar({ filterOptions, activeFilters, onApply }) {
     }));
   };
 
-  const handleApply = () => {
-    onApply(tempFilters);
-  };
+  const handleApply = () => onApply(tempFilters);
 
   return (
     <div className="filter-content">

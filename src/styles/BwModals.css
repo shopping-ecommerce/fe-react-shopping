@@ -1,0 +1,342 @@
+/* ========== Overlay & positioning ========== */
+.om-overlay{
+  position:fixed; inset:0;
+  background:rgba(0,0,0,.55);
+  display:flex; align-items:center; justify-content:center;
+  z-index:2000; animation:omFade .15s ease-out;
+}
+@keyframes omFade{from{opacity:0}to{opacity:1}}
+
+/* ========== Modal shell (khớp style OrderManagement) ========== */
+.om-modal{
+  width:760px; max-width:95vw;
+  background:linear-gradient(135deg,#ffffff 0%,#f8fafc 100%);
+  border:1px solid #e2e8f0; border-radius:16px;
+  box-shadow:0 20px 60px rgba(0,0,0,.25);
+  overflow:hidden; animation:omPop .18s ease-out;
+}
+@keyframes omPop{from{transform:translateY(8px) scale(.98);opacity:.9}to{transform:translateY(0) scale(1);opacity:1}}
+
+.om-header{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 20px;
+  background:linear-gradient(135deg,#3b82f6,#8b5cf6);
+  color:#fff; position:relative;
+}
+.om-header h3{margin:0;font-size:18px;font-weight:800}
+.om-x{
+  background:rgba(255,255,255,.15); color:#fff;
+  border:1px solid rgba(255,255,255,.4);
+  width:34px;height:34px;border-radius:10px;cursor:pointer;
+}
+.om-x:hover{background:#fff;color:#1f2937}
+
+.om-body{padding:18px; color:#0f172a;}
+
+/* Summary (nằm theo hàng) */
+.om-summary{
+  display:flex; /* thay đổi từ grid sang flex */
+  flex-wrap:wrap; /* cho phép xuống hàng nếu không đủ chỗ */
+  gap:12px 24px; /* gap giữa các items */
+  padding:14px 16px; 
+  margin-bottom:16px;
+  border:1px dashed #cbd5e1; 
+  border-radius:14px;
+  background:linear-gradient(135deg,#f8fafc,#f1f5f9);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.6);
+}
+
+.om-summary > div {
+  white-space: nowrap; /* không cho text xuống hàng */
+}
+
+
+/* Product list card */
+.om-list{
+  display:flex; flex-direction:column; gap:12px;
+  max-height:38vh; overflow:auto;
+  border:1px dashed #cbd5e1; border-radius:14px;
+  padding:12px; background:#fff; margin-bottom:16px;
+}
+.om-empty{color:#64748b;font-style:italic}
+
+.om-item{
+  display:grid; grid-template-columns:88px 1fr; gap:14px; align-items:center;
+  border:1px solid #e2e8f0; border-radius:14px; padding:12px;
+  background:linear-gradient(135deg,#ffffff,#f8fafc);
+}
+.om-thumb img{width:88px;height:88px;object-fit:cover;border-radius:10px;border:1px solid #e5e7eb}
+.om-meta{display:flex;flex-direction:column;gap:6px}
+.om-title{font-weight:800;color:#0f172a}
+.om-row{font-size:14px;color:#334155}
+.om-dot{margin:0 8px;color:#94a3b8}
+
+/* Totals */
+.om-total{display:grid;gap:6px;border-top:3px solid #f1f5f9;padding-top:12px}
+.om-total>div{display:flex;justify-content:space-between}
+.om-grand{font-weight:800}
+
+/* Footer buttons */
+.om-footer{
+  display:flex; justify-content:flex-end; gap:10px;
+  padding:14px 18px; border-top:1px solid #e2e8f0; background:#fff;
+}
+.om-btn{
+  height:42px; padding:0 18px; border-radius:12px;
+  font-weight:800; font-size:14px; cursor:pointer;
+  transition:transform .08s ease, box-shadow .2s ease, background .2s ease, color .2s ease;
+  border:2px solid transparent;
+}
+.om-btn:active{transform:translateY(1px)}
+
+.om-outline{
+  background:linear-gradient(135deg,#ffffff,#f8fafc);
+  color:#3b82f6; border-color:#3b82f6;
+}
+.om-outline:hover{
+  background:linear-gradient(135deg,#3b82f6,#1d4ed8);
+  color:#fff; box-shadow:0 8px 25px rgba(59,130,246,.35);
+}
+.om-solid{
+  background:linear-gradient(135deg,#070c0a,#030a08);
+  color:#fff; border-color:#070a09;
+}
+.om-solid:hover{background:linear-gradient(135deg,#060c0a,#040a09);box-shadow:0 8px 25px rgba(16,185,129,.35)}
+.om-danger{
+  background:linear-gradient(135deg,#ef4444,#dc2626);
+  color:#fff; border-color:#dc2626;
+}
+.om-danger:hover{background:linear-gradient(135deg,#dc2626,#b91c1c);box-shadow:0 8px 25px rgba(239,68,68,.35)}
+
+/* ====== Cancel modal specific ====== */
+.om-cancel-modal .om-body.om-cancel-body{
+  /* phần thân modal hủy có chiều cao cố định và cuộn bên trong */
+  max-height:525px;
+  overflow:auto;
+}
+.om-reasons{display:flex;flex-direction:column;gap:12px;margin-top:8px}
+.om-reasons-title{font-weight:800;color:#0f172a}
+.om-reasons-grid{
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+.om-radio{
+  display:flex;align-items:center;gap:10px;
+  border:1px dashed #cbd5e1; padding:10px 12px; border-radius:12px;
+  background:linear-gradient(135deg,#f8fafc,#ffffff);
+}
+.om-radio input{width:18px;height:18px;accent-color:#3b82f6}
+
+.om-other{display:grid;gap:6px}
+.om-other textarea{
+  resize:vertical; min-height:88px; padding:10px 12px;
+  border-radius:12px; border:1px solid #e2e8f0; background:#fff; color:#111827;
+  font-size:14px;
+}
+
+/* Responsive */
+@media (max-width:640px){
+  .om-modal{width:96vw}
+  .om-summary{grid-template-columns:1fr}
+  .om-item{grid-template-columns:72px 1fr}
+  .om-thumb img{width:72px;height:72px}
+  .om-reasons-grid{grid-template-columns:1fr}
+}
+/* ==== Chips & swatch cho options trong modal ==== */
+.om-variants-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin:4px 0 2px;
+}
+
+.om-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:4px 10px;
+  border-radius:9999px;
+  border:1px solid #ebeef2;
+  background:#f7f8fa;
+  font-size:12px;
+  line-height:1.2;
+  color:#333;
+}
+
+.om-chip-variant .om-k{ opacity:.7; }
+.om-chip-qty{ background:#f4f7ff; border-color:#e6eeff; }
+.om-chip-price{ background:#f5fff6; border-color:#e3f4e6; }
+
+.om-swatch{
+  width:12px;
+  height:12px;
+  border-radius:50%;
+  border:1px solid rgba(0,0,0,.12);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.6);
+}
+/* Overlay giữ nguyên */
+.om-overlay{
+  position:fixed; inset:0;
+  background:rgba(0,0,0,.55);
+  display:flex; align-items:center; justify-content:center;
+  z-index:2000; animation:omFade .15s ease-out;
+}
+@keyframes omFade{from{opacity:0}to{opacity:1}}
+
+/* Modal shell: fit viewport + flex column */
+.om-modal{
+  width:760px; max-width:95vw;
+  max-height:90vh;                 /* NEW: giới hạn theo viewport */
+  display:flex;                    /* NEW */
+  flex-direction:column;           /* NEW */
+  background:linear-gradient(135deg,#ffffff 0%,#f8fafc 100%);
+  border:1px solid #e2e8f0; border-radius:16px;
+  box-shadow:0 20px 60px rgba(0,0,0,.25);
+  overflow:hidden;                 /* giữ overflow ở vỏ */
+  animation:omPop .18s ease-out;
+}
+@keyframes omPop{from{transform:translateY(8px) scale(.98);opacity:.9}to{transform:translateY(0) scale(1);opacity:1}}
+
+/* Header/close giữ nguyên */
+.om-header{
+  flex:0 0 auto;                   /* NEW: cố định chiều cao */
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 20px;
+  background:linear-gradient(135deg,#3b82f6,#8b5cf6);
+  color:#fff; position:relative;
+}
+.om-header h3{margin:0;font-size:18px;font-weight:800}
+.om-x{
+  background:rgba(255,255,255,.15); color:#fff;
+  border:1px solid rgba(255,255,255,.4);
+  width:34px;height:34px;border-radius:10px;cursor:pointer;
+}
+.om-x:hover{background:#fff;color:#1f2937}
+
+/* Body cuộn bên trong */
+.om-body{
+  flex:1 1 auto;                   /* NEW: chiếm phần còn lại */
+  min-height:0;                    /* NEW: để overflow hoạt động đúng */
+  overflow:auto;                   /* NEW: cuộn nội dung ở đây */
+  overscroll-behavior:contain;     /* NEW: tránh cuộn nền */
+  -webkit-overflow-scrolling:touch;/* NEW: mượt trên iOS */
+  padding:18px; color:#0f172a;
+}
+
+/* Summary giữ nguyên, đã chuyển flex */
+.om-summary{
+  display:flex; flex-wrap:wrap; gap:12px 24px;
+  padding:14px 16px; margin-bottom:16px;
+  border:1px dashed #cbd5e1; border-radius:14px;
+  background:linear-gradient(135deg,#f8fafc,#f1f5f9);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.6);
+}
+.om-summary > div { white-space: nowrap; }
+
+/* Product list card */
+/* GỠ max-height để tránh cuộn lồng */
+.om-list{
+  display:flex; flex-direction:column; gap:12px;
+  /* max-height:38vh;  XÓA DÒNG NÀY */
+  /* overflow:auto;     XÓA DÒNG NÀY */
+  border:1px dashed #cbd5e1; border-radius:14px;
+  padding:12px; background:#fff; margin-bottom:16px;
+}
+.om-empty{color:#64748b;font-style:italic}
+
+.om-item{
+  display:grid; grid-template-columns:88px 1fr; gap:14px; align-items:center;
+  border:1px solid #e2e8f0; border-radius:14px; padding:12px;
+  background:linear-gradient(135deg,#ffffff,#f8fafc);
+}
+.om-thumb img{width:88px;height:88px;object-fit:cover;border-radius:10px;border:1px solid #e5e7eb}
+.om-meta{display:flex;flex-direction:column;gap:6px}
+.om-title{font-weight:800;color:#0f172a}
+.om-row{font-size:14px;color:#334155}
+.om-dot{margin:0 8px;color:#94a3b8}
+
+/* Totals */
+.om-total{display:grid;gap:6px;border-top:3px solid #f1f5f9;padding-top:12px}
+.om-total>div{display:flex;justify-content:space-between}
+.om-grand{font-weight:800}
+
+/* Footer luôn hiện, không cuộn */
+.om-footer{
+  flex:0 0 auto;                   /* NEW: cố định chiều cao */
+  display:flex; justify-content:flex-end; gap:10px;
+  padding:14px 18px; border-top:1px solid #e2e8f0; background:#fff;
+}
+.om-btn{
+  height:42px; padding:0 18px; border-radius:12px;
+  font-weight:800; font-size:14px; cursor:pointer;
+  transition:transform .08s ease, box-shadow .2s ease, background .2s ease, color .2s ease;
+  border:2px solid transparent;
+}
+.om-btn:active{transform:translateY(1px)}
+.om-outline{
+  background:linear-gradient(135deg,#ffffff,#f8fafc);
+  color:#3b82f6; border-color:#3b82f6;
+}
+.om-outline:hover{
+  background:linear-gradient(135deg,#3b82f6,#1d4ed8);
+  color:#fff; box-shadow:0 8px 25px rgba(59,130,246,.35);
+}
+
+.om-danger{
+  background:linear-gradient(135deg,#ef4444,#dc2626);
+  color:#fff; border-color:#dc2626;
+}
+.om-danger:hover{background:linear-gradient(135deg,#dc2626,#b91c1c);box-shadow:0 8px 25px rgba(239,68,68,.35)}
+
+/* BỎ rule cũ vì giờ body đã tự cuộn cho cả 2 modal */
+/*
+.om-cancel-modal .om-body.om-cancel-body{
+  max-height:525px;
+  overflow:auto;
+}
+*/
+
+/* Reasons & textarea (giữ nguyên) */
+.om-reasons{display:flex;flex-direction:column;gap:12px;margin-top:8px}
+.om-reasons-title{font-weight:800;color:#0f172a}
+.om-reasons-grid{
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+.om-radio{
+  display:flex;align-items:center;gap:10px;
+  border:1px dashed #cbd5e1; padding:10px 12px; border-radius:12px;
+  background:linear-gradient(135deg,#f8fafc,#ffffff);
+}
+.om-radio input{width:18px;height:18px;accent-color:#3b82f6}
+.om-other{display:grid;gap:6px}
+.om-other textarea{
+  resize:vertical; min-height:88px; padding:10px 12px;
+  border-radius:12px; border:1px solid #e2e8f0; background:#fff; color:#111827;
+  font-size:14px;
+}
+
+/* Chips & swatch cho options trong modal */
+.om-variants-row{ display:flex; flex-wrap:wrap; gap:6px; margin:4px 0 2px; }
+.om-chip{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:4px 10px; border-radius:9999px;
+  border:1px solid #ebeef2; background:#f7f8fa;
+  font-size:12px; line-height:1.2; color:#333;
+}
+.om-chip-variant .om-k{ opacity:.7; }
+.om-chip-qty{ background:#f4f7ff; border-color:#e6eeff; }
+.om-chip-price{ background:#f5fff6; border-color:#e3f4e6; }
+.om-swatch{
+  width:12px; height:12px; border-radius:50%;
+  border:1px solid rgba(0,0,0,.12);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.6);
+}
+
+/* Responsive */
+@media (max-width:640px){
+  .om-modal{ width:96vw; max-height:96vh; } /* NEW: fit tốt hơn trên mobile */
+  .om-item{grid-template-columns:72px 1fr}
+  .om-thumb img{width:72px;height:72px}
+  .om-reasons-grid{grid-template-columns:1fr}
+}

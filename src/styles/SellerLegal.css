@@ -428,3 +428,36 @@
 }
 
 /* các phần còn lại như bạn đang dùng giữ nguyên */
+/* Nhấn mạnh khối section */
+.sp-section .sub{ margin-top:4px; color:#6b7280; }
+
+/* Upload: viền xanh khi drag */
+.upload-card{ position:relative; }
+.upload-card:hover{ border-color:#93c5fd; background:#f9fafb; }
+.upload-card:focus-within{ outline: 3px solid rgba(24,144,255,.18); }
+.upload-card .utitle{ font-size:13px; color:#4b5563; }
+.upload-card.has-image{ border-style: solid; }
+
+/* Address selects focus */
+.form-row .control select:focus,
+.form-row .control input:focus{
+  border-color:#1890FF;
+  box-shadow: 0 0 0 3px rgba(24,144,255,.15);
+}
+
+/* Tip box mềm hơn */
+.tip-box{ border:1px solid #ffe8ad; background:#fff9e6; border-radius:10px; }
+
+/* Row spacing */
+.legal-grid{ gap:28px; }
+.addr-block{ border-top: 1px dashed #e5e7eb; border-radius: 0; }
+.row-2{ gap: 18px; }
+
+/* Field error */
+.field-error{ color:#d93025; font-size:13px; margin:6px 2px 0; }
+
+/* Mobile upload */
+@media (max-width: 768px){
+  .upload-grid{ grid-template-columns: 1fr; row-gap: 20px; }
+  .upload-card, .upload-card.tall{ width:100%; min-height: 220px; }
+}

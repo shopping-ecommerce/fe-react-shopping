@@ -1,0 +1,189 @@
+/* ===== Account Policies ===== */
+.account-policies {
+  --card-bg: #ffffff;
+  --text: #0f172a;           /* slate-900 */
+  --muted: #64748b;          /* slate-500 */
+  --border: #e2e8f0;         /* slate-200 */
+  --brand: #0ea5e9;          /* sky-500 */
+  --badge: #f1f5f9;          /* slate-100 */
+  --danger: #ef4444;         /* red-500 */
+
+  color: var(--text);
+}
+
+.account-policies__header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.account-policies__title {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.account-policies__count {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.account-policies__grid {
+  display: grid;
+  gap: 14px;
+}
+
+/* ===== Policy Card (details) ===== */
+.policy-card {
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 0;
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  overflow: hidden;
+}
+.policy-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(15, 23, 42, 0.08);
+}
+
+.policy-card > summary {
+  list-style: none;           /* remove default marker */
+  cursor: pointer;
+  user-select: none;
+  padding: 14px 16px;
+  display: grid;
+  grid-template-columns: 20px 1fr auto;
+  grid-auto-flow: column;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.policy-card > summary::-webkit-details-marker {
+  display: none;
+}
+
+/* caret */
+.policy-card__caret {
+  width: 12px;
+  height: 12px;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: rotate(-45deg);
+  transition: transform 0.15s ease;
+  margin-left: 2px;
+}
+.policy-card[open] .policy-card__caret {
+  transform: rotate(45deg);
+}
+
+/* text line */
+.policy-card__line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.policy-card__title {
+  font-weight: 600;
+}
+
+.policy-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  background: var(--badge);
+  color: #0f172a;
+}
+
+.policy-badge--version {
+  background: #e0f2fe;       /* sky-100 */
+  color: #075985;            /* sky-800 */
+  font-weight: 600;
+}
+
+.policy-badge--code {
+  background: #f8fafc;
+  border: 1px dashed var(--border);
+  color: var(--muted);
+}
+
+.policy-badge--date {
+  background: #fafafa;
+  color: #334155;
+}
+
+/* body */
+.policy-card__body {
+  padding: 14px 16px;
+}
+
+/* markdown-ish styling (we’re showing raw markdown text nicely) */
+.policy-md {
+  white-space: pre-wrap;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+/* make headings in markdown stand out */
+.policy-md h1,
+.policy-md h2,
+.policy-md h3,
+.policy-md h4 {
+  margin: 12px 0 6px;
+  line-height: 1.35;
+  font-weight: 700;
+}
+.policy-md h1 { font-size: 20px; }
+.policy-md h2 { font-size: 18px; }
+.policy-md h3 { font-size: 16px; }
+
+.policy-md p { margin: 8px 0; }
+
+.policy-md ul, .policy-md ol {
+  margin: 8px 0 8px 18px;
+  padding-left: 12px;
+}
+.policy-md li { margin: 4px 0; }
+
+/* code blocks if any */
+.policy-md pre,
+.policy-md code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
+.policy-md pre {
+  background: #0f172a0d; /* subtle dark bg */
+  border: 1px solid var(--border);
+  padding: 10px;
+  border-radius: 8px;
+  overflow: auto;
+}
+
+/* quote */
+.policy-md blockquote {
+  border-left: 3px solid var(--brand);
+  padding-left: 10px;
+  color: var(--muted);
+  margin: 8px 0;
+}
+
+/* states */
+.account-policies__loading,
+.account-policies__error {
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #f8fafc;
+}
+.account-policies__error {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: var(--danger);
+}

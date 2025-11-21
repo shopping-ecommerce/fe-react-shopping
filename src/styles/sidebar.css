@@ -1,3 +1,18 @@
+:root { --header-h: 0px; } /* nhớ chỉnh đúng chiều cao thật của Header */
+
+.sidebar{
+  position: sticky;
+  top: calc(var(--header-h) + 10px);
+  height: calc(100vh - var(--header-h) - 20px);
+  overflow: hidden;   /* cuộn bên trong .sidebar-menu */
+}
+.sidebar-menu{
+  overflow-y: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.sidebar-menu::-webkit-scrollbar{ display: none; }
+
 .main-content {
   padding: 20px;
 }
@@ -5,9 +20,10 @@
 .content-layout {
   display: flex;
   align-items: flex-start;
-  max-width: 1360px;
-  margin: 0 auto 0 0; /* Căn trái */
+  max-width: 1600px;  /* tăng max-width cho màn hình lớn */
+  margin: 0 auto;     /* căn giữa thay vì dính về bên trái */
   width: 100%;
+  gap: 20px;          /* tạo khoảng cách giữa sidebar và content */
 }
 
 .page-content {
@@ -15,12 +31,14 @@
 }
 
 .sidebar {
-  width: 270px;
+  flex-shrink: 0;     /* sidebar không bị co lại */
+  width: 240px;
   background-color: #fff;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-  padding: 3px;
+  padding: 10px;
   border-radius: 10px;
   transition: all 0.3s ease;
+  margin-left: -10px;
 }
 
 .sidebar:not(.active) {
@@ -45,7 +63,7 @@
 .sidebar-toggle {
   width: 40px;
   height: 40px;
-  background-color: #007bff;
+  background-color: #000;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -75,9 +93,12 @@
 }
 
 .menu-item img {
-  width: 40px;
-  height: 40px;
+  width: 36px;         /* thu gọn lại vừa với text */
+  height: 36px;
   margin-right: 10px;
+  border-radius: 50%;  /* bo tròn hình */
+  object-fit: cover;   /* giữ tỉ lệ ảnh, cắt vừa khung */
+  flex-shrink: 0;      /* không cho ảnh bị co khi text dài */
 }
 
 .menu-item span {
@@ -88,7 +109,7 @@
 .sidebar-toggle-floating {
   width: 40px;
   height: 40px;
-  background-color: #007bff;
+  background-color: #000;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -118,4 +139,31 @@
   .sidebar-toggle-floating {
     margin-left: 5px; /* Giảm khoảng cách trên mobile */
   }
+}
+/* ===== FIX: Sidebar sticky + là container flex để menu có thể cuộn ===== */
+.sidebar{
+  position: sticky !important;
+  top: calc(var(--header-h) + 10px) !important;
+  height: calc(100vh - var(--header-h) - 20px) !important;
+  display: flex !important;           /* cần có */
+  flex-direction: column !important;  /* cần có */
+  overflow: hidden !important;        /* cuộn ở .sidebar-menu, không ở đây */
+}
+
+/* Khu menu: chiếm hết phần còn lại và CUỘN (ẩn thanh cuộn) */
+.sidebar-menu{
+  flex: 1 !important;                 /* để nhận chiều cao còn lại */
+  overflow-y: auto !important;
+  -ms-overflow-style: none;           /* IE/Edge cũ */
+  scrollbar-width: none;              /* Firefox */
+}
+.sidebar-menu::-webkit-scrollbar{ display: none; } /* Chrome/Safari */
+.sidebar-header::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #01050b, #000);
 }

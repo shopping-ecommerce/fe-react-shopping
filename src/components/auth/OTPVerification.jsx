@@ -1,155 +1,287 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { AuthContext } from '../../contexts/AuthContext';
-import { verifyOtp as verifyOtpApi } from '../../services/api';
-import '../../styles/otp.css';
-import BackButton from './BackButton';
+// src/components/auth/OTPVerification.jsx
+"use client"
+
+import React, { useState, useEffect, useRef, useMemo } from "react"
+import { useNavigate, useLocation, Link } from "react-router-dom"
+import { verifyOtp as verifyRegisterOtpApi, register as apiRegister } from "../../services/auth"
+import { forgotPasswordSendOtp, forgotPasswordVerifyOtp } from "../../services/api"
+import "../../styles/otp.css"
+import BackButton from "./BackButton"
+import { showToast } from "../common/ChatToaster"
+
+const MAX_RESENDS = 3
+const COUNTDOWN = 60
 
 function OTPVerification() {
-  const [email, setEmail] = useState('');
-  const [otp, setOtp] = useState(['', '', '', '', '', '']);
-  const [timer, setTimer] = useState(60);
-  const [isResendDisabled, setIsResendDisabled] = useState(true); // Bắt đầu với disabled
-  const [sendCount, setSendCount] = useState(0);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const { register } = useContext(AuthContext);
-  const navigate = useNavigate();
-  const location = useLocation();
-  const emailFromSignup = location.state?.email || '';
-  const otpRefs = useRef([]);
+  const [email, setEmail] = useState("")
+  const [otp, setOtp] = useState(["", "", "", "", "", ""])
+  const [timer, setTimer] = useState(COUNTDOWN)
+  const [isResendDisabled, setIsResendDisabled] = useState(true)
+  const [resendCount, setResendCount] = useState(0)
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
 
+  const navigate = useNavigate()
+  const location = useLocation()
+  const emailFromState = location.state?.email || ""
+  const sourceFromState = location.state?.source || "" // "forgot" nếu đến từ ForgotPassword
+  const otpRefs = useRef([])
+
+  // đang ở luồng quên mật khẩu?
+  const isForgotFlow = useMemo(() => {
+    if (sourceFromState === "forgot") return true
+    return !!sessionStorage.getItem("forgot-email")
+  }, [sourceFromState])
+
+  // Khởi tạo email + start countdown
   useEffect(() => {
-    if (emailFromSignup) {
-      setEmail(emailFromSignup);
-      setIsResendDisabled(true); // Khởi động timer ngay khi vào trang
-    }
-    let interval;
-    if (timer > 0 && isResendDisabled && sendCount === 0) { // Chỉ chạy timer lần đầu
-      interval = setInterval(() => {
-        setTimer((prev) => prev - 1);
-      }, 1000);
-    } else if (timer === 0 && sendCount === 0) { // Khi timer hết, kích hoạt nút gửi lại
-      setIsResendDisabled(false);
-      setTimer(0); // Giữ timer ở 0, không đếm tiếp
-      clearInterval(interval); // Dừng interval
-    }
-    return () => clearInterval(interval); // Dọn dẹp interval
-  }, [timer, isResendDisabled, sendCount, emailFromSignup]);
+    const savedSignupRaw =
+      sessionStorage.getItem("signup-payload") ||
+      localStorage.getItem("signup-payload") ||
+      "{}"
+    const savedSignup = JSON.parse(savedSignupRaw)
 
-  const handleResendOtp = () => {
-    if (!isResendDisabled && sendCount === 0) { // Chỉ cho phép gửi lại khi sendCount = 0
-      setIsResendDisabled(true);
-      setSendCount(1); // Tăng lên 1 và khóa luôn
-      alert(`Mã OTP đã được gửi lại đến ${email}! (Kiểm tra email của bạn)`);
-    } else if (sendCount >= 1) {
-      alert('Bạn đã hết số lần gửi OTP!');
+    const fromForgot = sessionStorage.getItem("forgot-email") || ""
+    const initEmail = emailFromState || fromForgot || savedSignup.email || ""
+    setEmail(initEmail)
+
+    setIsResendDisabled(true)
+    setTimer(COUNTDOWN)
+  }, [emailFromState])
+
+  // countdown
+  useEffect(() => {
+    if (!isResendDisabled) return
+    if (timer <= 0) {
+      setIsResendDisabled(false)
+      return
     }
-  };
+    const id = setInterval(() => setTimer((t) => t - 1), 1000)
+    return () => clearInterval(id)
+  }, [isResendDisabled, timer])
+
+  const handleResendOtp = async () => {
+    if (resendCount >= MAX_RESENDS) {
+      setError("Bạn đã hết số lần gửi lại OTP.")
+      return
+    }
+    if (isResendDisabled) return
+
+    setLoading(true)
+    setError("")
+    try {
+      if (isForgotFlow) {
+        await forgotPasswordSendOtp(email)
+      } else {
+        const savedRaw =
+          sessionStorage.getItem("signup-payload") ||
+          localStorage.getItem("signup-payload")
+        if (!savedRaw) throw new Error("Thiếu dữ liệu đăng ký để gửi lại OTP.")
+        const payload = JSON.parse(savedRaw)
+        if (!payload?.email) throw new Error("Không xác định được email.")
+        await apiRegister(payload)
+      }
+
+      setOtp(["", "", "", "", "", ""])
+      otpRefs.current[0]?.focus()
+      setResendCount((c) => c + 1)
+      setIsResendDisabled(true)
+      setTimer(COUNTDOWN)
+      showToast({ title: "Đã gửi lại mã OTP!", type: "success" })
+    } catch (e) {
+      setError(e.message || "Không gửi lại được OTP. Vui lòng thử lại.")
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleOtpChange = (index, value) => {
-    if (!/^\d*$/.test(value)) return;
-    
-    const newOtp = [...otp];
-    newOtp[index] = value.slice(-1);
-    setOtp(newOtp);
-
-    if (value && index < 5) {
-      otpRefs.current[index + 1]?.focus();
-    }
-  };
+    if (!/^\d*$/.test(value)) return
+    const next = [...otp]
+    next[index] = value.slice(-1)
+    setOtp(next)
+    if (value && index < 5) otpRefs.current[index + 1]?.focus()
+  }
 
   const handleOtpKeyDown = (index, e) => {
-    if (e.key === 'Backspace' && !otp[index] && index > 0) {
-      otpRefs.current[index - 1]?.focus();
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
+      otpRefs.current[index - 1]?.focus()
     }
-  };
+  }
 
   const handleVerifyOtp = async () => {
-    const otpString = otp.join('');
+    const otpString = otp.join("")
     if (otpString.length !== 6) {
-      setError('Vui lòng nhập đầy đủ 6 chữ số!');
-      return;
+      setError("Vui lòng nhập đầy đủ 6 chữ số!")
+      return
     }
-    setError('');
-    setLoading(true);
-
-    const verifyData = {
-      email,
-      otp: otpString,
-    };
-
+    setError("")
+    setLoading(true)
     try {
-      const data = await verifyOtpApi(verifyData);
-      const userData = { email, role: 'buyer' };
-      const authToken = data.result?.token || 'sample-token'; // Giả định token từ backend
-      if (register) {
-        register(userData, authToken);
-        navigate('/login');
+      if (isForgotFlow) {
+        // Xác thực OTP quên mật khẩu → sang trang đặt lại mật khẩu
+        await forgotPasswordVerifyOtp({ email, otp: otpString })
+        showToast({ title: "OTP hợp lệ! Vui lòng đặt lại mật khẩu.", type: "success", duration: 2200 })
+        sessionStorage.setItem("forgot-email", email) // giữ lại cho trang reset
+        navigate("/reset-password", { state: { email, source: "forgot" } })
       } else {
-        console.error('register function is not available');
-        navigate('/login');
+        // Xác thực OTP đăng ký → về login
+        await verifyRegisterOtpApi({ email, otp: otpString })
+        showToast({ title: "Đăng ký thành công!", type: "success", duration: 2500 })
+        sessionStorage.removeItem("signup-payload")
+        navigate("/login")
       }
     } catch (err) {
-      setError(err.message || 'Mã OTP không đúng!');
+      setError(err.message || "Mã OTP không đúng!")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
+
+  // Hiệu ứng tuyết
+  const renderSnow = () => {
+    const flakes = useMemo(
+      () =>
+        Array.from({ length: 70 }, (_, i) => ({
+          id: i,
+          left: Math.random() * 100,
+          delay: Math.random() * 3,
+          size: Math.random() * 12 + 8,
+        })),
+      []
+    )
+    return (
+      <div className="otp-snow-container" aria-hidden="true">
+        {flakes.map((s) => (
+          <div
+            key={`snow-${s.id}`}
+            className="otp-snowflake"
+            style={{
+              left: `${s.left}%`,
+              animationDelay: `${s.delay}s`,
+              fontSize: `${s.size}px`,
+            }}
+          >
+            ❄
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  // Hàng ⛄ 🎄
+  const renderWinterLine = () => {
+    const row = ["⛄", "🎄", "⛄", "🎄", "⛄", "🎄", "⛄", "🎄", "⛄"]
+    return (
+      <div className="otp-winter-line" aria-hidden="true">
+        {row.map((ch, idx) => (
+          <div
+            key={idx}
+            className={`otp-winter-item ${ch === "⛄" ? "otp-snowman" : "otp-pine"}`}
+          >
+            {ch}
+          </div>
+        ))}
+      </div>
+    )
+  }
 
   return (
-    <>
-      <BackButton to="/signup" position="left" />
-      <div className="otp-wrapper">
-        <div className="otp-card">
-          <h2>Xác thực OTP</h2>
-          <div className="otp-field">
-            <div className="phone-row">
-              <div className="phone-input-wrapper">
-                <span className="otp-icon">📧</span>
-                <input
-                  type="email"
-                  value={email}
-                  readOnly
-                  placeholder="Nhập email"
-                />
-              </div>
-              {sendCount < 1 && (
-                <button type="button" className={`otp-send-btn ${isResendDisabled ? 'disabled' : ''}`} onClick={handleResendOtp} disabled={isResendDisabled}>
-                  {isResendDisabled && timer > 0 ? `Gửi lại (${timer}s)` : 'Gửi lại'}
-                </button>
-              )}
-            </div>
-          </div>
+    <div className="otp-page">
+      <BackButton to={isForgotFlow ? "/forgot-password" : "/signup"} position="left" />
+      <div className="otp-weather-layer">{renderSnow()}</div>
 
-          <div className="otp-field">
-            <div className="otp-code-container">
-              {otp.map((digit, index) => (
-                <input
-                  key={index}
-                  ref={(el) => (otpRefs.current[index] = el)}
-                  type="text"
-                  value={digit}
-                  onChange={(e) => handleOtpChange(index, e.target.value)}
-                  onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                  className="otp-digit-input"
-                  maxLength="1"
-                />
-              ))}
-            </div>
-            {error && <div className="error-message">{error}</div>}
-            {loading && <div className="loading-message">Đang xác thực...</div>}
+      <div className="otp-hero">
+        <div className="otp-hero-text">
+          <div className="otp-welcome otp-center">
+            <h1>Xác thực OTP</h1>
+            <p>
+              {isForgotFlow
+                ? "Nhập mã 6 chữ số đã được gửi tới email để xác thực trước khi đặt lại mật khẩu."
+                : "Nhập mã 6 chữ số đã được gửi tới email của bạn để hoàn tất đăng ký."}
+            </p>
           </div>
-          <button type="button" onClick={handleVerifyOtp} disabled={loading}>
-            Xác thực
-          </button>
-          <div className="otp-signup-link">
-            <span>Quay lại? <a href="/signup">Đăng ký</a></span>
+        </div>
+
+        <div className="otp-panel">
+          <div className="otp-form">
+            <form onSubmit={(e) => e.preventDefault()}>
+              {/* Email + Gửi lại */}
+              <div className="otp-field">
+                <div className="otp-phone-row">
+                  <div className="otp-phone-input">
+                    <span className="otp-input-icon">📧</span>
+                    <input type="email" value={email} readOnly placeholder="Email" />
+                  </div>
+
+                  <button
+                    type="button"
+                    className={`otp-send-btn ${isResendDisabled ? "disabled" : ""}`}
+                    onClick={handleResendOtp}
+                    disabled={isResendDisabled || resendCount >= MAX_RESENDS || loading}
+                    title={
+                      resendCount >= MAX_RESENDS
+                        ? "Đã hết lượt gửi lại"
+                        : isResendDisabled
+                        ? `Chờ ${timer}s`
+                        : "Gửi lại mã"
+                    }
+                  >
+                    {resendCount >= MAX_RESENDS
+                      ? "Hết lượt"
+                      : isResendDisabled
+                      ? `(${timer}s)`
+                      : "Gửi lại mã"}
+                  </button>
+                </div>
+              </div>
+
+              {/* Ô nhập 6 số */}
+              <div className="otp-field">
+                <div className="otp-code-container">
+                  {otp.map((d, i) => (
+                    <input
+                      key={i}
+                      ref={(el) => (otpRefs.current[i] = el)}
+                      type="text"
+                      value={d}
+                      onChange={(e) => handleOtpChange(i, e.target.value)}
+                      onKeyDown={(e) => handleOtpKeyDown(i, e)}
+                      className="otp-digit-input"
+                      maxLength="1"
+                      inputMode="numeric"
+                    />
+                  ))}
+                </div>
+                {error && <div className="otp-note otp-error">{error}</div>}
+                {loading && <div className="otp-note otp-loading">Đang xử lý...</div>}
+              </div>
+
+              <button
+                type="button"
+                className="otp-primary-btn"
+                onClick={handleVerifyOtp}
+                disabled={loading}
+              >
+                Xác thực
+              </button>
+            </form>
+
+            <div className="otp-auth-switch">
+              <span className="otp-auth-text">
+                {isForgotFlow ? "Quay lại?" : "Chưa có tài khoản?"}
+              </span>
+              <Link className="otp-auth-link" to={isForgotFlow ? "/forgot-password" : "/signup"}>
+                {isForgotFlow ? "Quên mật khẩu" : "Đăng ký"}
+              </Link>
+            </div>
           </div>
         </div>
       </div>
-    </>
-  );
+
+      {renderWinterLine()}
+    </div>
+  )
 }
 
-export default OTPVerification;
+export default OTPVerification

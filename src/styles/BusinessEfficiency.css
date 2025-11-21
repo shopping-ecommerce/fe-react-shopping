@@ -1,0 +1,386 @@
+/* ===== Theme tokens (LIGHT) ===== */
+:root {
+  --be-bg: #ffffff;
+  --be-card: #ffffff;
+  --be-border: #e5e7eb;
+  --be-text: #111827;
+  --be-muted: #6b7280;
+  --be-chip: #ffffff;
+  --be-chip-active: #111827;
+  --be-grad1: linear-gradient(135deg, #e0f2fe, #dcfce7);
+  --be-grad2: linear-gradient(135deg, #ede9fe, #dbeafe);
+  --be-shadow: 0 4px 18px rgba(17, 24, 39, .06);
+  --be-hover-ring: 0 0 0 1px rgba(17, 24, 39, .07), 0 4px 16px rgba(17, 24, 39, .08);
+}
+
+.be-wrap { padding: 16px; color: var(--be-text); background: var(--be-bg); }
+
+/* ===== Header & Filters ===== */
+.be-head { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:16px; }
+.be-head h1 { margin:0; font-size:24px; font-weight:900; letter-spacing:.2px; }
+
+/* Giữ filter trên một hàng, có scroll ngang khi chật */
+.be-filters {
+  display:flex; align-items:center; gap:8px;
+  flex-wrap:nowrap; overflow-x:auto; padding-bottom:2px;
+}
+.be-filters::-webkit-scrollbar { height: 6px; }
+.be-filters::-webkit-scrollbar-thumb { background:#e5e7eb; border-radius: 999px; }
+
+.be-chip {
+  border:1px solid var(--be-border);
+  background: var(--be-chip);
+  color: var(--be-text);
+  border-radius:999px;
+  padding:8px 12px;
+  font-weight:700;
+  cursor:pointer;
+  transition: transform .15s ease, box-shadow .2s ease, background .2s ease, color .2s ease;
+  white-space:nowrap;
+}
+.be-chip:hover { transform: translateY(-1px); box-shadow: var(--be-hover-ring); }
+.be-chip.is-active { background: var(--be-chip-active); color:#fff; border-color: var(--be-chip-active); }
+
+.be-datepick { display:flex; align-items:center; gap:6px; white-space:nowrap; }
+.be-datepick label { font-size:12px; color: var(--be-muted); }
+.be-datepick input[type="date"] {
+  padding:8px 10px; border:1px solid var(--be-border); color: var(--be-text); background:#fff; border-radius:10px; outline:none;
+}
+.be-datepick input[type="date"]:focus { box-shadow: var(--be-hover-ring); }
+
+/* Icon button cho Lọc */
+.be-icon-btn {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:36px; height:36px; border-radius:10px;
+  border:1px solid var(--be-border); background:#111827; color:#fff;
+  cursor:pointer; transition: transform .15s ease, box-shadow .2s ease, opacity .2s ease;
+  flex:0 0 auto;
+}
+.be-icon-btn:disabled { opacity:.6; cursor:not-allowed; }
+.be-icon-btn:not(:disabled):hover { transform: translateY(-1px); box-shadow: var(--be-hover-ring); }
+
+/* ===== Section separator ===== */
+.be-section-sep {
+  display:flex; align-items:center; gap:8px; font-weight:900; margin:20px 0 10px 0;
+  color:#0f172a;
+}
+.sep-dot { width:10px; height:10px; border-radius:999px; display:inline-block; }
+.sep-blue { background:#3b82f6; }
+.sep-gray { background:#9ca3af; }
+
+/* ===== Alerts ===== */
+.be-alert { padding:10px 12px; border-radius:12px; margin-bottom:12px; font-weight:700; }
+.be-alert--error { background:#fee2e2; color:#7f1d1d; border:1px solid #fecaca; }
+
+/* ===== Grid & Cards ===== */
+.be-grid { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:12px; margin-bottom:16px; }
+@media (max-width:1200px){ .be-grid{ grid-template-columns:repeat(2, minmax(0,1fr)); } }
+@media (max-width:640px){ .be-grid{ grid-template-columns:1fr; } }
+
+.be-card {
+  background: var(--be-card);
+  border:1px solid var(--be-border);
+  border-radius:16px;
+  padding:16px;
+  box-shadow: var(--be-shadow);
+  position:relative;
+  overflow:hidden;
+}
+.be-card.grad-1::before,
+.be-card.grad-2::before{
+  content:""; position:absolute; inset:0; opacity:.35; pointer-events:none;
+}
+.be-card.grad-1::before{ background: var(--be-grad1); }
+.be-card.grad-2::before{ background: var(--be-grad2); }
+
+.lift { transition: transform .18s ease, box-shadow .2s ease; }
+.lift:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(17,24,39,.12); }
+
+.be-card__title { font-size:12px; color: var(--be-muted); margin-bottom:6px; }
+.be-card__value { font-size:28px; font-weight:900; letter-spacing:.3px; margin-bottom:6px; }
+.be-subline { font-size:12px; color: var(--be-muted); display:flex; align-items:center; flex-wrap:wrap; gap:6px; }
+
+/* ===== KPI Theming (mỗi ô một màu, né green) ===== */
+.be-card.kpi {
+  border-width: 1px;
+  position: relative;
+  overflow: hidden;
+}
+.be-card.kpi::before {
+  content: "";
+  position: absolute; inset: 0;
+  background: var(--kpi-grad, transparent);
+  opacity: .45; pointer-events: none;
+}
+.be-card.kpi { border-color: var(--kpi-border, var(--be-border)); }
+.be-card.kpi .be-card__title { color: var(--kpi-ink-muted, var(--be-muted)); }
+.be-card.kpi .be-card__value { color: var(--kpi-ink, var(--be-text)); }
+
+/* Sky (Tổng doanh thu trong kỳ) */
+.kpi-sky {
+  --kpi-grad: linear-gradient(135deg, #e0f2fe, #dbeafe);
+  --kpi-border: #bfdbfe;
+  --kpi-ink: #0ea5e9;        /* cyan-600 */
+  --kpi-ink-muted: #0369a1;  /* sky-700 */
+}
+/* Rose (Tổng đơn trong kỳ) */
+.kpi-rose {
+  --kpi-grad: linear-gradient(135deg, #ffe4e6, #fecdd3);
+  --kpi-border: #fecdd3;
+  --kpi-ink: #e11d48;        /* rose-600 */
+  --kpi-ink-muted: #9f1239;  /* rose-800 */
+}
+/* Amber (Doanh thu hôm nay) */
+.kpi-amber {
+  --kpi-grad: linear-gradient(135deg, #fef3c7, #fde68a);
+  --kpi-border: #fcd34d;
+  --kpi-ink: #d97706;        /* amber-600 */
+  --kpi-ink-muted: #92400e;  /* amber-800 */
+}
+/* Violet (Doanh thu tháng) */
+.kpi-violet {
+  --kpi-grad: linear-gradient(135deg, #ede9fe, #ddd6fe);
+  --kpi-border: #c4b5fd;
+  --kpi-ink: #7c3aed;        /* violet-600 */
+  --kpi-ink-muted: #5b21b6;  /* violet-800 */
+}
+/* Indigo (Tổng sản phẩm) */
+.kpi-indigo {
+  --kpi-grad: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+  --kpi-border: #c7d2fe;
+  --kpi-ink: #4f46e5;        /* indigo-600 */
+  --kpi-ink-muted: #3730a3;  /* indigo-800 */
+}
+/* Cyan (Tồn kho hiện trạng) */
+.kpi-cyan {
+  --kpi-grad: linear-gradient(135deg, #cffafe, #a5f3fc);
+  --kpi-border: #67e8f9;
+  --kpi-ink: #0891b2;        /* cyan-700 */
+  --kpi-ink-muted: #155e75;  /* cyan-900 */
+}
+
+/* ===== Status grid / chips ===== */
+.be-status-grid {
+  display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:8px; margin-top:10px;
+}
+@media (max-width:840px){ .be-status-grid { grid-template-columns:repeat(2, minmax(0,1fr)); } }
+.be-status-item {
+  border:1px solid var(--be-border); border-radius:12px; padding:10px; text-align:center;
+  background:#f9fafb;
+}
+.be-status-label { font-size:11px; margin-bottom:6px; }
+.be-status-num { font-size:22px; font-weight:900; line-height:1; color:#0f172a; }
+
+.badge { padding:3px 10px; border-radius:999px; font-size:11px; font-weight:800; }
+.badge.ok { background:#ecfdf5; color:#065f46; }
+.badge.warn { background:#fffbeb; color:#92400e; }
+.badge.danger { background:#fef2f2; color:#991b1b; }
+.badge.mute { background:#f3f4f6; color:#374151; }
+.dot { margin:0 6px; color:#d1d5db; }
+
+/* ===== Panel ===== */
+.be-panel { background:#fff; border:1px solid var(--be-border); border-radius:16px; padding:16px; margin-bottom:16px; box-shadow: var(--be-shadow); }
+.be-panel__head { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px; }
+.be-panel__head h2 { margin:0; font-size:18px; font-weight:900; }
+.be-note { font-size:12px; color: var(--be-muted); }
+
+/* Panel trạng thái lọc */
+.be-filter-status .be-panel__head h2 { font-size:16px; }
+
+/* ===== Chart ===== */
+.be-chart { width:100%; height:360px; }
+.be-chart-legend { margin-top:6px; font-size:12px; color: var(--be-muted); display:flex; gap:12px; }
+.be-chart-legend .lgd b { font-weight:900; }
+.be-chart-svg { width:100%; height:360px; }
+
+/* ===== Donut layout ===== */
+.be-flex-row { display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
+.be-donut-svg { width:360px; height:360px; flex:0 0 auto; }
+.be-donut-legend { flex:1; display:flex; flex-direction:column; gap:8px; }
+.be-donut-row { display:grid; grid-template-columns:16px 1fr auto auto; align-items:center; gap:8px; padding:8px 10px; border:1px solid var(--be-border); border-radius:10px; }
+.be-donut-dot { width:12px; height:12px; border-radius:3px; display:inline-block; }
+.be-donut-name { font-weight:800; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#111827; }
+.be-donut-pct { font-weight:800; color:#111827; }
+.be-donut-val { color:var(--be-muted); font-weight:700; }
+
+/* ===== Table ===== */
+.be-table { width:100%; border:1px solid #f1f5f9; border-radius:12px; overflow:hidden; }
+.be-thead, .be-row { display:grid; grid-template-columns:64px 1.6fr 0.7fr 1fr 0.7fr; gap:10px; align-items:center; }
+.be-thead { background:#f8fafc; border-bottom:1px solid #f1f5f9; font-weight:700; font-size:12px; color:#374151; padding:10px; }
+.be-tbody .be-row { padding:10px; border-bottom:1px dashed #f1f5f9; transition: background .12s ease; }
+.be-tbody .be-row:last-child { border-bottom:0; }
+.hover-row:hover { background:#f9fafb; }
+
+.be-td { font-size:14px; color:#111827; min-width:0; }
+.be-td--name { font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.be-empty { padding:16px; text-align:center; color:#6b7280; }
+
+.be-img { width:44px; height:44px; border-radius:10px; overflow:hidden; background:#f3f4f6; display:inline-flex; align-items:center; justify-content:center; }
+.be-img img { width:100%; height:100%; object-fit:cover; }
+
+/* ===== Skeleton ===== */
+.is-skeleton { position:relative; }
+.is-skeleton::after{
+  content:""; position:absolute; inset:0;
+  background: linear-gradient(90deg, rgba(0,0,0,0), rgba(0,0,0,.04), rgba(0,0,0,0));
+  background-size:200% 100%; animation: shimmer 1.2s infinite; border-radius:inherit; pointer-events:none;
+}
+@keyframes shimmer{ 0%{background-position:200% 0;} 100%{background-position:-200% 0;} }
+
+.fade-in{ animation:fadeIn .25s ease-out both; }
+@keyframes fadeIn{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
+
+/* Khoá control khi chế độ khác */
+.be-chip:disabled,
+.be-datepick input:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+/* ===== Inventory summary (compact) (giữ nếu cần dùng nơi khác) ===== */
+.be-inv-summary { display:flex; flex-direction:column; gap:8px; }
+.be-inv-capsule {
+  display:inline-flex; align-items:center; flex-wrap:wrap; gap:10px;
+  padding:10px 12px; border:1px dashed var(--be-border); border-radius:999px; background:#fff;
+}
+.inv-pill { display:inline-flex; align-items:center; gap:8px; font-weight:800; font-size:14px; padding:6px 10px; border-radius:999px; line-height:1; }
+.inv-pill b { font-weight:900; }
+.inv-dot { width:8px; height:8px; border-radius:999px; display:inline-block; }
+.inv-total { background:#f8fafc; color:#0f172a; } .inv-total .inv-dot { background:#3b82f6; }
+.inv-low { background:#fffbeb; color:#78350f; } .inv-low .inv-dot { background:#f59e0b; }
+.inv-oos { background:#fef2f2; color:#7f1d1d; } .inv-oos .inv-dot { background:#ef4444; }
+.mid-dot { color:#cbd5e1; font-weight:900; margin:0 2px; }
+
+/* Chú thích ở dưới biểu đồ */
+.be-chart-legend .lgd b { font-weight: 900; }
+
+/* ===== Fix: giữ label + số cùng 1 hàng trong chip ===== */
+.be-status-inline {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+.be-status-chip {
+  flex: 1 1 240px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--be-border);
+  border-radius: 12px;
+  background: #f9fafb;
+  white-space: nowrap;
+  flex-wrap: nowrap;
+}
+.be-status-chip .chip-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+.be-status-chip .chip-num {
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1;
+  color: #0f172a;
+  text-align: right;
+  min-width: 80px;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+  white-space: nowrap;
+}
+/* Dot tròn nhỏ trong label */
+.dot8 {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+/* Màu nền/viền riêng cho chip tồn kho */
+.be-status-chip.inv-total {
+  background: #f8fafc;
+  color: #0f172a;
+  border-color: #e5e7eb;
+}
+.be-status-chip.inv-low {
+  background: #fffbeb;
+  color: #78350f;
+  border-color: #fde68a;
+}
+.be-status-chip.inv-oos {
+  background: #fef2f2;
+  color: #7f1d1d;
+  border-color: #fecaca;
+}
+/* Màu dot cho từng loại */
+.inv-total .inv-dot { background: #3b82f6; }
+.inv-low  .inv-dot { background: #f59e0b; }
+.inv-oos  .inv-dot { background: #ef4444; }
+
+/* Riêng hàng inline trong ô tồn kho */
+.be-status-inline--inv { margin-top: 10px; }
+/* === Fix KPI overlay che chữ + tăng tương phản === */
+.be-card.kpi {
+  position: relative;
+  isolation: isolate;              /* tách stacking context để z-index chuẩn */
+}
+
+/* Overlay gradient nằm dưới nội dung */
+.be-card.kpi::before {
+  z-index: 0;                      /* QUAN TRỌNG: dưới chữ */
+  opacity: .22 !important;         /* bớt đậm overlay (trước .45) */
+}
+
+/* Mọi nội dung text bên trong nổi lên trên overlay */
+.be-card.kpi > * {
+  position: relative;
+  z-index: 1;                      /* trên overlay */
+}
+
+/* Tăng contrast cho tiêu đề, giá trị, subline trong KPI */
+.be-card.kpi .be-card__title {
+  color: var(--kpi-ink-muted, #0f172a) !important;
+  opacity: .95;
+}
+.be-card.kpi .be-card__value {
+  color: var(--kpi-ink, #0f172a) !important;
+  text-shadow: 0 1px 0 rgba(255,255,255,.65); /* viền sáng nhẹ để nổi trên nền */
+}
+.be-card.kpi .be-subline {
+  color: #334155 !important;       /* đậm hơn muted */
+  opacity: .95;
+}
+
+/* Nếu đang dùng skeleton, chỉ phủ khi có class .is-skeleton */
+.be-card.kpi.is-skeleton::after {
+  content:"";
+  position:absolute; inset:0;
+  background: linear-gradient(90deg, rgba(0,0,0,0), rgba(0,0,0,.035), rgba(0,0,0,0));
+  background-size:200% 100%;
+  animation: shimmer 1.2s infinite;
+  border-radius:inherit;
+  z-index: 2;                      /* phủ trên chữ khi loading */
+}
+
+.be-donut-legend{
+  flex: 0 0 50%;   /* chiếm đúng 50% */
+  max-width: 50%;
+}
+
+/* Mobile/Tablet: vẫn để rộng 100% cho dễ đọc */
+@media (max-width: 900px){
+  .be-donut-legend{
+    flex: 1 1 100%;
+    max-width: none;
+  }
+}

@@ -1,47 +1,254 @@
-// ProfileSeller.jsx
-import React, { useRef, useState } from "react";
+// src/pages/seller/profile/ProfileSeller.jsx
+import React, { useEffect, useMemo, useRef, useState, useContext } from "react";
 import { NavLink } from "react-router-dom";
 import "../../../styles/SellerProfile.css";
+import { API_CONFIG, apiUrl } from "../../../config/api";
+import { AuthContext } from "../../../contexts/AuthContext";
 
 export default function ProfileSeller() {
-  function ToggleSwitch() {
-  const [on, setOn] = React.useState(false);
+  const { authFetch } = useContext(AuthContext) || {};
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState(null);
 
-  const toggle = () => setOn(v => !v);
+  // ✨ chế độ chỉnh sửa
+  const [editing, setEditing] = useState(false);
 
-  return (
-    <button
-      type="button"
-      className={`tk-switch ${on ? "is-on" : ""}`}
-      onClick={toggle}
-      aria-pressed={on}
-      aria-label={on ? "Tắt gian hàng" : "Bật gian hàng"}
-    >
-      <span className="tk-track" />
-      <span className="tk-thumb" />
-      <span className="tk-text">{on ? "Bật" : "Tắt"}</span>
-      <span className="tk-info">i</span>
-    </button>
-  );
-}
-  const [tab, setTab] = useState("login"); // login | shop | warehouse | legal
+  // ===== Resolve sellerId =====
+  const [sellerId, setSellerId] = useState("");
+  useEffect(() => {
+    const fromLS =
+      localStorage.getItem("seller_id") ||
+      localStorage.getItem("sellerId") ||
+      "";
+    if (fromLS) {
+      setSellerId(fromLS);
+      return;
+    }
 
-  // refs cho từng section bên phải
-  const secLoginRef = useRef(null);
-  const secShopRef = useRef(null);
-  const secWarehouseRef = useRef(null);
-  const secLegalRef = useRef(null);
+    let cancelled = false;
+    (async () => {
+      if (!authFetch) return;
+      try {
+        const resProf = await authFetch(
+          apiUrl(API_CONFIG.endpoints.getMyProfile),
+          { headers: { Accept: "application/json" } }
+        );
+        const dataProf = await resProf.json().catch(() => ({}));
+        if (!resProf.ok) throw new Error(dataProf?.message || "Lỗi profile");
+        const userId = dataProf?.result?.id;
 
-  const sectionRefs = {
-    login: secLoginRef,
-    shop: secShopRef,
-    warehouse: secWarehouseRef,
-    legal: secLegalRef,
+        const resSeller = await authFetch(
+          apiUrl(API_CONFIG.endpoints.searchSellerByUserId(userId)),
+          { headers: { Accept: "application/json" } }
+        );
+        const dataSeller = await resSeller.json().catch(() => ({}));
+        if (!resSeller.ok) throw new Error(dataSeller?.message || "Lỗi seller");
+        const sid = dataSeller?.result?.id || dataSeller?.result?.sellerId;
+        if (!cancelled && sid) {
+          setSellerId(sid);
+          localStorage.setItem("seller_id", sid);
+        }
+      } catch (e) {
+        setToast({
+          type: "error",
+          msg: e?.message || "Không tìm được sellerId",
+        });
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [authFetch]);
+
+  // ===== Seller data =====
+  const [seller, setSeller] = useState(null);
+  const [shopName, setShopName] = useState("");
+  const [avatarPreview, setAvatarPreview] = useState("");
+  const avatarFileRef = useRef(null);
+
+  // ➕ state mới cho Email & Địa chỉ (sửa ở hero)
+  const [email, setEmail] = useState("");
+  const [address, setAddress] = useState("");
+
+  useEffect(() => {
+    if (!authFetch || !sellerId) return;
+    let stop = false;
+    (async () => {
+      try {
+        setLoading(true);
+        const res = await authFetch(
+          apiUrl(API_CONFIG.endpoints.searchSellerBySellerId(sellerId)),
+          { headers: { Accept: "application/json" } }
+        );
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data?.message || `HTTP ${res.status}`);
+        if (stop) return;
+        setSeller(data.result);
+        setShopName(data.result?.shop_name || "");
+        setAvatarPreview(data.result?.avatar_link || "");
+        // nạp email & address
+        setEmail(data.result?.email || "");
+        setAddress(data.result?.address || "");
+      } catch (e) {
+        setToast({ type: "error", msg: e?.message || "Tải hồ sơ thất bại" });
+      } finally {
+        if (!stop) setLoading(false);
+      }
+    })();
+    return () => {
+      stop = true;
+    };
+  }, [authFetch, sellerId]);
+
+  const prettyDate = (iso) =>
+    iso ? new Date(iso).toLocaleString("vi-VN") : "—";
+
+  // chỉ cho chọn ảnh khi đang chỉnh sửa
+  const onPickAvatar = (e) => {
+    if (!editing) {
+      setToast({ type: "error", msg: "Hãy bấm 'Cập nhật' trước khi đổi ảnh." });
+      e.target.value = "";
+      return;
+    }
+    const f = e.target.files?.[0];
+    if (f) {
+      const url = URL.createObjectURL(f);
+      setAvatarPreview(url);
+    }
   };
 
+  // ================== Helpers: LUÔN CÓ ẢNH GỬI LÊN ==================
+  const dataURLToBlob = (dataUrl) => {
+    const arr = dataUrl.split(",");
+    const mime = arr[0].match(/:(.*?);/)[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) u8arr[n] = bstr.charCodeAt(n);
+    return new Blob([u8arr], { type: mime });
+  };
+
+  const TINY_PNG_DATAURL =
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9U6W8kQAAAAASUVORK5CYII=";
+
+  const urlToFile = async (url, filename = "avatar-old") => {
+    const resp = await fetch(url, { mode: "cors" });
+    if (!resp.ok) throw new Error(`Fetch avatar failed: HTTP ${resp.status}`);
+    const blob = await resp.blob();
+    const ext =
+      blob.type === "image/png"
+        ? "png"
+        : blob.type === "image/jpeg"
+        ? "jpg"
+        : blob.type === "image/webp"
+        ? "webp"
+        : "bin";
+    return new File([blob], `${filename}.${ext}`, {
+      type: blob.type || "application/octet-stream",
+    });
+  };
+
+  const getAvatarFileToSend = async (inputRef, currentAvatarUrl) => {
+    const picked = inputRef.current?.files?.[0];
+    if (picked) return picked;
+    if (currentAvatarUrl) {
+      try {
+        return await urlToFile(currentAvatarUrl, "avatar-old");
+      } catch (_) {}
+    }
+    const blob = dataURLToBlob(TINY_PNG_DATAURL);
+    return new File([blob], "avatar-fallback.png", { type: "image/png" });
+  };
+  // =================================================================
+
+  // Nút chính: Cập nhật ⇄ Lưu thay đổi
+  const onPrimary = async () => {
+    if (!editing) {
+      setEditing(true);
+      return;
+    }
+    await onSave();
+  };
+
+  const onSave = async () => {
+    if (!authFetch || !sellerId) {
+      setToast({ type: "error", msg: "Chưa có sellerId hoặc token." });
+      return;
+    }
+
+    // (tuỳ chọn) validate email nhẹ
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setToast({ type: "error", msg: "Email không hợp lệ." });
+      return;
+    }
+
+    try {
+      setSaving(true);
+
+      const fd = new FormData();
+
+      // ✅ luôn gắn avatar: file mới | ảnh cũ từ URL | ảnh PNG nhỏ
+      const avatarFile = await getAvatarFileToSend(
+        avatarFileRef,
+        seller?.avatar_link
+      );
+      fd.append("avatar", avatarFile);
+
+      fd.append("sellerId", sellerId);
+      fd.append("shopName", (shopName || "").trim());
+      // ➕ gửi thêm email & address như API hỗ trợ
+      fd.append("email", (email || "").trim());
+      fd.append("address", (address || "").trim());
+
+      const res = await authFetch(
+        apiUrl(API_CONFIG.endpoints.updateSellerInfo),
+        { method: "POST", body: fd }
+      );
+
+      const text = await res.text();
+      let data = {};
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch (_) {}
+
+      if (!res.ok) {
+        const beMsg = data?.message || text || `HTTP ${res.status}`;
+        throw new Error(beMsg);
+      }
+
+      const result = data.result ?? data;
+      setSeller(result);
+      setShopName(result?.shop_name || "");
+      setAvatarPreview(result?.avatar_link || avatarPreview);
+      // cập nhật lại state để UI phản chiếu ngay
+      setEmail(result?.email || "");
+      setAddress(result?.address || "");
+
+      try {
+        localStorage.setItem("seller_store_name", result?.shop_name || "");
+      } catch {}
+
+      setToast({ type: "success", msg: "Cập nhật hồ sơ thành công!" });
+      setEditing(false);
+    } catch (e) {
+      console.error("❌ updateInfSeller:", e);
+      setToast({ type: "error", msg: `Cập nhật thất bại: ${e.message}` });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Tabs & scroll
+  const [tab, setTab] = useState("login");
+  const secLoginRef = useRef(null);
+  const secShopRef = useRef(null);
+  const sectionRefs = useMemo(
+    () => ({ login: secLoginRef, shop: secShopRef }),
+    []
+  );
   const go = (key) => {
     setTab(key);
-    // scroll mượt tới section, sidebar vẫn sticky
     setTimeout(() => {
       sectionRefs[key]?.current?.scrollIntoView({
         behavior: "smooth",
@@ -58,53 +265,149 @@ export default function ProfileSeller() {
           <NavLink to="/seller/home" className="sp-crumb-link">
             Trang chủ
           </NavLink>
-          <span className="sp-crumb-sep">/</span>
-          <span className="sp-crumb-current">Hồ sơ nhà bán</span>
         </div>
-
         <div className="sp-head-row">
           <h1 className="sp-title">Hồ sơ nhà bán</h1>
           <button className="sp-btn ghost">⏱ Lịch sử bật tắt gian hàng</button>
         </div>
       </div>
 
-      {/* Alert vàng */}
-      <div className="sp-alert">
-        <div className="left">
-          <span className="ic-box">🏬</span>
-          <span>Vui lòng cung cấp địa chỉ kho lấy và trả hàng</span>
-        </div>
-        <button className="sp-btn primary">Cung cấp địa chỉ kho</button>
-      </div>
+      {/* ⭐ SHOP HERO */}
+      <div className="sp-card fade-in shop-hero">
+        <div className="shop-hero-left">
+          {/* Avatar tròn */}
+          <div
+            className={`hero-avatar ${editing ? "editable" : "locked"}`}
+            role="button"
+            tabIndex={0}
+            aria-label={
+              editing ? "Chọn ảnh gian hàng" : "Bấm 'Cập nhật' để đổi ảnh"
+            }
+            onClick={() => {
+              if (!editing) {
+                setToast({ type: "error", msg: "Bấm 'Cập nhật' để đổi ảnh." });
+                return;
+              }
+              avatarFileRef.current?.click();
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                if (!editing) {
+                  setToast({
+                    type: "error",
+                    msg: "Bấm 'Cập nhật' để đổi ảnh.",
+                  });
+                  return;
+                }
+                avatarFileRef.current?.click();
+              }
+            }}
+          >
+            {avatarPreview ? (
+              <img
+                className="hero-avatar-img hero-avatar-img--cover"
+                src={avatarPreview}
+                alt="shop avatar"
+              />
+            ) : (
+              <div className="hero-avatar-ph">🏪</div>
+            )}
 
-      {/* Card shop */}
-      <div className="sp-card">
-        <div className="shop-left">
-          <div className="avatar">🏪</div>
-          <div>
-            <div className="shop-name">TAHIShop</div>
-            <div className="shop-meta">
-              <span className="badge warn">Chưa được duyệt</span>
-              <span className="muted">
-                ID nhà bán: <strong>S00362859</strong> 📋
+            {/* Dấu cộng chỉ hiện khi đang chỉnh sửa */}
+            {editing && (
+              <span className="hero-plus" aria-hidden="true">
+                +
               </span>
-            </div>
+            )}
+
+            <input
+              ref={avatarFileRef}
+              id="avatarFile"
+              type="file"
+              accept="image/*"
+              onChange={onPickAvatar}
+              style={{ display: "none" }}
+            />
+          </div>
+
+          {/* Info bên phải ảnh */}
+          <div className="hero-info">
+            {/* Tên shop */}
+            {editing ? (
+              <input
+                className="hero-name-input"
+                value={shopName}
+                onChange={(e) => setShopName(e.target.value)}
+                maxLength={80}
+                placeholder="Tên gian hàng"
+                autoFocus
+              />
+            ) : (
+              <div className="hero-name">{seller?.shop_name || "—"}</div>
+            )}
+
+            {/* Email */}
+            {editing ? (
+              <input
+                className="hero-email-input"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email liên hệ"
+              />
+            ) : (
+              <div className="hero-email">{seller?.email ?? email ?? "—"}</div>
+            )}
+
+            {/* Địa chỉ */}
+            {editing ? (
+              <input
+                className="hero-email-input"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="Địa chỉ"
+              />
+            ) : (
+              <div className="hero-address">
+                {seller?.address ?? address ?? "—"}
+              </div>
+            )}
           </div>
         </div>
 
-       <div className="shop-right">
-  <ToggleSwitch />
-  <button className="sp-btn outline">
-    Thiết lập gian hàng <span className="arrow">›</span>
-  </button>
-</div>
+        <div className="shop-hero-right">
+          {/* Meta cùng hàng với nút */}
+          <div className="shop-meta">
+            <span
+              className={`badge-status ${
+                seller?.status === "APPROVED" ? "approved" : "pending"
+              }`}
+            >
+              {seller?.status === "APPROVED"
+                ? "✓ Đã duyệt"
+                : "⏳ Chưa được duyệt"}
+            </span>
+            <span className="meta-date">
+              Đăng ký: {prettyDate(seller?.registration_date)}
+            </span>
+          </div>
 
+          <button
+            className={`sp-btn primary ${saving ? "is-loading" : ""}`}
+            onClick={onPrimary}
+            disabled={loading || saving}
+          >
+            {editing
+              ? saving
+                ? "Đang lưu…"
+                : "💾 Lưu thay đổi"
+              : "✏️ Cập nhật"}
+          </button>
+        </div>
       </div>
 
-      {/* body */}
+      {/* Body */}
       <div className="sp-body">
-        {/* SIDEBAR (sticky) */}
-        {/* SIDEBAR (sticky) */}
         <aside className="sp-side">
           <button
             className={`sp-side-item ${
@@ -115,7 +418,6 @@ export default function ProfileSeller() {
             <span className="state">✓</span>
             <div className="t1">Tài khoản đăng nhập</div>
           </button>
-
           <button
             className={`sp-side-item ${tab === "shop" ? "is-active" : ""} done`}
             onClick={() => go("shop")}
@@ -123,31 +425,8 @@ export default function ProfileSeller() {
             <span className="state">✓</span>
             <div className="t1">Thông tin gian hàng và quản lý</div>
           </button>
-
-          <button
-            className={`sp-side-item ${
-              tab === "warehouse" ? "is-active" : ""
-            } pending`}
-            onClick={() => go("warehouse")}
-          >
-            <span className="state">?</span>
-            <div className="t1">
-              Thông tin kho hàng, mô hình vận hành và liên lạc
-            </div>
-          </button>
-
-          <button
-            className={`sp-side-item ${
-              tab === "legal" ? "is-active" : ""
-            } pending`}
-            onClick={() => go("legal")}
-          >
-            <span className="state">?</span>
-            <div className="t1">Giấy tờ pháp lý</div>
-          </button>
         </aside>
 
-        {/* PANEL: render tất cả section, dùng ref để scroll */}
         <section className="sp-panel">
           {/* Tài khoản đăng nhập */}
           <div ref={secLoginRef} className="sp-section">
@@ -159,110 +438,97 @@ export default function ProfileSeller() {
             </div>
             <div className="sp-table">
               <div className="row">
-                <div className="label">Tài khoản</div>
-                <div className="value">nguyenquocthai001005@gmail.com</div>
+                <div className="label">Email</div>
+                <div className="value">{seller?.email ?? email ?? "—"}</div>
               </div>
               <div className="row">
-                <div className="label">ID tài khoản</div>
-                <div className="value">362859</div>
+                <div className="label">Ngày đăng ký</div>
+                <div className="value">
+                  {prettyDate(seller?.registration_date)}
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Thông tin gian hàng và quản lý */}
+          {/* Thông tin gian hàng */}
           <div ref={secShopRef} className="sp-section">
             <div className="sp-section-head">
               <h2>Thông tin gian hàng và quản lý</h2>
-              <button className="sp-link">Chi tiết ›</button>
             </div>
             <div className="sp-subdesc">
-              Điều chỉnh loại hình kinh doanh, thông tin của gian hàng và quản
-              lý
+              Điều chỉnh thông tin công khai của gian hàng
             </div>
             <div className="sp-table">
+              {/* ID nhà bán */}
+              <div className="row">
+                <div className="label">ID nhà bán</div>
+                <div className="value">
+                  <span className="id-badge">{sellerId || "—"}</span>
+                </div>
+              </div>
+              {/* Tên gian hàng - CÓ THỂ CHỈNH SỬA */}
               <div className="row">
                 <div className="label">Tên gian hàng</div>
-                <div className="value">TAHIShop</div>
-              </div>
-              <div className="row">
-                <div className="label">Quản lý gian hàng</div>
-                <div className="value">Nguyễn Quốc Thái / +84358097747</div>
-              </div>
-              <div className="row">
-                <div className="label">Mã gian hàng</div>
-                <div className="value">S00362859</div>
-              </div>
-              <div className="row">
-                <div className="label">Loại hình kinh doanh</div>
-                <div className="value">Tài khoản Cá nhân</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Thông tin kho hàng… */}
-          <div ref={secWarehouseRef} className="sp-section">
-            <div className="sp-section-head">
-              <h2>Thông tin kho hàng, mô hình vận hành và liên lạc</h2>
-              <button className="sp-link">Chi tiết ›</button>
-            </div>
-            <div className="sp-subdesc">
-              Điều chỉnh mô hình vận hành, tài khoản ngân hàng và các thông tin
-              khác
-            </div>
-            <div className="sp-table">
-              <div className="row">
-                <div className="label">Mô hình vận hành & Kho hàng</div>
-                <div className="value value-group">
-                  <span className="text-strong">
-                    Lưu kho Shopping, Giao thẳng từ Nhà Bán
-                  </span>
-                  <span className="sp-pill warn">
-                    ⚠ Cần địa chỉ kho lấy & trả hàng
-                  </span>
-                </div>
-              </div>
-              <div className="row">
-                <div className="label">Tài khoản ngân hàng</div>
-                <div className="value value-group">
-                  <span className="text-mute">—</span>
-                  <span className="sp-pill warn">
-                    ⚠ Cần tài khoản ngân hàng
-                  </span>
-                </div>
-              </div>
-              <div className="row">
-                <div className="label">Thông tin liên lạc</div>
                 <div className="value">
-                  <span className="text-mute">—</span>
+                  <input
+                    className="sp-input"
+                    value={shopName}
+                    onChange={(e) => setShopName(e.target.value)}
+                    maxLength={80}
+                    placeholder="Tên gian hàng"
+                    disabled={!editing}
+                  />
                 </div>
               </div>
-            </div>
-          </div>
-
-          {/* Giấy tờ pháp lý */}
-          <div ref={secLegalRef} className="sp-section">
-            <div className="sp-section-head">
-              <h2>Giấy tờ pháp lý</h2>
-              <button className="sp-link">Chi tiết ›</button>
-            </div>
-            <div className="sp-subdesc">
-              Lưu trữ các giấy tờ pháp lý và hợp đồng của Nhà bán
-            </div>
-            <div className="sp-table">
+              {/* Email liên hệ - KHÓA giống Tên gian hàng (mở khi editing) */}
               <div className="row">
-                <div className="label">Giấy tờ tùy thân</div>
+                <div className="label">Email liên hệ</div>
                 <div className="value">
-                  <span className="sp-pill warn">⚠ Cần giấy tờ tùy thân</span>
+                  <input
+                    className="sp-input"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Email liên hệ"
+                    disabled={!editing}
+                  />
                 </div>
               </div>
+              {/* Địa chỉ - KHÓA giống Tên gian hàng (mở khi editing) */}
               <div className="row">
-                <div className="label">Số hợp đồng</div>
-                <div className="value">364452/MP/SHOP/T7-2025</div>
+                <div className="label">Địa chỉ</div>
+                <div className="value">
+                  <input
+                    className="sp-input"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    placeholder="Địa chỉ"
+                    disabled={!editing}
+                  />
+                </div>
               </div>
             </div>
           </div>
         </section>
       </div>
+
+      {/* Loading overlay */}
+      {loading && (
+        <div className="sp-loading">
+          <div className="spinner" />
+          <div>Đang tải hồ sơ…</div>
+        </div>
+      )}
+
+      {/* Toast */}
+      {toast && (
+        <div
+          className={`sp-toast ${toast.type}`}
+          onAnimationEnd={() => setToast(null)}
+        >
+          {toast.msg}
+        </div>
+      )}
     </div>
   );
 }

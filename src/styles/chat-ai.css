@@ -1,0 +1,35 @@
+.chat-ai-suggestions {
+  padding: 8px 16px 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-top: 1px dashed #e5e7eb;
+  background: #fafafa;
+}
+
+.chat-ai-suggest-chip {
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  background: #ffffff;
+  color: #374151;
+  cursor: pointer;
+  max-width: 100%;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.chat-ai-suggest-chip:hover:not(:disabled) {
+  background: #111827;
+  color: #ffffff;
+  border-color: #111827;
+  transform: translateY(-1px);
+}
+
+.chat-ai-suggest-chip:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
