@@ -205,3 +205,124 @@
   scrollbar-width: none;          /* Firefox */
 }
 .notif-scroll::-webkit-scrollbar { display: none; } /* Chrome/Safari/Edge */
+/* ==== Pager cho Thông báo (ORDER) ==== */
+.notif-pager {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+/* Nhóm nút Trước / Sau + trạng thái trang */
+.notif-pg-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px;
+  border: 1px solid #eef1f7;
+  border-radius: 12px;
+  background: #fafcff;
+}
+
+.notif-pg-btn {
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid #e7ecf5;
+  background: #fff;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.notif-pg-btn:hover:not(:disabled) {
+  background: #f4f7ff;
+}
+
+.notif-pg-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* "Trang [input] / X" trên cùng một hàng */
+.notif-pg-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.notif-page-input {
+  width: 64px;
+  height: 34px;
+  text-align: center;
+  border-radius: 10px;
+  border: 1px solid #e7ecf5;
+  background: #fff;
+  outline: none;
+  font-size: 14px;
+}
+
+.notif-page-input:focus {
+  border-color: #cfe0ff;
+  box-shadow: 0 0 0 3px rgba(42, 108, 234, 0.12);
+}
+
+/* "Mỗi trang [select]" dính cùng 1 hàng với pager */
+.notif-size {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.notif-size-label {
+  color: #5b6a86;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.notif-size-select {
+  height: 36px;
+  min-width: 80px;
+  border-radius: 10px;
+  border: 1px solid #e7ecf5;
+  background: #fff;
+  padding: 0 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.notif-size-select:focus {
+  border-color: #cfe0ff;
+  box-shadow: 0 0 0 3px rgba(42, 108, 234, 0.12);
+}
+
+/* Dark mode nếu file Notifications.css có dùng */
+@media (prefers-color-scheme: dark) {
+  .notif-pg-group {
+    border-color: #1a2741;
+    background: #0f172a;
+  }
+  .notif-pg-btn {
+    border-color: #1f2937;
+    background: #020617;
+    color: #e5e7eb;
+  }
+  .notif-pg-btn:hover:not(:disabled) {
+    background: #111827;
+  }
+  .notif-page-input,
+  .notif-size-select {
+    border-color: #1f2937;
+    background: #020617;
+    color: #e5e7eb;
+  }
+  .notif-size-label {
+    color: #9ca3af;
+  }
+}

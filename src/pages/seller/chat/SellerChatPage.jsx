@@ -16,6 +16,27 @@ import {
   getSocket,
 } from "../../../services/realtime";
 
+// ====== Product helper (giống bên user) ======
+const PRODUCT_PREFIX = "[PRODUCT]";
+
+function decodeProductMessage(message) {
+  if (typeof message !== "string") return null;
+  if (!message.startsWith(PRODUCT_PREFIX)) return null;
+  try {
+    const payload = message.slice(PRODUCT_PREFIX.length).trim();
+    const [id, name, price, link, image] = payload.split("|||");
+    return {
+      id: id || null,
+      name: name || "",
+      price: price || "",
+      link: link || "",
+      image: image || "",
+    };
+  } catch {
+    return null;
+  }
+}
+
 export default function SellerChatPage() {
   // Emoji
   const [showEmoji, setShowEmoji] = useState(false);
@@ -192,10 +213,13 @@ export default function SellerChatPage() {
           : []) || [];
 
       const hasFiles = filesArr.length > 0;
-      const text =
-        (message && String(message)) ||
-        (emoji ? `(${emoji})` : "") ||
-        (hasFiles ? "[tệp]" : "");
+      const product = decodeProductMessage(message);
+
+      const text = product
+        ? `Sản phẩm: ${product.name || "?"}`
+        : (message && String(message)) ||
+          (emoji ? `(${emoji})` : "") ||
+          (hasFiles ? "[tệp]" : "");
 
       setMsgs((prev) => ({
         ...prev,
@@ -204,6 +228,7 @@ export default function SellerChatPage() {
           {
             role: "them",
             text,
+            product,
             files: filesArr,
             createdAt: createdAt || new Date().toISOString(),
           },
@@ -214,7 +239,13 @@ export default function SellerChatPage() {
         prev
           .map((c) =>
             c.id === cid
-              ? { ...c, last: text, time: formatTime(createdAt || new Date()) }
+              ? {
+                  ...c,
+                  last: product
+                    ? `Sản phẩm: ${product.name || "?"}`
+                    : text,
+                  time: formatTime(createdAt || new Date()),
+                }
               : c
           )
           .sort((a, b) => (a.id === cid ? -1 : b.id === cid ? 1 : 0))
@@ -267,6 +298,12 @@ export default function SellerChatPage() {
 
             const hasFiles =
               Array.isArray(row.fileUrls) && row.fileUrls.length > 0;
+            const product = decodeProductMessage(row.message);
+
+            const lastText = product
+              ? `Sản phẩm: ${product.name || "?"}`
+              : (row.message && String(row.message).trim()) ||
+                (row.emoji ? row.emoji : hasFiles ? "[tệp]" : "—");
 
             return {
               id: `c-${uid}`,
@@ -274,9 +311,7 @@ export default function SellerChatPage() {
               targetId: uid,
               name: meta.name,
               avatar: meta.avatar,
-              last:
-                (row.message && String(row.message).trim()) ||
-                (row.emoji ? row.emoji : hasFiles ? "[tệp]" : "—"),
+              last: lastText,
               time: formatTime(row.createdAt),
             };
           })
@@ -325,13 +360,19 @@ export default function SellerChatPage() {
 
         const mapped = (data || []).map((m) => {
           const hasFiles = Array.isArray(m.fileUrls) && m.fileUrls.length > 0;
+          const product = decodeProductMessage(m.message);
+
+          const baseText = product
+            ? `Sản phẩm: ${product.name || "?"}`
+            : (m.message && String(m.message)) ||
+              (m.emoji ? `(${m.emoji})` : "") ||
+              (hasFiles ? "[tệp]" : "");
+
           return {
             role: m.fromSelf ? "me" : "them",
-            text:
-              (m.message && String(m.message)) ||
-              (m.emoji ? `(${m.emoji})` : "") ||
-              (hasFiles ? "[tệp]" : ""),
-            files: hasFiles ? m.fileUrls : [],
+            text: baseText,
+            product,
+            files: hasFiles ? m.fileUrls : product?.image ? [product.image] : [],
             createdAt: m.createdAt,
           };
         });
@@ -450,6 +491,7 @@ export default function SellerChatPage() {
           {
             role: "me",
             text: newText,
+            product: null,
             files: uploadedUrls || previewUrls,
             createdAt: resp?.message?.createdAt || new Date().toISOString(),
           },
@@ -471,7 +513,8 @@ export default function SellerChatPage() {
   };
 
   const renderFiles = (m) => {
-    if (!m.files?.length) return null;
+    // Nếu là product message thì đã có ảnh trong card => không cần render files nữa
+    if (!m.files?.length || m.product) return null;
     const arr = Array.isArray(m.files) ? m.files : [m.files];
     return (
       <div className="files" style={{ marginTop: 8 }}>
@@ -512,7 +555,7 @@ export default function SellerChatPage() {
       return;
     }
     const start = el.selectionStart ?? el.value.length;
-       const end = el.selectionEnd ?? el.value.length;
+    const end = el.selectionEnd ?? el.value.length;
     const next = text.slice(0, start) + emojiStr + text.slice(end);
     setText(next);
     requestAnimationFrame(() => {
@@ -629,7 +672,50 @@ export default function SellerChatPage() {
                 className={`cs-bubble ${m.role === "me" ? "me" : "them"}`}
               >
                 <div className="bubble">
-                  {m.text}
+                  {/* Card sản phẩm nếu có */}
+                  {m.product && (
+                    <div className="cs-product-card">
+                      <div className="cs-product-thumb-wrap">
+                        {m.product.image ? (
+                          <img
+                            src={m.product.image}
+                            alt={m.product.name || "Sản phẩm"}
+                            className="cs-product-thumb"
+                          />
+                        ) : (
+                          <div className="cs-product-thumb placeholder" />
+                        )}
+                      </div>
+                      <div className="cs-product-meta">
+                        <div className="cs-product-tag">
+                          Sản phẩm khách đang hỏi
+                        </div>
+                        <div className="cs-product-name">
+                          {m.product.name || "Sản phẩm"}
+                        </div>
+                        {m.product.price && (
+                          <div className="cs-product-price">
+                            {m.product.price}
+                          </div>
+                        )}
+                        {m.product.link && (
+                          <a
+                            href={m.product.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="cs-product-link"
+                          >
+                            Xem chi tiết sản phẩm
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {m.text && (
+                    <div className="cs-message-text">{m.text}</div>
+                  )}
+
                   {renderFiles(m)}
                 </div>
               </div>

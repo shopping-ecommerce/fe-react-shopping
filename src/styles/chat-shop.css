@@ -828,3 +828,125 @@
   filter: none;          /* đảm bảo không áp filter nào */
   opacity: 1;
 }
+/* ================= PRODUCT CARD TRONG BUBBLE ================= */
+
+.cs-product-card {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 8px 10px;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  border: 1px solid rgba(249, 250, 251, 0.8);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* bên phía shop (nền trắng) */
+.cs-bubble.them .cs-product-card {
+  background: #f3f4f6;
+  border-color: #e5e7eb;
+}
+
+/* bên phía user (nền đen) */
+.cs-bubble.me .cs-product-card {
+  background: rgba(15, 23, 42, 0.6);
+  border-color: rgba(148, 163, 184, 0.6);
+}
+
+.cs-product-thumb-wrap {
+  flex-shrink: 0;
+}
+
+.cs-product-thumb {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: #e5e7eb;
+  border: 1px solid #d1d5db;
+}
+
+.cs-product-thumb.placeholder {
+  background: linear-gradient(135deg, #e5e7eb, #f9fafb);
+}
+
+.cs-product-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.cs-product-tag {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  margin-bottom: 2px;
+  opacity: 0.7;
+}
+
+.cs-bubble.me .cs-product-tag {
+  color: #e5e7eb;
+}
+
+.cs-bubble.them .cs-product-tag {
+  color: #4b5563;
+}
+
+.cs-product-name {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+
+.cs-bubble.me .cs-product-name {
+  color: #f9fafb;
+}
+
+.cs-bubble.them .cs-product-name {
+  color: #111827;
+}
+
+.cs-product-price {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.cs-bubble.me .cs-product-price {
+  color: #fbbf24;
+}
+
+.cs-bubble.them .cs-product-price {
+  color: #b91c1c;
+}
+
+.cs-product-link {
+  font-size: 12px;
+  text-decoration: underline;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cs-bubble.me .cs-product-link {
+  color: #e5e7eb;
+}
+
+.cs-bubble.them .cs-product-link {
+  color: #111827;
+}
+
+.cs-product-link:hover {
+  opacity: 0.8;
+}
+
+/* Text trong bubble tách riêng để không dính vào card */
+.cs-message-text {
+  font-size: 14px;
+  line-height: 1.5;
+  margin-top: 4px;
+}

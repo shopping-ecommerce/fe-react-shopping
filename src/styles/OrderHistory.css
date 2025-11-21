@@ -155,3 +155,78 @@
   box-shadow: 0 6px 16px rgba(224,36,36,.35);
   background: #c81e1e;
 }
+/* ==== Pager cho lịch sử đơn hàng ==== */
+.order-pager {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-start; /* 🔥 Quan trọng: canh trái */
+}
+
+.order-pg-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px;
+  border: 1px solid #eef1f7;
+  border-radius: 12px;
+  background: #fafcff;
+}
+
+.order-pg-btn {
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid #e7ecf5;
+  background: #fff;
+  cursor: pointer;
+  font-weight: 600;
+}
+.order-pg-btn:hover:not(:disabled) { background: #f4f7ff; }
+.order-pg-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.order-pg-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px;
+  font-weight: 600;
+}
+
+.order-page-input {
+  width: 64px;
+  height: 34px;
+  text-align: center;
+  border-radius: 10px;
+  border: 1px solid #e7ecf5;
+  background: #fff;
+  outline: none;
+}
+.order-page-input:focus {
+  border-color: #cfe0ff;
+  box-shadow: 0 0 0 3px rgba(42,108,234,.12);
+}
+
+.order-size {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto; /* phần "Mỗi trang" đẩy về bên phải */
+}
+.order-size-label { color: #5b6a86; font-weight: 600; }
+.order-size-select {
+  height: 36px;
+  min-width: 80px;
+  border-radius: 10px;
+  border: 1px solid #e7ecf5;
+  background: #fff;
+  padding: 0 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.order-size-select:focus {
+  border-color: #cfe0ff;
+  box-shadow: 0 0 0 3px rgba(42,108,234,.12);
+}

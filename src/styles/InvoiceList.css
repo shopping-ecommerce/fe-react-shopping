@@ -128,7 +128,13 @@
 }
 .status-completed { background:#d1ecf1; color:#0c5460; border:1px solid #7fcdcd; }
 
-.col-actions { display: flex; gap: 10px; }
+.col-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;   /* 👈 thêm dòng này */
+  align-items: center;       /* (tuỳ, để cho icon canh giữa theo chiều dọc luôn) */
+}
+
 .btn-icon{
   width:36px; height:36px; border:none; border-radius:10px; background:#111; color:#fff;
   display:grid; place-items:center; cursor:pointer; transition: transform .12s ease, box-shadow .12s ease, background .2s ease;
@@ -217,4 +223,103 @@
   .table-row > div:last-child{ border-bottom:none; }
   .col-actions{ justify-content:flex-end; }
   .modal-content{ width:95%; }
+}
+/* ===== Phân trang hóa đơn – đồng bộ style với các trang seller ===== */
+
+.order-pager {
+  margin-top: 16px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* nhóm nút trái, chọn size bên phải */
+  gap: 16px;
+}
+
+/* Nhóm nút Trang trước / Trang sau + input số trang */
+.order-pg-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Nút Trước / Sau */
+.order-pg-btn {
+  min-width: 88px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  font-size: 14px;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.08s ease;
+}
+
+.order-pg-btn:hover:not(:disabled) {
+  background: #111827;
+  border-color: #111827;
+  color: #ffffff;
+  transform: translateY(-0.5px);
+}
+
+.order-pg-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* "Trang [input] / [total]" */
+.order-pg-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.order-page-input {
+  width: 56px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  text-align: center;
+  font-size: 14px;
+}
+
+.order-page-input:disabled {
+  background: #f9fafb;
+  color: #9ca3af;
+}
+
+/* Chọn số dòng mỗi trang */
+.order-pg-size {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.order-size-label {
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.order-size-select {
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  background: #ffffff;
+  min-width: 72px;
+}
+
+.order-size-select:focus,
+.order-page-input:focus {
+  outline: none;
+  border-color: #111827;
+  box-shadow: 0 0 0 1px rgba(17, 24, 39, 0.08);
 }

@@ -290,7 +290,11 @@ function ItemReviewModal({
       onSubmitted?.(data?.result);
       setSubmitting(false);
       onClose?.();
-      Toast.success(`Đã gửi đánh giá${target?.productName ? ` cho “${target.productName}”` : ""}. Cảm ơn bạn!`);
+      Toast.success(
+        `Đã gửi đánh giá${
+          target?.productName ? ` cho “${target.productName}”` : ""
+        }. Cảm ơn bạn!`
+      );
     } catch (e) {
       setSubmitting(false);
       Toast.error(e?.message || "Gửi đánh giá thất bại");
@@ -513,6 +517,9 @@ export default function OrderHistory() {
   const [sellerNameMap, setSellerNameMap] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  // Phân trang
+  const [page, setPage] = useState(0); // 0-based
+  const [size, setSize] = useState(5); // số đơn / trang
 
   // Modal hủy
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
@@ -728,6 +735,39 @@ export default function OrderHistory() {
     });
   }, [orders, searchQuery]);
 
+  // Mỗi lần đổi tab hoặc từ khoá, quay về trang 1
+  useEffect(() => {
+    setPage(0);
+  }, [activeTab, searchQuery]);
+
+  // Tổng số trang
+  const totalPages = useMemo(() => {
+    if (!filtered.length) return 0;
+    return Math.max(1, Math.ceil(filtered.length / size));
+  }, [filtered.length, size]);
+
+  // Đảm bảo page không vượt quá totalPages - 1
+  useEffect(() => {
+    if (!totalPages) {
+      setPage(0);
+      return;
+    }
+    setPage((prev) => Math.min(prev, totalPages - 1));
+  }, [totalPages]);
+
+  // Mảng đơn hàng cho trang hiện tại
+  const pagedOrders = useMemo(() => {
+    if (!filtered.length) return [];
+    const start = page * size;
+    return filtered.slice(start, start + size);
+  }, [filtered, page, size]);
+
+  const handleJumpPage = (val) => {
+    const total = totalPages || 1;
+    const n = Math.max(1, Math.min(total, Number(val) || 1));
+    setPage(n - 1);
+  };
+
   // ===== Cancel modal handlers =====
   const openCancelModal = (order) => {
     setCancelTarget(order);
@@ -883,135 +923,202 @@ export default function OrderHistory() {
             <p className="order-empty-text">Chưa có đơn hàng</p>
           </div>
         ) : (
-          <div className="order-list">
-            {filtered.map((o) => {
-              const items = Array.isArray(o.orderItems) ? o.orderItems : [];
-              const total = pickPaidTotal(o);
-              const statusText = STATUS_VI[o.status] || o.status;
-              const sellerName =
-                sellerNameMap[o.sellerId] ||
-                `Nhà bán #${(o.sellerId || "").slice(0, 8)}`;
+          <>
+            <div className="order-list">
+              {pagedOrders.map((o) => {
+                const items = Array.isArray(o.orderItems) ? o.orderItems : [];
+                const total = pickPaidTotal(o);
+                const statusText = STATUS_VI[o.status] || o.status;
+                const sellerName =
+                  sellerNameMap[o.sellerId] ||
+                  `Nhà bán #${(o.sellerId || "").slice(0, 8)}`;
 
-              return (
-                <div key={o.id} className="order-card">
-                  <div className="order-topbar">
-                    <div className="order-shop">
-                      <span className="shop-name">{sellerName}</span>
+                return (
+                  <div key={o.id} className="order-card">
+                    <div className="order-topbar">
+                      <div className="order-shop">
+                        <span className="shop-name">{sellerName}</span>
+                      </div>
+                      <div className="order-status">
+                        <span className={badgeClass(o.status)}>
+                          {statusText}
+                        </span>
+                      </div>
                     </div>
-                    <div className="order-status">
-                      <span className={badgeClass(o.status)}>{statusText}</span>
+
+                    <div
+                      className="order-meta"
+                      style={{ padding: "0 16px", color: "#666", fontSize: 13 }}
+                    >
+                      <span>Ngày đặt: {fmtDate(o.createdTime)}</span>
+                      {" · "}
+                      <span>Người nhận: {o.recipientName || "-"}</span>
+                      {" · "}
+                      <span>Thanh toán: {o.paymentStatus || "-"}</span>
                     </div>
-                  </div>
 
-                  <div
-                    className="order-meta"
-                    style={{ padding: "0 16px", color: "#666", fontSize: 13 }}
-                  >
-                    <span>Ngày đặt: {fmtDate(o.createdTime)}</span>
-                    {" · "}
-                    <span>Người nhận: {o.recipientName || "-"}</span>
-                    {" · "}
-                    <span>Thanh toán: {o.paymentStatus || "-"}</span>
-                  </div>
+                    <div className="order-items modern">
+                      {items.map((it, idx) => {
+                        const reviewedKey = `${o.id}:${it.productId}`;
+                        const reviewed = reviewedSet.has(reviewedKey);
 
-                  <div className="order-items modern">
-                    {items.map((it, idx) => {
-                      const reviewedKey = `${o.id}:${it.productId}`;
-                      const reviewed = reviewedSet.has(reviewedKey);
+                        return (
+                          <div
+                            key={idx}
+                            className="order-line"
+                            role="button"
+                            tabIndex={0}
+                            onClick={() =>
+                              navigate(`${baseOrdersPath}/${o.id}`)
+                            }
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ")
+                                navigate(`${baseOrdersPath}/${o.id}`);
+                            }}
+                            style={{ cursor: "pointer" }}
+                          >
+                            <div className="line-left">
+                              <div
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  alignItems: "center",
+                                  gap: 8,
+                                }}
+                              >
+                                <img
+                                  className="thumb"
+                                  src={it.productImage}
+                                  alt={it.productName}
+                                />
 
-                      return (
-                        <div
-                          key={idx}
-                          className="order-line"
-                          role="button"
-                          tabIndex={0}
-                          onClick={() => navigate(`${baseOrdersPath}/${o.id}`)}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" || e.key === " ")
-                              navigate(`${baseOrdersPath}/${o.id}`);
-                          }}
-                          style={{ cursor: "pointer" }}
-                        >
-                          <div className="line-left">
-                            <div
-                              style={{
-                                display: "flex",
-                                flexDirection: "column",
-                                alignItems: "center",
-                                gap: 8,
-                              }}
-                            >
-                              <img
-                                className="thumb"
-                                src={it.productImage}
-                                alt={it.productName}
-                              />
-
-                              {o.status === "DELIVERED" && (
-                                <button
-                                  className="btn-primary"
-                                  style={{ padding: "6px 10px", fontSize: 13 }}
-                                  onClick={(e) => {
-                                    e.stopPropagation(); // ⛔ không trigger điều hướng
-                                    setReviewOpen(true);
-                                    setReviewTarget({
-                                      orderId: o.id,
-                                      productId: it.productId,
-                                      productName: it.productName,
-                                      productImage: it.productImage,
-                                    });
-                                  }}
-                                  disabled={reviewed || !profileUserId}
-                                  title={
-                                    reviewed
-                                      ? "Bạn đã đánh giá sản phẩm này"
-                                      : !profileUserId
-                                      ? "Thiếu userId"
-                                      : "Đánh giá sản phẩm"
-                                  }
-                                >
-                                  {reviewed ? "Đã đánh giá" : "Đánh giá"}
-                                </button>
-                              )}
-                            </div>
-
-                            <div className="meta">
-                              <div className="name">{it.productName}</div>
-                              <div className="variant">
-                                {variantLine(it) || "-"}
+                                {o.status === "DELIVERED" && (
+                                  <button
+                                    className="btn-primary"
+                                    style={{
+                                      padding: "6px 10px",
+                                      fontSize: 13,
+                                    }}
+                                    onClick={(e) => {
+                                      e.stopPropagation(); // ⛔ không trigger điều hướng
+                                      setReviewOpen(true);
+                                      setReviewTarget({
+                                        orderId: o.id,
+                                        productId: it.productId,
+                                        productName: it.productName,
+                                        productImage: it.productImage,
+                                      });
+                                    }}
+                                    disabled={reviewed || !profileUserId}
+                                    title={
+                                      reviewed
+                                        ? "Bạn đã đánh giá sản phẩm này"
+                                        : !profileUserId
+                                        ? "Thiếu userId"
+                                        : "Đánh giá sản phẩm"
+                                    }
+                                  >
+                                    {reviewed ? "Đã đánh giá" : "Đánh giá"}
+                                  </button>
+                                )}
                               </div>
 
-                              <div className="qty">x{it.quantity}</div>
+                              <div className="meta">
+                                <div className="name">{it.productName}</div>
+                                <div className="variant">
+                                  {variantLine(it) || "-"}
+                                </div>
+
+                                <div className="qty">x{it.quantity}</div>
+                              </div>
+                            </div>
+
+                            <div className="line-right">
+                              <div className="price-now">
+                                {fmtVND(it.unitPrice)}
+                              </div>
                             </div>
                           </div>
-
-                          <div className="line-right">
-                            <div className="price-now">
-                              {fmtVND(it.unitPrice)}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  <div className="order-bottom">
-                    {renderActions(o)}
-                    <div className="order-total right">
-                      <span>Thành tiền:</span>
-                      <strong className="total-amount pill">
-                        {fmtVND(total)}
-                      </strong>
+                        );
+                      })}
                     </div>
+
+                    <div className="order-bottom">
+                      {renderActions(o)}
+                      <div className="order-total right">
+                        <span>Thành tiền:</span>
+                        <strong className="total-amount pill">
+                          {fmtVND(total)}
+                        </strong>
+                      </div>
+                    </div>
+
+                    {o.notes && (
+                      <div className="order-note">Ghi chú: {o.notes}</div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Phân trang */}
+            {totalPages > 1 && (
+              <div className="order-pager">
+                <div className="order-pg-group">
+                  <button
+                    className="order-pg-btn"
+                    disabled={page <= 0}
+                    onClick={() => setPage((p) => Math.max(0, p - 1))}
+                  >
+                    ← Trước
+                  </button>
+
+                  <div className="order-pg-status">
+                    <span>Trang</span>
+                    <input
+                      className="order-page-input"
+                      type="number"
+                      min={1}
+                      max={totalPages || 1}
+                      value={totalPages === 0 ? 0 : page + 1}
+                      onChange={(e) => handleJumpPage(e.target.value)}
+                    />
+                    <span>/ {totalPages || 1}</span>
                   </div>
 
-                  {o.notes && (
-                    <div className="order-note">Ghi chú: {o.notes}</div>
-                  )}
+                  <button
+                    className="order-pg-btn"
+                    disabled={totalPages === 0 || page >= totalPages - 1}
+                    onClick={() =>
+                      setPage((p) =>
+                        totalPages ? Math.min(totalPages - 1, p + 1) : p
+                      )
+                    }
+                  >
+                    Sau →
+                  </button>
                 </div>
-              );
-            })}
-          </div>
+
+                <div className="order-size">
+                  <span className="order-size-label">Trang</span>
+                  <select
+                    className="order-size-select"
+                    value={size}
+                    onChange={(e) => {
+                      setPage(0);
+                      setSize(Number(e.target.value) || 5);
+                    }}
+                  >
+                    {[5, 10, 20].map((n) => (
+                      <option key={n} value={n}>
+                        {n}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
 

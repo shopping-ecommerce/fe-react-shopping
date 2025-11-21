@@ -312,7 +312,7 @@ export default function UserWallet() {
             </button>
           </div>
           <div className="sw-size">
-            <label className="sw-size-label">Mỗi trang</label>
+            <label className="sw-size-label">Trang</label>
             <select
               className="sw-size-select"
               value={size}

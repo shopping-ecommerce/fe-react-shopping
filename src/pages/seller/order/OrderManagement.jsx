@@ -14,6 +14,8 @@ import { ConfirmOrderModal, CancelOrderModal } from "./OrderModals";
 // API config để gọi profile & seller
 import { API_CONFIG, apiUrl } from "../../../config/api";
 
+import Portal from "../product/Portal";
+
 /** Map tab -> status backend (Enum từ BE) */
 const STATUS_MAP = {
   all: null,
@@ -112,9 +114,14 @@ export default function OrderManagement() {
   const [tab, setTab] = useState("pending");
   const [q, setQ] = useState("");
 
+  // Phân trang
+  const [pageSize, setPageSize] = useState(10); // 10 dòng / trang
+  const [page, setPage] = useState(1); // trang hiện tại
+
   // Modal state
   const [orderForConfirm, setOrderForConfirm] = useState(null);
   const [orderForCancel, setOrderForCancel] = useState(null);
+  const [orderForShip, setOrderForShip] = useState(null);
 
   // Options
   const dateRangeOptions = [
@@ -568,10 +575,28 @@ export default function OrderManagement() {
     customDateEnd,
   ]);
 
+  // Tổng số trang
+  const totalPages = useMemo(
+    () => Math.max(1, Math.ceil(filteredOrders.length / pageSize)),
+    [filteredOrders.length, pageSize]
+  );
+
+  // Reset về trang 1 khi filter thay đổi hoặc pageSize đổi
+  useEffect(() => {
+    setPage(1);
+  }, [pageSize, selectedDateRange, customDateStart, customDateEnd, q, tab]);
+
+  // Dữ liệu sau khi phân trang
+  const paginatedOrders = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return filteredOrders.slice(start, start + pageSize);
+  }, [filteredOrders, page, pageSize]);
+
   // ====== Chọn đơn (header checkbox indeterminate) ======
   const visiblePendingIds = useMemo(
-    () => filteredOrders.filter((o) => o.status === "pending").map((o) => o.id),
-    [filteredOrders]
+    () =>
+      paginatedOrders.filter((o) => o.status === "pending").map((o) => o.id),
+    [paginatedOrders]
   );
 
   const allVisiblePendingSelected =
@@ -684,19 +709,49 @@ export default function OrderManagement() {
     setAllOrders(rawAll.map(toUiOrder));
   };
 
-  // ngay cạnh các handler khác
-  const onShipOrder = async (order) => {
+  // dùng cho nút "Xác nhận" trong toast
+  const onShipOrder = async () => {
+    if (!orderForShip) return;
     try {
       await updateOrder(authFetch, {
-        orderId: order._raw.id, // nhớ dùng id thực từ BE
-        sellerId, // sellerId động
-        status: "SHIPPED", // đẩy sang trạng thái Đang vận chuyển
+        orderId: orderForShip.id,
+        sellerId,
+        status: "SHIPPED",
         reason: "",
       });
+      setOrderForShip(null);
       await refreshLists();
     } catch (e) {
       alert(e?.message || "Chuyển sang vận chuyển thất bại");
     }
+  };
+
+  // Handler phân trang
+  const handlePrevPage = () => {
+    setPage((p) => Math.max(1, p - 1));
+  };
+
+  const handleNextPage = () => {
+    setPage((p) => Math.min(totalPages, p + 1));
+  };
+
+  const handlePageSizeChange = (e) => {
+    const value = Number(e.target.value) || 10;
+    setPageSize(value);
+    setPage(1);
+  };
+
+  const handlePageInputChange = (e) => {
+    const raw = e.target.value;
+    if (raw === "") {
+      setPage(1);
+      return;
+    }
+    let num = Number(raw);
+    if (Number.isNaN(num)) return;
+    if (num < 1) num = 1;
+    if (num > totalPages) num = totalPages;
+    setPage(num);
   };
 
   return (
@@ -951,15 +1006,7 @@ export default function OrderManagement() {
                     </div>
                   </div>
                 </th>
-
-                <th>
-                  <div className="order-mgmt-th-content">
-                    <div className="order-mgmt-th-text">
-                      <span className="red-dot">●</span>
-                      <span>Nhận đơn hàng</span>
-                    </div>
-                  </div>
-                </th>
+                {/* ❌ BỎ luôn cột Nhận đơn hàng */}
                 <th>
                   <div className="order-mgmt-th-content">
                     <span>Thao tác</span>
@@ -971,7 +1018,7 @@ export default function OrderManagement() {
             <tbody>
               {!sellerId ? (
                 <tr>
-                  <td colSpan={6} className="empty-state">
+                  <td colSpan={5} className="empty-state">
                     {resolvingSeller
                       ? "Đang xác định Seller..."
                       : sellerErr || "Chưa xác định được Seller"}
@@ -979,19 +1026,19 @@ export default function OrderManagement() {
                 </tr>
               ) : loading ? (
                 <tr>
-                  <td colSpan={6} className="empty-state">
+                  <td colSpan={5} className="empty-state">
                     Đang tải…
                   </td>
                 </tr>
               ) : err ? (
                 <tr>
-                  <td colSpan={6} className="empty-state">
+                  <td colSpan={5} className="empty-state">
                     {err}
                   </td>
                 </tr>
               ) : filteredOrders.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="empty-state">
+                  <td colSpan={5} className="empty-state">
                     <div className="no-data">
                       <div className="no-data-text">Không có đơn hàng nào</div>
                       <div className="no-data-subtitle">
@@ -1001,7 +1048,7 @@ export default function OrderManagement() {
                   </td>
                 </tr>
               ) : (
-                filteredOrders.map((order) => (
+                paginatedOrders.map((order) => (
                   <tr key={order.id} className="order-row">
                     <td>
                       <input
@@ -1062,7 +1109,7 @@ export default function OrderManagement() {
                               SL: {order.quantity}
                             </span>
                             <span className="chip value">
-                              GTĐH: {formatCurrency(order.orderValue)}
+                              Giá: {formatCurrency(order.orderValue)}
                             </span>
                           </div>
 
@@ -1078,32 +1125,27 @@ export default function OrderManagement() {
                       </td>
                     </td>
 
-                    <td>
-                      <div className="receive-order">
-                        <span className="receive-status">Đã nhận</span>
-                      </div>
-                    </td>
-
                     <td className="action-cell">
                       <div className="action-buttons-cell">
+                        {/* ✅ Xem chi tiết: dùng cho MỌI trạng thái */}
+                        <NavLink
+                          to={`/seller/orders/${order.id}`}
+                          className="icon-btn icon-view"
+                          title="Xem chi tiết"
+                          aria-label="Xem chi tiết"
+                        >
+                          {/* Eye icon */}
+                          <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path
+                              fill="currentColor"
+                              d="M12 5c5.05 0 9.27 3.11 10.8 7.5C21.27 16.89 17.05 20 12 20S2.73 16.89 1.2 12.5C2.73 8.11 6.95 5 12 5zm0 2C7.89 7 4.36 9.44 3.03 12.5 4.36 15.56 7.89 18 12 18s7.64-2.44 8.97-5.5C19.64 9.44 16.11 7 12 7zm0 2.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7z"
+                            />
+                          </svg>
+                        </NavLink>
+
+                        {/* 🔵 Các nút chỉ dành cho trạng thái CHỜ & ĐÃ XÁC NHẬN */}
                         {order.status === "pending" && (
                           <>
-                            {/* Xem chi tiết: nền đen, icon trắng */}
-                            <NavLink
-                              to={`/seller/orders/${order.id}`}
-                              className="icon-btn icon-view"
-                              title="Xem chi tiết"
-                              aria-label="Xem chi tiết"
-                            >
-                              {/* Eye icon */}
-                              <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <path
-                                  fill="currentColor"
-                                  d="M12 5c5.05 0 9.27 3.11 10.8 7.5C21.27 16.89 17.05 20 12 20S2.73 16.89 1.2 12.5C2.73 8.11 6.95 5 12 5zm0 2C7.89 7 4.36 9.44 3.03 12.5 4.36 15.56 7.89 18 12 18s7.64-2.44 8.97-5.5C19.64 9.44 16.11 7 12 7zm0 2.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7z"
-                                />
-                              </svg>
-                            </NavLink>
-
                             {/* Xác nhận: nền xanh dương, icon trắng */}
                             <button
                               className="icon-btn icon-confirm"
@@ -1142,25 +1184,10 @@ export default function OrderManagement() {
 
                         {order.status === "processing" && (
                           <>
-                            {/* (tuỳ chọn) vẫn để nút xem */}
-                            <NavLink
-                              to={`/seller/orders/${order.id}`}
-                              className="icon-btn icon-view"
-                              title="Xem chi tiết"
-                              aria-label="Xem chi tiết"
-                            >
-                              <svg viewBox="0 0 24 24" aria-hidden="true">
-                                <path
-                                  fill="currentColor"
-                                  d="M12 5c5.05 0 9.27 3.11 10.8 7.5C21.27 16.89 17.05 20 12 20S2.73 16.89 1.2 12.5C2.73 8.11 6.95 5 12 5zm0 2C7.89 7 4.36 9.44 3.03 12.5 4.36 15.56 7.89 18 12 18s7.64-2.44 8.97-5.5C19.64 9.44 16.11 7 12 7zm0 2.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7z"
-                                />
-                              </svg>
-                            </NavLink>
-
-                            {/* (giữ logic giao hàng nếu cần – icon truck, có thể dùng màu xanh dương chung) */}
+                            {/* Chuyển sang Đang vận chuyển */}
                             <button
                               className="icon-btn icon-confirm"
-                              onClick={() => onShipOrder(order)}
+                              onClick={() => setOrderForShip(order._raw)}
                               disabled={!sellerId}
                               title="Chuyển sang Đang vận chuyển"
                               aria-label="Chuyển sang Đang vận chuyển"
@@ -1182,6 +1209,53 @@ export default function OrderManagement() {
             </tbody>
           </table>
         </div>
+        {filteredOrders.length > 0 && (
+          <div className="order-pager">
+            <div className="order-pg-group">
+              <button
+                className="order-pg-btn"
+                disabled={page <= 0 || filteredOrders.length === 0}
+                onClick={() => setPage((p) => Math.max(0, p - 1))}
+              >
+                ← Trước
+              </button>
+
+              <div className="order-pg-status">
+                <input
+                  type="number"
+                  className="order-page-input"
+                  value={page}
+                  min={1}
+                  max={totalPages}
+                  onChange={handlePageInputChange}
+                />
+                <span>/ {totalPages}</span>
+              </div>
+
+              <button
+                className="order-pg-btn"
+                disabled={page >= totalPages - 1 || filteredOrders.length === 0}
+                onClick={() => setPage((p) => (p < totalPages - 1 ? p + 1 : p))}
+              >
+                Sau →
+              </button>
+            </div>
+
+            <div className="order-pg-size">
+              <span className="order-size-label">Trang:</span>
+              <select
+                className="order-size-select"
+                value={pageSize}
+                onChange={handlePageSizeChange}
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+              </select>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* SIDEBAR LỌC KHÁC */}
@@ -1257,6 +1331,36 @@ export default function OrderManagement() {
             }
           }}
         />
+      )}
+
+      {/* Toast xác nhận chuyển sang Đang vận chuyển */}
+      {/* Toast xác nhận chuyển sang Đang vận chuyển */}
+      {orderForShip && (
+        <Portal>
+          <div className="center-toast-overlay">
+            <div className="center-toast">
+              <h3>Chuyển đơn sang trạng thái "Đang vận chuyển"?</h3>
+              <p className="center-toast-text">
+                Bạn chắc chắn là đã chuẩn bị hàng xong và sẵn sàng bàn giao cho
+                đơn vị vận chuyển?
+              </p>
+              <div className="center-toast-actions">
+                <button
+                  className="center-toast-btn primary"
+                  onClick={onShipOrder}
+                >
+                  Xác nhận
+                </button>
+                <button
+                  className="center-toast-btn"
+                  onClick={() => setOrderForShip(null)}
+                >
+                  Hủy
+                </button>
+              </div>
+            </div>
+          </div>
+        </Portal>
       )}
     </div>
   );

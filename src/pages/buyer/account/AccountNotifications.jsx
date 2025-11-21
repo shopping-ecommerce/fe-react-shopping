@@ -102,6 +102,10 @@ export default function AccountNotifications() {
   const [loadingOrder, setLoadingOrder] = useState(true);
   const [unreadOrder, setUnreadOrder] = useState(0);
 
+  // 🔹 Phân trang cho thông báo đơn hàng
+  const [pageOrder, setPageOrder] = useState(0);   // 0-based
+  const [sizeOrder, setSizeOrder] = useState(10);  // số item mỗi trang
+
   // B1: lấy userId & mySellerId
   useEffect(() => {
     let cancelled = false;
@@ -160,7 +164,7 @@ export default function AccountNotifications() {
           setLoadingChat(false);
         }
 
-        // ORDER (BE)
+        // ORDER (BE) — hiện tại vẫn lấy 1 mẻ rồi phân trang ở FE
         setLoadingOrder(true);
         const { items } = await fetchNotificationsByUser(authFetch, userId, {
           page: 0,
@@ -174,6 +178,7 @@ export default function AccountNotifications() {
           setItemsOrder(sorted);
           setUnreadOrder(c);
           setLoadingOrder(false);
+          setPageOrder(0); // reset về trang 1 mỗi lần load mới
         }
       } catch (e) {
         console.error("Load notifications failed:", e);
@@ -264,6 +269,33 @@ export default function AccountNotifications() {
       return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
     });
   }, [itemsOrder]);
+
+  // 🔹 Tính tổng số trang và slice item theo trang cho ORDER
+  const totalPagesOrder = useMemo(() => {
+    if (!itemsOrderSorted.length) return 0;
+    return Math.max(1, Math.ceil(itemsOrderSorted.length / sizeOrder));
+  }, [itemsOrderSorted.length, sizeOrder]);
+
+  // nếu đổi size / dữ liệu ít lại thì đảm bảo pageOrder không vượt quá totalPagesOrder
+  useEffect(() => {
+    if (!totalPagesOrder) {
+      setPageOrder(0);
+      return;
+    }
+    setPageOrder((prev) => Math.min(prev, totalPagesOrder - 1));
+  }, [totalPagesOrder]);
+
+  const pagedOrderItems = useMemo(() => {
+    if (!itemsOrderSorted.length) return [];
+    const start = pageOrder * sizeOrder;
+    return itemsOrderSorted.slice(start, start + sizeOrder);
+  }, [itemsOrderSorted, pageOrder, sizeOrder]);
+
+  const handleJumpOrderPage = (val) => {
+    const total = totalPagesOrder || 1;
+    const n = Math.max(1, Math.min(total, Number(val) || 1));
+    setPageOrder(n - 1);
+  };
 
   // Actions: chat
   const markReadBySeller = (sellerId) => {
@@ -460,7 +492,7 @@ export default function AccountNotifications() {
 
           {/* ===== ORDER ===== */}
           <h3 style={{ margin: "16px 0 8px" }}>
-            Thông báo hệ thống (đơn hàng)
+            Thông báo đơn hàng
             {unreadOrder ? (
               <span className="unread-red"> • {unreadOrder} chưa đọc</span>
             ) : (
@@ -491,89 +523,156 @@ export default function AccountNotifications() {
           ) : itemsOrderSorted.length === 0 ? (
             <p>Không có thông báo hệ thống.</p>
           ) : (
-            <ul
-              className="notif-list"
-              style={{
-                listStyle: "none",
-                padding: 0,
-                margin: "12px 0 0",
-                display: "grid",
-                gap: 12,
-              }}
-            >
-              {itemsOrderSorted.map((it) => (
-                <li
-                  key={it.id}
-                  className={`notif-item notif--system ${
-                    it.status !== "READ" ? "is-unread" : ""
-                  }`}
-                  style={{
-                    border: "1px solid #e5e7eb",
-                    borderRadius: 10,
-                    padding: 12,
-                    background: it.status !== "READ" ? "#f9fafb" : "#fff",
-                    display: "grid",
-                    gridTemplateColumns: "1fr auto",
-                    gap: 8,
-                    alignItems: "center",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => onClickOrderItem(it)}
-                  title="Mở chi tiết đơn"
-                >
-                  <div>
-                    <div style={{ fontWeight: 700, marginBottom: 4 }}>
-                      {it.type === "MESSAGE" ? "Thông báo đơn hàng" : it.type}
+            <>
+              <ul
+                className="notif-list"
+                style={{
+                  listStyle: "none",
+                  padding: 0,
+                  margin: "12px 0 0",
+                  display: "grid",
+                  gap: 12,
+                }}
+              >
+                {pagedOrderItems.map((it) => (
+                  <li
+                    key={it.id}
+                    className={`notif-item notif--system ${
+                      it.status !== "READ" ? "is-unread" : ""
+                    }`}
+                    style={{
+                      border: "1px solid #e5e7eb",
+                      borderRadius: 10,
+                      padding: 12,
+                      background: it.status !== "READ" ? "#f9fafb" : "#fff",
+                      display: "grid",
+                      gridTemplateColumns: "1fr auto",
+                      gap: 8,
+                      alignItems: "center",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => onClickOrderItem(it)}
+                    title="Mở chi tiết đơn"
+                  >
+                    <div>
+                      <div style={{ fontWeight: 700, marginBottom: 4 }}>
+                        {it.type === "MESSAGE" ? "Thông báo đơn hàng" : it.type}
+                      </div>
+                      <div style={{ color: "#374151", marginBottom: 6 }}>
+                        {it?.content?.text || "Bạn có thông báo mới"}
+                      </div>
+                      <div style={{ fontSize: 12, color: "#6b7280" }}>
+                        {formatTime(it.createdAt)}
+                        {it?.content?.orderId && (
+                          <span style={{ marginLeft: 8, color: "#9CA3AF" }}>
+                            • Mã đơn:{" "}
+                            {String(it.content.orderId)
+                              .slice(-8)
+                              .toUpperCase()}
+                          </span>
+                        )}
+                        {it.status !== "READ" && (
+                          <span style={{ marginLeft: 8, color: "#ef4444" }}>
+                            • Chưa đọc
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <div style={{ color: "#374151", marginBottom: 6 }}>
-                      {it?.content?.text || "Bạn có thông báo mới"}
-                    </div>
-                    <div style={{ fontSize: 12, color: "#6b7280" }}>
-                      {formatTime(it.createdAt)}
-                      {it?.content?.orderId && (
-                        <span style={{ marginLeft: 8, color: "#9CA3AF" }}>
-                          • Mã đơn:{" "}
-                          {String(it.content.orderId).slice(-8).toUpperCase()}
-                        </span>
-                      )}
-                      {it.status !== "READ" && (
-                        <span style={{ marginLeft: 8, color: "#ef4444" }}>
-                          • Chưa đọc
-                        </span>
-                      )}
-                    </div>
-                  </div>
 
-                  {it.status !== "READ" && (
-                    <div style={{ display: "flex", gap: 8 }}>
-                      <button
-                        className="btn btn--light"
-                        onClick={async (e) => {
-                          e.stopPropagation();
-                          try {
-                            await markNotificationRead(authFetch, it.id);
-                            setItemsOrder((prev) =>
-                              prev.map((x) =>
-                                x.id === it.id ? { ...x, status: "READ" } : x
-                              )
-                            );
-                            setUnreadOrder((c) => Math.max(0, c - 1));
-                          } catch (er) {
-                            alert(er?.message || "Đánh dấu đã đọc thất bại");
-                          }
-                        }}
-                      >
-                        Đã đọc
-                      </button>
-                    </div>
-                  )}
-                </li>
-              ))}
-            </ul>
+                    {it.status !== "READ" && (
+                      <div style={{ display: "flex", gap: 8 }}>
+                        <button
+                          className="btn btn--light"
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            try {
+                              await markNotificationRead(authFetch, it.id);
+                              setItemsOrder((prev) =>
+                                prev.map((x) =>
+                                  x.id === it.id ? { ...x, status: "READ" } : x
+                                )
+                              );
+                              setUnreadOrder((c) => Math.max(0, c - 1));
+                            } catch (er) {
+                              alert(
+                                er?.message || "Đánh dấu đã đọc thất bại"
+                              );
+                            }
+                          }}
+                        >
+                          Đã đọc
+                        </button>
+                      </div>
+                    )}
+                  </li>
+                ))}
+              </ul>
+
+              {/* 🔹 Pager ORDER */}
+              <div className="notif-pager">
+                <div className="notif-pg-group">
+                  <button
+                    className="notif-pg-btn"
+                    disabled={pageOrder <= 0}
+                    onClick={() =>
+                      setPageOrder((p) => Math.max(0, p - 1))
+                    }
+                  >
+                    ← Trước
+                  </button>
+                  <div className="notif-pg-status">
+                    <span>Trang</span>
+                    <input
+                      className="notif-page-input"
+                      type="number"
+                      min={1}
+                      max={totalPagesOrder || 1}
+                      value={totalPagesOrder === 0 ? 0 : pageOrder + 1}
+                      onChange={(e) => handleJumpOrderPage(e.target.value)}
+                    />
+                    <span>/ {totalPagesOrder || 1}</span>
+                  </div>
+                  <button
+                    className="notif-pg-btn"
+                    disabled={
+                      totalPagesOrder === 0 ||
+                      pageOrder >= totalPagesOrder - 1
+                    }
+                    onClick={() =>
+                      setPageOrder((p) =>
+                        totalPagesOrder
+                          ? Math.min(totalPagesOrder - 1, p + 1)
+                          : p
+                      )
+                    }
+                  >
+                    Sau →
+                  </button>
+                </div>
+
+                <div className="notif-size">
+                  <span className="notif-size-label">Trang</span>
+                  <select
+                    className="notif-size-select"
+                    value={sizeOrder}
+                    onChange={(e) => {
+                      setPageOrder(0);
+                      setSizeOrder(Number(e.target.value) || 10);
+                    }}
+                  >
+                    {[5, 10, 20, 50].map((n) => (
+                      <option key={n} value={n}>
+                        {n}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </>
           )}
         </div>
         {/* /notif-scroll */}
       </div>
     </div>
   );
-} 
+}

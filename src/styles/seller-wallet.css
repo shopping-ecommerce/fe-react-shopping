@@ -269,6 +269,7 @@
   gap: 8px;
   padding: 0 8px;
   font-weight: 600;
+  white-space: nowrap;      /* 👈 bắt tất cả ở chung 1 dòng */
 }
 
 .sw-page-input {
@@ -277,9 +278,10 @@
   text-align: center;
   border-radius: 10px;
   border: 1px solid #e7ecf5;
-  background: #fff;
+  background: #fff; 
   outline: none;
 }
+
 .sw-page-input:focus {
   border-color: #cfe0ff;
   box-shadow: 0 0 0 3px rgba(42,108,234,.12);

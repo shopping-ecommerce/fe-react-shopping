@@ -1576,8 +1576,32 @@ export default function ProductDetail() {
                     onClick={() => {
                       const sid =
                         seller?.id || product?.sellerId || product?.seller_id;
-                      if (!sid)
-                        return alert("Không tìm thấy sellerId của shop.");
+                      if (!sid) {
+                        alert("Không tìm thấy sellerId của shop.");
+                        return;
+                      }
+
+                      // Tính giá để gửi qua chat (giống logic buy now / add to cart)
+                      let chatPrice = 0;
+                      if (
+                        priceState.mode === "exact" &&
+                        Number.isFinite(priceState.price)
+                      ) {
+                        chatPrice = Number(priceState.price);
+                      } else if (
+                        priceState.mode === "single" &&
+                        Number.isFinite(priceState.price)
+                      ) {
+                        chatPrice = Number(priceState.price);
+                      } else if (
+                        priceState.mode === "range" &&
+                        Number.isFinite(priceState.priceMin)
+                      ) {
+                        chatPrice = Number(priceState.priceMin);
+                      }
+
+                      const productLink = `${window.location.origin}/products/${product.id}`;
+
                       navigate(
                         `/chat-shop?sellerId=${encodeURIComponent(sid)}`,
                         {
@@ -1586,6 +1610,14 @@ export default function ProductDetail() {
                             sellerAvatar:
                               seller?.logoUrl || "/img/default-shop.png",
                             autoGreet: true,
+                            // ✅ Gửi thêm thông tin sản phẩm
+                            initialProduct: {
+                              id: product.id,
+                              name: product.name,
+                              image: mainUrl || pickImageUrl(product.images),
+                              price: chatPrice,
+                              link: productLink,
+                            },
                           },
                         }
                       );

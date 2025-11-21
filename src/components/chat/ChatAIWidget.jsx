@@ -1,14 +1,16 @@
+// src/components/chat/ChatAIWidget.jsx
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { API_CONFIG, apiUrl } from "../../config/api";
+import "../../styles/chat-ai.css";
 
 const fmtVND = (n) =>
   new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(
     n ?? 0
   );
 
+// ===== Helpers giá =====
 const toNum = (v) => {
   const n = typeof v === "string" ? Number(v) : v;
   return Number.isFinite(n) ? n : null;
@@ -63,13 +65,30 @@ const pickImgUrl = (images) => {
   return typeof first === "string" ? first : first?.url || null;
 };
 
+// 🔑 Hàm tạo conversationId mới, mỗi lần gửi là một ID khác
+const buildConversationId = (convProp) => {
+  // Nếu bên ngoài truyền convProp thì vẫn ưu tiên dùng
+  if (convProp) return convProp;
+
+  if (typeof window !== "undefined" && window.crypto?.randomUUID) {
+    return window.crypto.randomUUID();
+  }
+  // Fallback: vẫn gần như không trùng
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+};
+
+// 🧠 Gợi ý câu hỏi nhanh
+const QUICK_SUGGESTIONS = [
+  { id: "policy-cancel", text: "Chính sách hủy đơn hàng" },
+  { id: "find-jeans", text: "Tìm quần jean nam dưới 500k" },
+  { id: "find-keyboard", text: "Tìm bàn phím cơ cho lập trình" },
+];
+
 export default function ChatAIWidget({
   open,
   onClose,
   conversationId: convProp,
 }) {
-  const navigate = useNavigate();
-
   const [messages, setMessages] = useState([
     {
       role: "assistant",
@@ -87,13 +106,8 @@ export default function ChatAIWidget({
   const bodyRef = useRef(null);
   const fileInputRef = useRef(null);
 
-  // Lưu/đọc conversationId
-  const conversationId = useMemo(() => {
-    const stored = localStorage.getItem("chat_conversation_id");
-    const id = convProp || stored || "1";
-    if (!stored) localStorage.setItem("chat_conversation_id", id);
-    return id;
-  }, [convProp]);
+  // 🔥 Chỉ hiện gợi ý lúc đầu
+  const [showSuggestions, setShowSuggestions] = useState(true);
 
   useEffect(() => {
     if (!bodyRef.current) return;
@@ -162,15 +176,24 @@ export default function ChatAIWidget({
   };
 
   const sendMessage = async (text) => {
+    if (sending) return; // tránh spam khi đang gửi
+
     const content = (text ?? input).trim();
-    if (!content) return;
+    // Cho phép gửi nếu có text hoặc có file đính kèm
+    if (!content && !selectedFile) return;
+
+    // 🔥 Ẩn gợi ý ngay khi user có hành động gửi (gõ hoặc bấm gợi ý)
+    if (showSuggestions) setShowSuggestions(false);
+
+    // 🔑 Mỗi lần gửi -> tạo conversationId khác nhau
+    const conversationId = buildConversationId(convProp);
 
     // Chụp lại file & preview để hiển thị bubble và gửi API
     const fileToSend = selectedFile || null;
     const previewToShow = selectedFilePreview || null;
     const fileNameToShow = selectedFile?.name;
 
-    // Hiển thị tin nhắn người dùng NGAY: ảnh (nếu có) + text
+    // Hiển thị tin nhắn người dùng NGAY: ảnh (nếu có) + text (nếu có)
     setMessages((prev) => {
       const next = [...prev];
       if (previewToShow) {
@@ -181,7 +204,9 @@ export default function ChatAIWidget({
           fileName: fileNameToShow,
         });
       }
-      next.push({ role: "user", type: "text", content });
+      if (content) {
+        next.push({ role: "user", type: "text", content });
+      }
       return next;
     });
 
@@ -207,11 +232,11 @@ export default function ChatAIWidget({
         const formData = new FormData();
         formData.append("file", fileToSend);
         formData.append("message", content || "");
-        formData.append("conversationId", conversationId);
+        formData.append("conversationId", conversationId); // ✅ mỗi lần khác
         body = formData;
       } else {
         headers["Content-Type"] = "application/json";
-        body = JSON.stringify({ message: content, conversationId });
+        body = JSON.stringify({ message: content, conversationId }); // ✅ mỗi lần khác
       }
 
       const res = await fetch(url, { method: "POST", headers, body });
@@ -276,62 +301,6 @@ export default function ChatAIWidget({
     }
   };
 
-  const toNum = (v) => {
-    const n = typeof v === "string" ? Number(v) : v;
-    return Number.isFinite(n) ? n : null;
-  };
-
-  const priceFromVariants = (variants = []) => {
-    if (!Array.isArray(variants) || variants.length === 0)
-      return { price: null, compare: null };
-    const prices = variants
-      .map((v) => toNum(v?.price))
-      .filter((n) => n != null);
-    const compares = variants
-      .map((v) => toNum(v?.compareAtPrice))
-      .filter((n) => n != null);
-    if (!prices.length) return { price: null, compare: null };
-    const price = Math.min(...prices);
-    const cmp = compares.length ? Math.min(...compares) : null;
-    return { price, compare: cmp != null && cmp > price ? cmp : null };
-  };
-
-  const priceFromSizes = (sizes = []) => {
-    if (!Array.isArray(sizes) || sizes.length === 0)
-      return { price: null, compare: null };
-    const prices = sizes.map((s) => toNum(s?.price)).filter((n) => n != null);
-    const compares = sizes
-      .map((s) => toNum(s?.compareAtPrice))
-      .filter((n) => n != null);
-    if (!prices.length) return { price: null, compare: null };
-    const price = Math.min(...prices);
-    const cmp = compares.length ? Math.min(...compares) : null;
-    return { price, compare: cmp != null && cmp > price ? cmp : null };
-  };
-
-  const computeDisplayPrice = (prod = {}) => {
-    // Ưu tiên variants -> sizes -> giá trực tiếp
-    if (Array.isArray(prod.variants) && prod.variants.length) {
-      return priceFromVariants(prod.variants);
-    }
-    if (Array.isArray(prod.sizes) && prod.sizes.length) {
-      return priceFromSizes(prod.sizes);
-    }
-    const price = toNum(prod.price);
-    const compare = toNum(prod.compareAtPrice);
-    return {
-      price: price != null ? price : null,
-      compare:
-        compare != null && price != null && compare > price ? compare : null,
-    };
-  };
-
-  const pickImgUrl = (images) => {
-    if (!Array.isArray(images) || !images.length) return null;
-    const first = images[0];
-    return typeof first === "string" ? first : first?.url || null;
-  };
-
   const onKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -371,7 +340,6 @@ export default function ChatAIWidget({
                     className="bubble"
                     style={{ padding: "4px", maxWidth: "70%" }}
                   >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={m.content || "/placeholder.svg"}
                       alt={m.fileName || "Uploaded image"}
@@ -485,6 +453,23 @@ export default function ChatAIWidget({
           )}
         </div>
 
+        {/* 🔎 Gợi ý câu hỏi nhanh – chỉ hiện lúc đầu */}
+        {showSuggestions && QUICK_SUGGESTIONS.length > 0 && (
+          <div className="chat-ai-suggestions">
+            {QUICK_SUGGESTIONS.map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                className="chat-ai-suggest-chip"
+                onClick={() => sendMessage(s.text)}
+                disabled={sending}
+              >
+                {s.text}
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* Ô nhập + attach bar nằm TRONG chat-ai-input */}
         <div className={`chat-ai-input ${selectedFile ? "has-attach" : ""}`}>
           {selectedFile && (
@@ -560,7 +545,7 @@ export default function ChatAIWidget({
           <button
             className="send-btn"
             onClick={() => sendMessage()}
-            disabled={!input.trim() || sending}
+            disabled={sending || (!input.trim() && !selectedFile)}
             aria-label="Gửi"
             title="Gửi"
           >

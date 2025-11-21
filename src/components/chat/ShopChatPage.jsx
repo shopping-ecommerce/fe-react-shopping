@@ -14,8 +14,6 @@ import {
 
 /* ✅ ĐK web component emoji picker (bắt buộc) */
 import "emoji-picker-element";
-// (tuỳ chọn) import style mặc định
-// import "emoji-picker-element/styles/index.css";
 
 /** ✅ Realtime chuẩn */
 import {
@@ -36,6 +34,49 @@ const AUTO_GREETING =
 // ✅ Key tránh chèn lặp
 const greetKey = (sellerId, userId) => `greeted:${sellerId}->${userId}`;
 
+// Helper parse/encode product message
+const PRODUCT_PREFIX = "[PRODUCT]";
+
+function encodeProductMessage(product) {
+  if (!product) return "";
+  const id =
+    product.id ||
+    product.productId ||
+    product._id ||
+    product.slug ||
+    product.code ||
+    "";
+  const name = product.name || product.productName || "";
+  const priceText = product.priceText || product.price || "";
+  const link = product.link || "";
+  const image =
+    product.image ||
+    product.thumbnail ||
+    product.imageUrl ||
+    product.cover ||
+    "";
+  // đơn giản: tách bằng |||
+  return `${PRODUCT_PREFIX} ${id}|||${name}|||${priceText}|||${link}|||${image}`;
+}
+
+function decodeProductMessage(message) {
+  if (typeof message !== "string") return null;
+  if (!message.startsWith(PRODUCT_PREFIX)) return null;
+  try {
+    const payload = message.slice(PRODUCT_PREFIX.length).trim();
+    const [id, name, price, link, image] = payload.split("|||");
+    return {
+      id: id || null,
+      name: name || "",
+      price: price || "",
+      link: link || "",
+      image: image || "",
+    };
+  } catch {
+    return null;
+  }
+}
+
 export default function ShopChatPage({ initialSellerId }) {
   // Emoji & textarea
   const [showEmoji, setShowEmoji] = useState(false);
@@ -44,20 +85,23 @@ export default function ShopChatPage({ initialSellerId }) {
 
   const { authFetch } = useContext(AuthContext) || {};
   const location = useLocation();
+  const locationState = location.state || {};
+  const initialProduct = locationState.initialProduct || null;
 
   const sellerIdFromQuery =
     new URLSearchParams(location.search).get("sellerId") || "";
-  const sellerIdFromState = location.state?.sellerId || "";
+  const sellerIdFromState = locationState.sellerId || "";
   let bootstrapSellerId =
     sellerIdFromQuery || sellerIdFromState || initialSellerId || "";
 
-  const stateName = location.state?.sellerName || "";
-  const stateAvatar = location.state?.sellerAvatar || "";
+  const stateName = locationState.sellerName || "";
+  const stateAvatar = locationState.sellerAvatar || "";
 
   const [userId, setUserId] = useState("");
   const [mySellerId, setMySellerId] = useState("");
 
   const metaCacheRef = useRef(new Map());
+  const sentProductRef = useRef(null); // ✅ chặn gửi 2 lần cùng 1 sản phẩm
 
   const [conversations, setConversations] = useState([]);
   const [activeCid, setActiveCid] = useState("");
@@ -162,6 +206,15 @@ export default function ShopChatPage({ initialSellerId }) {
     }
   }, [mySellerId]);
 
+  const fromTo = useMemo(() => {
+    if (!activeConv) return { from: "", to: "" };
+    if (activeConv.type === "seller") {
+      if (activeConv.targetId === mySellerId) return { from: "", to: "" };
+      return { from: userId, to: activeConv.targetId };
+    }
+    return { from: "", to: "" };
+  }, [activeConv, userId, mySellerId]);
+
   /** Lắng nghe socket events (bỏ qua self) */
   useEffect(() => {
     if (!userId) return;
@@ -198,10 +251,12 @@ export default function ShopChatPage({ initialSellerId }) {
           ? payload.files
           : []) || [];
 
-      const lastText =
-        (payload.message && String(payload.message)) ||
-        (payload.emoji ? `(${payload.emoji})` : "") ||
-        (filesArr.length ? "[tệp]" : "—");
+      const product = decodeProductMessage(payload.message);
+      const lastText = product
+        ? `Sản phẩm: ${product.name || "?"}`
+        : (payload.message && String(payload.message)) ||
+          (payload.emoji ? `(${payload.emoji})` : "") ||
+          (filesArr.length ? "[tệp]" : "—");
 
       setMsgs((prev) => ({
         ...prev,
@@ -210,6 +265,7 @@ export default function ShopChatPage({ initialSellerId }) {
           {
             role: "them",
             text: lastText,
+            product,
             files: filesArr,
             createdAt: payload.createdAt || new Date().toISOString(),
           },
@@ -225,7 +281,13 @@ export default function ShopChatPage({ initialSellerId }) {
         const exists = prev.find((c) => c.id === cid);
         if (exists) {
           return prev.map((c) =>
-            c.id === cid ? { ...c, last: lastText, time: timeStr } : c
+            c.id === cid
+              ? {
+                  ...c,
+                  last: product ? `Sản phẩm: ${product.name}` : lastText,
+                  time: timeStr,
+                }
+              : c
           );
         }
         return [
@@ -235,7 +297,7 @@ export default function ShopChatPage({ initialSellerId }) {
             targetId: senderId,
             name: senderId,
             avatar: "/img/default-shop.png",
-            last: lastText,
+            last: product ? `Sản phẩm: ${product.name}` : lastText,
             time: timeStr,
           },
           ...prev,
@@ -277,20 +339,25 @@ export default function ShopChatPage({ initialSellerId }) {
               const meta = await fetchSellerMeta(otherId);
               const hasFiles =
                 Array.isArray(it.fileUrls) && it.fileUrls.length > 0;
+
+              const product = decodeProductMessage(it.message);
+              const lastText = product
+                ? `Sản phẩm: ${product.name || "?"}`
+                : it.message && String(it.message).trim()
+                ? it.message
+                : hasFiles
+                ? "[tệp]"
+                : it.emoji
+                ? it.emoji
+                : "—";
+
               return {
                 id: `c-${otherId}`,
                 type: "seller",
                 targetId: otherId,
                 name: meta.name,
                 avatar: meta.avatar,
-                last:
-                  it.message && String(it.message).trim()
-                    ? it.message
-                    : hasFiles
-                    ? "[tệp]"
-                    : it.emoji
-                    ? it.emoji
-                    : "—",
+                last: lastText,
                 time: formatTime(it.createdAt),
               };
             })
@@ -361,7 +428,7 @@ export default function ShopChatPage({ initialSellerId }) {
     return () => {
       ignore = true;
     };
-  }, [userId, mySellerId, bootstrapSellerId]);
+  }, [userId, mySellerId, bootstrapSellerId, stateName, stateAvatar]);
 
   // 4) Load messages khi đổi hội thoại
   useEffect(() => {
@@ -384,13 +451,19 @@ export default function ShopChatPage({ initialSellerId }) {
         });
         const formatted = list.map((m) => {
           const hasFiles = Array.isArray(m.fileUrls) && m.fileUrls.length > 0;
+          const product = decodeProductMessage(m.message);
+
+          const baseText = product
+            ? `Sản phẩm: ${product.name || "?"}`
+            : (m.message && String(m.message)) ||
+              (m.emoji ? `(${m.emoji})` : "") ||
+              (hasFiles ? "[tệp]" : "");
+
           return {
             role: m.fromSelf ? "user" : "them",
-            text:
-              (m.message && String(m.message)) ||
-              (m.emoji ? `(${m.emoji})` : "") ||
-              (hasFiles ? "[tệp]" : ""),
-            files: hasFiles ? m.fileUrls : [],
+            text: baseText,
+            product,
+            files: hasFiles ? m.fileUrls : product?.image ? [product.image] : [],
             createdAt: m.createdAt,
           };
         });
@@ -411,7 +484,6 @@ export default function ShopChatPage({ initialSellerId }) {
   }, [activeCid, activeConv, userId, mySellerId]);
 
   // 4b) Chèn auto greeting (không greet self)
-  const locationState = useLocation().state || {};
   useEffect(() => {
     if (!userId || !bootstrapSellerId || !activeConv) return;
     if (!locationState.autoGreet) return;
@@ -448,7 +520,121 @@ export default function ShopChatPage({ initialSellerId }) {
 
     sessionStorage.setItem(greetKey(bootstrapSellerId, userId), "1");
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId, bootstrapSellerId, activeConv, activeCid, msgs, mySellerId, locationState.autoGreet]);
+  }, [
+    userId,
+    bootstrapSellerId,
+    activeConv,
+    activeCid,
+    msgs,
+    mySellerId,
+    locationState.autoGreet,
+  ]);
+
+  // 4c) Auto gửi thông tin sản phẩm từ trang chi tiết (chỉ 1 lần / sản phẩm)
+  useEffect(() => {
+    if (!initialProduct) return;
+    if (!activeConv || !fromTo.from || !fromTo.to) return;
+
+    const productId =
+      initialProduct.id ||
+      initialProduct.productId ||
+      initialProduct._id ||
+      initialProduct.slug ||
+      initialProduct.code ||
+      null;
+
+    // đã gửi product này rồi thì thôi
+    if (productId && sentProductRef.current === productId) return;
+
+    // đánh dấu đã gửi
+    if (productId) {
+      sentProductRef.current = productId;
+    } else {
+      // fallback nếu không có id
+      sentProductRef.current = "__SENT__";
+    }
+
+    const name = initialProduct.name || initialProduct.productName || "";
+    const priceValue =
+      initialProduct.priceText || initialProduct.price || initialProduct.displayPrice || "";
+    const priceText =
+      typeof priceValue === "number"
+        ? priceValue.toLocaleString("vi-VN") + "₫"
+        : priceValue || "";
+
+    const link =
+      initialProduct.link ||
+      `${window.location.origin}/product/${
+        initialProduct.slug || initialProduct.id || ""
+      }`;
+
+    const image =
+      initialProduct.image ||
+      initialProduct.thumbnail ||
+      initialProduct.imageUrl ||
+      initialProduct.cover ||
+      "";
+
+    const productPayload = {
+      id: productId,
+      name,
+      priceText,
+      link,
+      image,
+    };
+
+    const encoded = encodeProductMessage(productPayload);
+
+    (async () => {
+      try {
+        const token = getToken();
+
+        const resp = await sendMediaMessage({
+          token,
+          from: fromTo.from,
+          to: fromTo.to,
+          text: encoded,
+          emoji: "",
+          files: [],
+        });
+
+        const createdAt =
+          resp?.message?.createdAt || new Date().toISOString();
+
+        const newMsg = {
+          role: "user",
+          text: `Sản phẩm: ${name}`,
+          product: productPayload,
+          files: image ? [image] : [],
+          createdAt,
+        };
+
+        const timeStr = new Date().toLocaleTimeString("vi-VN", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+
+        setMsgs((prev) => ({
+          ...prev,
+          [activeConv.id]: [...(prev[activeConv.id] || []), newMsg],
+        }));
+
+        setConversations((prev) =>
+          prev.map((c) =>
+            c.id === activeConv.id
+              ? {
+                  ...c,
+                  last: `Sản phẩm: ${name}`,
+                  time: timeStr,
+                }
+              : c
+          )
+        );
+      } catch (e) {
+        console.error("Auto send product failed:", e);
+      }
+    })();
+  }, [initialProduct, activeConv, fromTo.from, fromTo.to]);
 
   // 5) Auto scroll
   useEffect(() => {
@@ -456,16 +642,6 @@ export default function ShopChatPage({ initialSellerId }) {
       bodyRef.current.scrollTop = bodyRef.current.scrollHeight;
     }
   }, [activeCid, msgs, isTyping]);
-
-  const fromTo = useMemo(() => {
-    if (!activeConv) return { from: "", to: "" };
-    if (activeConv.type === "seller") {
-      // ❌ Không cho to = mySellerId (self)
-      if (activeConv.targetId === mySellerId) return { from: "", to: "" };
-      return { from: userId, to: activeConv.targetId };
-    }
-    return { from: "", to: "" };
-  }, [activeConv, userId, mySellerId]);
 
   // --- Typing helpers ---
   const emitTypingSafe = () => {
@@ -525,6 +701,7 @@ export default function ShopChatPage({ initialSellerId }) {
           t ||
           (emoji ? `(${emoji})` : "") ||
           ((uploadedUrls || previewUrls).length ? "[tệp]" : ""),
+        product: null,
         files: uploadedUrls || previewUrls,
         createdAt: resp?.message?.createdAt || new Date().toISOString(),
       };
@@ -710,8 +887,53 @@ export default function ShopChatPage({ initialSellerId }) {
                 className={`cs-bubble ${m.role === "user" ? "me" : "them"}`}
               >
                 <div className="bubble">
-                  {m.text}
-                  {m.files?.length ? (
+                  {/* ✅ Card sản phẩm nếu có */}
+                  {m.product && (
+                    <div className="cs-product-card">
+                      <div className="cs-product-thumb-wrap">
+                        {m.product.image ? (
+                          <img
+                            src={m.product.image}
+                            alt={m.product.name || "Sản phẩm"}
+                            className="cs-product-thumb"
+                          />
+                        ) : (
+                          <div className="cs-product-thumb placeholder" />
+                        )}
+                      </div>
+                      <div className="cs-product-meta">
+                        <div className="cs-product-tag">
+                          Sản phẩm bạn đang hỏi
+                        </div>
+                        <div className="cs-product-name">
+                          {m.product.name || "Sản phẩm"}
+                        </div>
+                        {m.product.price && (
+                          <div className="cs-product-price">
+                            {m.product.price}
+                          </div>
+                        )}
+                        {m.product.link && (
+                          <a
+                            href={m.product.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="cs-product-link"
+                          >
+                            Xem chi tiết sản phẩm
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Text chính */}
+                  {m.text && (
+                    <div className="cs-message-text">{m.text}</div>
+                  )}
+
+                  {/* File/ảnh đính kèm – bỏ qua nếu đã hiển thị trong card sản phẩm */}
+                  {m.files?.length && !m.product ? (
                     <div className="files">
                       {(Array.isArray(m.files) ? m.files : [m.files]).map(
                         (file, i) => {

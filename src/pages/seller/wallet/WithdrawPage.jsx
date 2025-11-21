@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useEffect, useMemo, useState, useContext, useCallback } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+  useContext,
+  useCallback,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import "../../../styles/seller-withdraw.css";
 import { AuthContext } from "../../../contexts/AuthContext";
@@ -12,11 +18,87 @@ const fmtVND = (n) => nf.format(Number(n) || 0);
 // 🔹 Mức rút tối thiểu
 const MIN_WITHDRAW = 50000;
 
+// helper parse JSON an toàn
+const safeJson = async (res) => {
+  const t = await res.text();
+  if (!t) return {};
+  try {
+    return JSON.parse(t);
+  } catch {
+    return { message: t };
+  }
+};
+
 export default function WithdrawPage() {
-  const { user, authFetch, authReady, isAuthenticated } = useContext(AuthContext);
+  const { user, authFetch, authReady, isAuthenticated } =
+    useContext(AuthContext);
   const navigate = useNavigate();
 
-  const userId = user?.id || "";
+  // ===== sellerId lấy từ userId (giống trang SellerWallet) =====
+  const [mySellerId, setMySellerId] = useState("");
+  const [sellerLoading, setSellerLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        if (!authReady || !isAuthenticated || !user) {
+          if (!cancelled) {
+            setMySellerId("");
+            setSellerLoading(false);
+          }
+          return;
+        }
+
+        // 1) Lấy userId thật từ getMyProfile
+        const r1 = await authFetch(
+          apiUrl(API_CONFIG.endpoints.getMyProfile),
+          {
+            method: "GET",
+            headers: { Accept: "application/json" },
+          }
+        );
+        const j1 = await safeJson(r1);
+        const userId = (j1.result ?? j1)?.id;
+        if (!userId) {
+          if (!cancelled) {
+            setMySellerId("");
+            setSellerLoading(false);
+          }
+          return;
+        }
+
+        // 2) Từ userId → sellerId
+        const r2 = await authFetch(
+          apiUrl(API_CONFIG.endpoints.searchSellerByUserId(userId)),
+          { method: "GET", headers: { Accept: "application/json" } }
+        );
+        if (!r2.ok) {
+          if (!cancelled) {
+            setMySellerId("");
+            setSellerLoading(false);
+          }
+          return;
+        }
+        const j2 = await safeJson(r2);
+        const sid = j2?.result?.id || "";
+
+        if (!cancelled) {
+          setMySellerId(sid);
+          setSellerLoading(false);
+        }
+      } catch {
+        if (!cancelled) {
+          setMySellerId("");
+          setSellerLoading(false);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [authReady, isAuthenticated, user, authFetch]);
+
   const [loading, setLoading] = useState(false);
   const [balance, setBalance] = useState(0);
 
@@ -32,33 +114,42 @@ export default function WithdrawPage() {
   const isCustomBank = bank === "__OTHER__";
   const chosenBankName = isCustomBank ? bankCustom.trim() : bank.trim();
 
-  const overBalance = useMemo(() => Number(amount) > Number(balance), [amount, balance]);
+  const overBalance = useMemo(
+    () => Number(amount) > Number(balance),
+    [amount, balance]
+  );
   const tooSmall = amount > 0 && Number(amount) < MIN_WITHDRAW;
 
   const canSubmit =
     !loading &&
-    amount >= MIN_WITHDRAW &&               // 🔹 đủ min
+    !!mySellerId &&                    // 🔹 phải có sellerId
+    amount >= MIN_WITHDRAW &&          // 🔹 đủ min
     !overBalance &&
     chosenBankName &&
     account.trim() &&
     holder.trim();
 
-  // Lấy số dư
+  // Lấy số dư theo sellerId (đồng bộ với SellerWallet)
   const loadBalance = useCallback(async () => {
-    if (!authReady || !isAuthenticated || !userId) return;
+    if (!authReady || !isAuthenticated || !mySellerId) return;
     try {
-      const url = apiUrl(API_CONFIG.endpoints.walletBalance(userId));
-      const res = await authFetch(url, { method: "GET", headers: { Accept: "application/json" } });
+      const url = apiUrl(API_CONFIG.endpoints.walletBalance(mySellerId));
+      const res = await authFetch(url, {
+        method: "GET",
+        headers: { Accept: "application/json" },
+      });
       const text = await res.text();
       if (!res.ok) return;
       const json = text ? JSON.parse(text) : {};
       const result = json.result ?? json;
-      const bal = typeof result === "number" ? result : (result.balance ?? 0);
+      const bal = typeof result === "number" ? result : result.balance ?? 0;
       setBalance(bal);
     } catch {}
-  }, [authFetch, authReady, isAuthenticated, userId]);
+  }, [authFetch, authReady, isAuthenticated, mySellerId]);
 
-  useEffect(() => { loadBalance(); }, [loadBalance]);
+  useEffect(() => {
+    loadBalance();
+  }, [loadBalance]);
 
   // Helpers
   const setChip = (v) => {
@@ -81,14 +172,18 @@ export default function WithdrawPage() {
   };
 
   const onSubmit = async () => {
-    if (!canSubmit) return;
+    if (!canSubmit || !mySellerId) return;
     setLoading(true);
     setMsg("");
     try {
-      const url = apiUrl(API_CONFIG.endpoints.walletWithdraw(userId));
+      // 🔹 Dùng sellerId giống trang ví
+      const url = apiUrl(API_CONFIG.endpoints.walletWithdraw(mySellerId));
       const res = await authFetch(url, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
         body: JSON.stringify({
           amount: Number(amount),
           bankAccount: account.trim(),
@@ -119,23 +214,49 @@ export default function WithdrawPage() {
   return (
     <div className="wd-container">
       <div className="wd-header">
-        <button className="wd-back" onClick={() => navigate(-1)}>← Quay lại</button>
+        <button className="wd-back" onClick={() => navigate(-1)}>
+          ← Quay lại
+        </button>
         <h1>Rút tiền về ngân hàng</h1>
         <div />
       </div>
+
+      {/* Thông báo nếu chưa có sellerId */}
+      {!sellerLoading && !mySellerId && (
+        <div
+          style={{
+            margin: "12px 0",
+            padding: "10px 12px",
+            borderRadius: 8,
+            background: "#fff7e6",
+            color: "#8a5a00",
+            fontWeight: 500,
+          }}
+        >
+          Không tìm thấy thông tin người bán. Hãy hoàn tất đăng ký/duyệt Seller
+          để sử dụng chức năng rút tiền.
+        </div>
+      )}
 
       <div className="wd-grid">
         {/* Trái: số dư + nhập số tiền */}
         <div className="wd-card wd-tilt">
           <div className="wd-card-title">Số dư khả dụng</div>
           <div className="wd-balance">
-            <div className="wd-balance-number">{fmtVND(balance)}<span className="wd-currency"> ₫</span></div>
+            <div className="wd-balance-number">
+              {fmtVND(balance)}
+              <span className="wd-currency"> ₫</span>
+            </div>
             <div className="wd-balance-sub">Có thể rút ngay</div>
           </div>
 
           <div className="wd-section">
             <label className="wd-label">Số tiền muốn rút</label>
-            <div className={`wd-amount-input ${(overBalance || tooSmall) ? "danger" : ""}`}>
+            <div
+              className={`wd-amount-input ${
+                overBalance || tooSmall ? "danger" : ""
+              }`}
+            >
               <span className="wd-prefix">₫</span>
               <input
                 inputMode="numeric"
@@ -145,15 +266,25 @@ export default function WithdrawPage() {
                 onChange={onAmountChange}
               />
               {amount > 0 && (
-                <button className="wd-clear" onClick={() => setAmount(0)} title="Xoá">×</button>
+                <button
+                  className="wd-clear"
+                  onClick={() => setAmount(0)}
+                  title="Xoá"
+                >
+                  ×
+                </button>
               )}
             </div>
 
             {/* Ưu tiên cảnh báo hết số dư, nếu không thì cảnh báo min */}
             {overBalance ? (
-              <div className="wd-error">Số dư không khả dụng cho số tiền đã chọn.</div>
+              <div className="wd-error">
+                Số dư không khả dụng cho số tiền đã chọn.
+              </div>
             ) : tooSmall ? (
-              <div className="wd-error">Số tiền rút phải từ {fmtVND(MIN_WITHDRAW)}đ.</div>
+              <div className="wd-error">
+                Số tiền rút phải từ {fmtVND(MIN_WITHDRAW)}đ.
+              </div>
             ) : null}
           </div>
 
@@ -183,10 +314,7 @@ export default function WithdrawPage() {
           <div className="wd-section">
             <label className="wd-label">Ngân hàng</label>
             <div className="wd-select-wrap">
-              <select
-                value={bank}
-                onChange={(e) => setBank(e.target.value)}
-              >
+              <select value={bank} onChange={(e) => setBank(e.target.value)}>
                 {VN_BANKS.map((b) => (
                   <option key={b.code || b.name} value={b.name}>
                     {b.name}
@@ -246,7 +374,8 @@ export default function WithdrawPage() {
           </div>
 
           <p className="wd-note">
-            Lưu ý: Thời gian nhận tiền phụ thuộc ngân hàng của bạn. Hãy kiểm tra kỹ thông tin trước khi gửi yêu cầu.
+            Lưu ý: Thời gian nhận tiền phụ thuộc ngân hàng của bạn. Hãy kiểm tra
+            kỹ thông tin trước khi gửi yêu cầu.
           </p>
         </div>
       </div>
