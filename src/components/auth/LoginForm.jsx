@@ -149,8 +149,7 @@ function LoginForm() {
 
       let profRes;
       try {
-        // ❌ cũ: `${PROFILE_BASE}${getMyProfilePath}`
-        // ✅ mới: dùng apiUrl để không bị dính localhost
+        // dùng apiUrl để không bị dính localhost
         profRes = await authFetch(apiUrl(getMyProfilePath), {
           method: "GET",
         });
@@ -339,8 +338,334 @@ function LoginForm() {
             </div>
           </div>
         </div>
+
+        {/* Layer emoji có thể kéo-thả & rơi chậm */}
+        <InteractiveWinter />
       </div>
     </>
+  );
+}
+
+/* ================== COMPONENT KÉO-THẢ & RƠI CHẬM VỀ VỊ TRÍ CŨ ================== */
+function InteractiveWinter() {
+  const items = ["⛄", "🎄", "⛄", "🎄", "⛄", "🎄", "⛄", "🎄", "⛄"];
+  const slots = [6, 17, 28, 39, 50, 61, 72, 83, 94];
+  const size =
+    typeof window !== "undefined" && window.innerWidth <= 920 ? 36 : 48;
+
+  return (
+    <div className="drag-layer" aria-hidden="true">
+      {items.map((ch, i) => (
+        <DraggableEmoji
+          key={i}
+          ch={ch}
+          initXPercent={slots[i]}
+          size={size}
+          groundOffset={90}
+          bounce={0.35}
+          swayAmpFall={80}
+          swayOmegaFall={1.8}
+        />
+      ))}
+    </div>
+  );
+}
+
+function DraggableEmoji({
+  ch,
+  initXPercent = 50,
+  size = 48,
+  groundOffset = 90,
+  bounce = 0.35,
+  swayAmpFall = 80,
+  swayOmegaFall = 1.8,
+}) {
+  const wrapRef = useRef(null);
+  const raf = useRef(0);
+  const draggingRef = useRef(false);
+  const offsetRef = useRef({ x: 0, y: 0 });
+  const velRef = useRef({ x: 0, y: 0 });
+  const lastT = useRef(0);
+  const fallClock = useRef(0);
+  const isFallingRef = useRef(false);
+  const isReturningRef = useRef(false);
+  const dragStartPosRef = useRef({ x: 0, y: 0 });
+  const originalPosRef = useRef({ x: 0, y: 0 });
+
+  const [pos, setPos] = useState(() => {
+    const initX =
+      ((typeof window !== "undefined" ? window.innerWidth : 0) * initXPercent) /
+        100 -
+      size / 2;
+    const initY =
+      (typeof window !== "undefined" ? window.innerHeight : 0) -
+      groundOffset -
+      size;
+    originalPosRef.current = { x: initX, y: initY };
+    return { x: initX, y: initY };
+  });
+  const [dragging, setDragging] = useState(false);
+  const [idle, setIdle] = useState(true);
+
+  const clamp = (val, min, max) => Math.max(min, Math.min(max, val));
+  const floorY = () =>
+    (typeof window === "undefined" ? 0 : window.innerHeight) -
+    groundOffset -
+    size;
+  const leftBound = () => 0;
+  const rightBound = () =>
+    (typeof window === "undefined" ? 0 : window.innerWidth) - size;
+
+  const step = (t) => {
+    if (!lastT.current) lastT.current = t;
+    const dt = Math.min((t - lastT.current) / 1000, 0.033);
+    lastT.current = t;
+    fallClock.current += dt;
+
+    // ===== PHASE 1: RƠI TỰ DO CÓ TRỌNG LỰC =====
+    if (!isReturningRef.current) {
+      const g = 800;
+      const airDrag = 0.015;
+      const maxFallSpeed = 300;
+
+      velRef.current.y += g * dt;
+      const dragForce = airDrag * velRef.current.y * Math.abs(velRef.current.y);
+      velRef.current.y -= dragForce * dt;
+
+      if (velRef.current.y > maxFallSpeed) {
+        velRef.current.y = maxFallSpeed;
+      }
+
+      const swayForce =
+        swayAmpFall * 1.5 * Math.sin(fallClock.current * swayOmegaFall);
+      velRef.current.x += swayForce * dt;
+      const dragX = airDrag * velRef.current.x * Math.abs(velRef.current.x);
+      velRef.current.x -= dragX * dt;
+
+      let nx = pos.x + velRef.current.x * dt;
+      let ny = pos.y + velRef.current.y * dt;
+
+      if (nx < leftBound()) {
+        nx = leftBound();
+        velRef.current.x *= -bounce;
+      }
+      if (nx > rightBound()) {
+        nx = rightBound();
+        velRef.current.x *= -bounce;
+      }
+
+      const fy = floorY();
+      if (ny >= fy) {
+        ny = fy;
+        velRef.current.y = -Math.abs(velRef.current.y) * bounce;
+        velRef.current.x *= 0.85;
+
+        // Kiểm tra xem nên bắt đầu quay về vị trí cũ không
+        if (
+          Math.abs(velRef.current.y) < 50 &&
+          Math.abs(velRef.current.x) < 30
+        ) {
+          isReturningRef.current = true;
+          velRef.current = { x: 0, y: 0 };
+        }
+      }
+
+      setPos({ x: nx, y: ny });
+    }
+
+    // ===== PHASE 2: TRỞ VỀ VỊ TRÍ GỐC =====
+    else {
+      const targetX = originalPosRef.current.x;
+      const targetY = originalPosRef.current.y;
+
+      const dx = targetX - pos.x;
+      const dy = targetY - pos.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist < 2) {
+        // Đã về đúng vị trí
+        cancelAnimationFrame(raf.current);
+        raf.current = 0;
+        isFallingRef.current = false;
+        isReturningRef.current = false;
+        setPos({ x: targetX, y: targetY });
+        setIdle(true);
+        return;
+      }
+
+      const returnSpeed = 200;
+      const moveSpeed = Math.min(returnSpeed * dt, dist);
+      const ratio = moveSpeed / dist;
+
+      const nx = pos.x + dx * ratio;
+      const ny = pos.y + dy * ratio;
+
+      setPos({ x: nx, y: ny });
+    }
+
+    raf.current = requestAnimationFrame(step);
+  };
+
+  const onDown = (e) => {
+    e.preventDefault();
+    const point = e.touches ? e.touches[0] : e;
+    const rect = wrapRef.current.getBoundingClientRect();
+    offsetRef.current = {
+      x: point.clientX - rect.left,
+      y: point.clientY - rect.top,
+    };
+    dragStartPosRef.current = { x: pos.x, y: pos.y };
+    draggingRef.current = true;
+    setDragging(true);
+    setIdle(false);
+    isFallingRef.current = false;
+    isReturningRef.current = false;
+
+    if (raf.current) {
+      cancelAnimationFrame(raf.current);
+      raf.current = 0;
+    }
+
+    velRef.current = { x: 0, y: 0 };
+    lastT.current = 0;
+    fallClock.current = 0;
+  };
+
+  const onMove = (e) => {
+    if (!draggingRef.current) return;
+    const point = e.touches ? e.touches[0] : e;
+    const nx = clamp(
+      point.clientX - offsetRef.current.x,
+      leftBound(),
+      rightBound()
+    );
+    const ny = clamp(point.clientY - offsetRef.current.y, 0, floorY());
+    setPos({ x: nx, y: ny });
+  };
+
+  const onUp = () => {
+    if (!draggingRef.current) return;
+    draggingRef.current = false;
+    setDragging(false);
+
+    const currentY = pos.y;
+    const groundY = floorY();
+    const dragDeltaX = pos.x - dragStartPosRef.current.x;
+    const dragDeltaY = pos.y - dragStartPosRef.current.y;
+
+    const isVerticalDrag = Math.abs(dragDeltaY) > Math.abs(dragDeltaX) * 1.5;
+    const isPulledUp = dragDeltaY < -30;
+
+    // Kéo lên trên: rơi mềm + quay về
+    if (isVerticalDrag && isPulledUp) {
+      isFallingRef.current = true;
+      isReturningRef.current = false;
+      velRef.current = { x: 0, y: 0 };
+      lastT.current = 0;
+      fallClock.current = 0;
+
+      if (!raf.current) {
+        raf.current = requestAnimationFrame(step);
+      }
+    }
+    // Kéo ngang mạnh: rơi + nảy rồi quay về
+    else if (!isVerticalDrag && Math.abs(dragDeltaX) > 40) {
+      isFallingRef.current = true;
+      isReturningRef.current = false;
+      velRef.current = { x: dragDeltaX * 0.5, y: 0 };
+      lastT.current = 0;
+      fallClock.current = 0;
+
+      if (!raf.current) {
+        raf.current = requestAnimationFrame(step);
+      }
+    }
+    // Không kéo nhiều: về thẳng
+    else {
+      if (
+        currentY < groundY - 5 ||
+        Math.abs(pos.x - originalPosRef.current.x) > 5
+      ) {
+        isFallingRef.current = true;
+        isReturningRef.current = false;
+        velRef.current = { x: 0, y: 0 };
+        lastT.current = 0;
+        fallClock.current = 0;
+
+        if (!raf.current) {
+          raf.current = requestAnimationFrame(step);
+        }
+      } else {
+        setPos({ x: originalPosRef.current.x, y: originalPosRef.current.y });
+        setIdle(true);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const opt = { passive: false };
+
+    const handleMouseMove = (e) => onMove(e);
+    const handleMouseUp = () => onUp();
+    const handleTouchMove = (e) => onMove(e);
+    const handleTouchEnd = () => onUp();
+
+    window.addEventListener("mousemove", handleMouseMove, opt);
+    window.addEventListener("mouseup", handleMouseUp, opt);
+    window.addEventListener("touchmove", handleTouchMove, opt);
+    window.addEventListener("touchend", handleTouchEnd, opt);
+
+    const handleResize = () => {
+      const newFloorY =
+        (typeof window === "undefined" ? 0 : window.innerHeight) -
+        groundOffset -
+        size;
+      const newWidth = typeof window === "undefined" ? 0 : window.innerWidth;
+      const newOriginalX = (newWidth * initXPercent) / 100 - size / 2;
+      const newOriginalY = newFloorY;
+
+      originalPosRef.current = { x: newOriginalX, y: newOriginalY };
+
+      setPos((p) => ({
+        x: clamp(p.x, leftBound(), rightBound()),
+        y: clamp(p.y, 0, newFloorY),
+      }));
+    };
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleTouchEnd);
+      window.removeEventListener("resize", handleResize);
+      if (raf.current) cancelAnimationFrame(raf.current);
+    };
+  }, [pos]);
+
+  return (
+    <div
+      ref={wrapRef}
+      className={`draggable-emoji ${dragging ? "dragging" : ""}`}
+      style={{
+        left: pos.x,
+        top: pos.y,
+        width: size,
+        height: size,
+        transition: dragging ? "none" : "none",
+      }}
+      onMouseDown={onDown}
+      onTouchStart={onDown}
+    >
+      <span
+        className={`emoji-char ${
+          idle ? (ch === "🎄" ? "idle-sway-pine" : "idle-sway-snowman") : ""
+        }`}
+        style={{ fontSize: size }}
+      >
+        {ch}
+      </span>
+    </div>
   );
 }
 
