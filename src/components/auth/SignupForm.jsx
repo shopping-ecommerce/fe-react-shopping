@@ -1,3 +1,4 @@
+// src/components/auth/SignupForm.jsx
 "use client";
 
 import React, { useState, useMemo } from "react";
@@ -17,39 +18,11 @@ function SignupForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showPasswordRules, setShowPasswordRules] = useState(false);
   const navigate = useNavigate();
-
-  // 👉 Kiểm tra điều kiện mật khẩu
-  const passwordRules = useMemo(
-    () => ({
-      length: password.length >= 8,
-      upper: /[A-Z]/.test(password),
-      special: /[^A-Za-z0-9]/.test(password),
-    }),
-    [password]
-  );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-
-    // Chặn submit nếu mật khẩu không đạt rule
-    if (
-      !passwordRules.length ||
-      !passwordRules.upper ||
-      !passwordRules.special
-    ) {
-      const msg =
-        "Mật khẩu có ít nhất 8 ký tự, 1 chữ in hoa và 1 ký tự đặc biệt.";
-      setError(msg);
-      showToast({
-        title: "Mật khẩu chưa hợp lệ",
-        message: msg,
-        type: "warning",
-      });
-      return;
-    }
 
     if (password !== confirmPassword) {
       const msg = "Mật khẩu và mật khẩu xác nhận không khớp!";
@@ -215,82 +188,12 @@ function SignupForm() {
                 </div>
               </div>
 
-              {/* Ô mật khẩu + checklist rule */}
               <div className={styles.field}>
-                {/* Checklist nằm TRÊN ô mật khẩu & chỉ hiện khi đã focus */}
-                {showPasswordRules && (
-                  <ul className={styles.passwordHint}>
-                    <li className={styles.passwordHintItem}>
-                      <span
-                        className={`${styles.checkIcon} ${
-                          passwordRules.length
-                            ? styles.checkIconOk
-                            : styles.checkIconPending
-                        }`}
-                      >
-                        {passwordRules.length ? "✓" : ""}
-                      </span>
-                      <span
-                        className={
-                          passwordRules.length
-                            ? styles.hintLabelOk
-                            : styles.hintLabelPending
-                        }
-                      >
-                        Ít nhất 8 ký tự
-                      </span>
-                    </li>
-
-                    <li className={styles.passwordHintItem}>
-                      <span
-                        className={`${styles.checkIcon} ${
-                          passwordRules.upper
-                            ? styles.checkIconOk
-                            : styles.checkIconPending
-                        }`}
-                      >
-                        {passwordRules.upper ? "✓" : ""}
-                      </span>
-                      <span
-                        className={
-                          passwordRules.upper
-                            ? styles.hintLabelOk
-                            : styles.hintLabelPending
-                        }
-                      >
-                        Có ít nhất 1 chữ cái in hoa (A–Z)
-                      </span>
-                    </li>
-
-                    <li className={styles.passwordHintItem}>
-                      <span
-                        className={`${styles.checkIcon} ${
-                          passwordRules.special
-                            ? styles.checkIconOk
-                            : styles.checkIconPending
-                        }`}
-                      >
-                        {passwordRules.special ? "✓" : ""}
-                      </span>
-                      <span
-                        className={
-                          passwordRules.special
-                            ? styles.hintLabelOk
-                            : styles.hintLabelPending
-                        }
-                      >
-                        Có ít nhất 1 ký tự đặc biệt (ví dụ: !@#$%&amp;*)
-                      </span>
-                    </li>
-                  </ul>
-                )}
-
                 <div className={styles.passwordContainer}>
                   <input
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    onFocus={() => setShowPasswordRules(true)}
                     placeholder="Mật khẩu"
                     required
                   />
