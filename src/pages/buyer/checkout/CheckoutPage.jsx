@@ -12,14 +12,18 @@ import { removeCartItemsBatch } from "../../../services/cartService";
 import { createNotification } from "../../../services/notificationService";
 
 const fmtVND = (n) =>
-  new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(n ?? 0);
+  new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(
+    n ?? 0
+  );
 const fmt = (n) => new Intl.NumberFormat("en-US").format(Number(n) || 0);
 
 const SHIPPING_BASE_FEE = 30000;
 const PROVINCE_TREE_URL = "https://provinces.open-api.vn/api/?depth=3";
 const makePaymentRef = (userId) => {
   const ts = Date.now();
-  const rand = Math.floor(Math.random() * 10000).toString().padStart(4, "0");
+  const rand = Math.floor(Math.random() * 10000)
+    .toString()
+    .padStart(4, "0");
   return `${userId}:${ts}:${rand}`;
 };
 
@@ -32,7 +36,9 @@ const pickDefaultAddress = (addresses = []) =>
 const guessName = (p = {}) => {
   const full = p.fullName || p.full_name || p.name || p.displayName;
   if (full) return full;
-  const combo = [p.first_name || p.firstName, p.last_name || p.lastName].filter(Boolean).join(" ");
+  const combo = [p.first_name || p.firstName, p.last_name || p.lastName]
+    .filter(Boolean)
+    .join(" ");
   return combo || "";
 };
 const guessPhone = (p = {}) => p.phone || p.phone_number || p.mobile || "";
@@ -48,7 +54,7 @@ const getItemImage = (it) =>
     it.image,
     it.imageUrl,
     it.thumbnail,
-    Array.isArray(it.images) ? (it.images[0]?.url || it.images[0]) : null,
+    Array.isArray(it.images) ? it.images[0]?.url || it.images[0] : null,
     "https://placehold.co/150x150"
   );
 
@@ -66,18 +72,36 @@ const _readOptionFromArr = (arr, regex) => {
 };
 const readOption = (it, regex) => {
   const fromObj =
-    _readOptionFromObj(it.options, regex) ?? _readOptionFromObj(it.selectedOptions, regex);
+    _readOptionFromObj(it.options, regex) ??
+    _readOptionFromObj(it.selectedOptions, regex);
   if (fromObj !== undefined) return fromObj;
-  return _readOptionFromArr(it.options, regex) ?? _readOptionFromArr(it.selectedOptions, regex);
+  return (
+    _readOptionFromArr(it.options, regex) ??
+    _readOptionFromArr(it.selectedOptions, regex)
+  );
 };
 
 const getSelectedSize = (it) =>
-  firstTruthy(readOption(it, /kích cỡ|kich co|kích thước|kich thuoc|size/i), it.size, it.variantSize, "");
+  firstTruthy(
+    readOption(it, /kích cỡ|kich co|kích thước|kich thuoc|size/i),
+    it.size,
+    it.variantSize,
+    ""
+  );
 const getSelectedColor = (it) =>
-  firstTruthy(readOption(it, /màu sắc|mau sac|màu|mau|color|colour/i), it.color, it.colour, it.colorName, "");
+  firstTruthy(
+    readOption(it, /màu sắc|mau sac|màu|mau|color|colour/i),
+    it.color,
+    it.colour,
+    it.colorName,
+    ""
+  );
 
 // chuẩn hoá key "linh hoạt" => key chuẩn
-const normalizeKey = (k) => String(k || "").trim().toLowerCase();
+const normalizeKey = (k) =>
+  String(k || "")
+    .trim()
+    .toLowerCase();
 const toCanonicalOptions = (obj = {}) => {
   const out = {};
   for (const [k, vRaw] of Object.entries(obj)) {
@@ -85,7 +109,8 @@ const toCanonicalOptions = (obj = {}) => {
     if (!v || v.toUpperCase() === "FREE") continue; // bỏ placeholder khi hiển thị
     const kk = normalizeKey(k);
     if (["size", "kích cỡ", "kích thước"].includes(kk)) out["Kích cỡ"] = v;
-    else if (["màu sắc", "màu", "color", "colour"].includes(kk)) out["Màu sắc"] = v;
+    else if (["màu sắc", "màu", "color", "colour"].includes(kk))
+      out["Màu sắc"] = v;
     else out[k] = v;
   }
   return out;
@@ -125,8 +150,10 @@ const buildOptionsForPayload = (it) => {
     const v = String(vRaw ?? "").trim();
     const kk = normalizeKey(k);
     if (!v) continue;
-    if (["size", "kích cỡ", "kích thước"].includes(kk)) canonical["Kích cỡ"] = v;
-    else if (["màu sắc", "màu", "color", "colour"].includes(kk)) canonical["Màu sắc"] = v;
+    if (["size", "kích cỡ", "kích thước"].includes(kk))
+      canonical["Kích cỡ"] = v;
+    else if (["màu sắc", "màu", "color", "colour"].includes(kk))
+      canonical["Màu sắc"] = v;
     else canonical[k] = v;
   }
   if (Object.keys(canonical).length === 0) {
@@ -142,7 +169,13 @@ const buildOptionsForPayload = (it) => {
 };
 
 /** Form địa chỉ */
-function AddressForm({ defaultName, defaultPhone, onSaved, authFetch, profileId }) {
+function AddressForm({
+  defaultName,
+  defaultPhone,
+  onSaved,
+  authFetch,
+  profileId,
+}) {
   const [fullName, setFullName] = useState(defaultName || "");
   const [phone, setPhone] = useState(defaultPhone || "");
   const [addressLine, setAddressLine] = useState("");
@@ -178,7 +211,13 @@ function AddressForm({ defaultName, defaultPhone, onSaved, authFetch, profileId 
     return d?.wards || [];
   }, [districts, district]);
 
-  const canSave = fullName.trim() && phone.trim() && addressLine.trim() && province && district && ward;
+  const canSave =
+    fullName.trim() &&
+    phone.trim() &&
+    addressLine.trim() &&
+    province &&
+    district &&
+    ward;
 
   const handleSave = async () => {
     if (!canSave) return;
@@ -186,7 +225,12 @@ function AddressForm({ defaultName, defaultPhone, onSaved, authFetch, profileId 
       setErr("Không tìm thấy thông tin user.");
       return;
     }
-    const fullAddress = [addressLine.trim(), ward?.name, district?.name, province?.name]
+    const fullAddress = [
+      addressLine.trim(),
+      ward?.name,
+      district?.name,
+      province?.name,
+    ]
       .filter(Boolean)
       .join(", ");
 
@@ -220,64 +264,126 @@ function AddressForm({ defaultName, defaultPhone, onSaved, authFetch, profileId 
 
   return (
     <div className="theciu-card">
-      <div className="theciu-card-header"><h3>Địa chỉ</h3></div>
+      <div className="theciu-card-header">
+        <h3>Địa chỉ</h3>
+      </div>
       <div className="theciu-form">
         <div className="theciu-field-group">
           <div className="theciu-field">
-            <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)}
-              placeholder="Nhập họ và tên" className="theciu-input theciu-input-pill" />
+            <input
+              type="text"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder="Nhập họ và tên"
+              className="theciu-input theciu-input-pill"
+            />
           </div>
           <div className="theciu-field">
-            <input type="text" value={phone} onChange={(e) => setPhone(e.target.value)}
-              placeholder="Nhập số điện thoại" className="theciu-input theciu-input-pill" />
+            <input
+              type="text"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="Nhập số điện thoại"
+              className="theciu-input theciu-input-pill"
+            />
           </div>
         </div>
 
         <div className="theciu-field">
-          <input type="text" value={addressLine} onChange={(e) => setAddressLine(e.target.value)}
-            placeholder="Nhập địa chỉ chi tiết của bạn" className="theciu-input theciu-input-pill" />
+          <input
+            type="text"
+            value={addressLine}
+            onChange={(e) => setAddressLine(e.target.value)}
+            placeholder="Nhập địa chỉ chi tiết của bạn"
+            className="theciu-input theciu-input-pill"
+          />
         </div>
 
         <div className="theciu-field-row">
           <div className="theciu-field">
             <div className="theciu-select-wrapper">
-              <select value={province?.code || ""} onChange={(e) => {
-                  const p = provinces.find((x) => String(x.code) === String(e.target.value));
-                  setProvince(p || null); setDistrict(null); setWard(null);
-                }} disabled={!provinces.length} className="theciu-select theciu-input-pill">
+              <select
+                value={province?.code || ""}
+                onChange={(e) => {
+                  const p = provinces.find(
+                    (x) => String(x.code) === String(e.target.value)
+                  );
+                  setProvince(p || null);
+                  setDistrict(null);
+                  setWard(null);
+                }}
+                disabled={!provinces.length}
+                className="theciu-select theciu-input-pill"
+              >
                 <option value="">Chọn tỉnh/thành phố</option>
-                {provinces.map((p) => <option key={p.code} value={p.code}>{p.name}</option>)}
+                {provinces.map((p) => (
+                  <option key={p.code} value={p.code}>
+                    {p.name}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
           <div className="theciu-field">
             <div className="theciu-select-wrapper">
-              <select value={district?.code || ""} onChange={(e) => {
-                  const d = districts.find((x) => String(x.code) === String(e.target.value));
-                  setDistrict(d || null); setWard(null);
-                }} disabled={!province} className="theciu-select theciu-input-pill">
+              <select
+                value={district?.code || ""}
+                onChange={(e) => {
+                  const d = districts.find(
+                    (x) => String(x.code) === String(e.target.value)
+                  );
+                  setDistrict(d || null);
+                  setWard(null);
+                }}
+                disabled={!province}
+                className="theciu-select theciu-input-pill"
+              >
                 <option value="">Chọn quận</option>
-                {districts.map((d) => <option key={d.code} value={d.code}>{d.name}</option>)}
+                {districts.map((d) => (
+                  <option key={d.code} value={d.code}>
+                    {d.name}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
           <div className="theciu-field">
             <div className="theciu-select-wrapper">
-              <select value={ward?.code || ""} onChange={(e) => {
-                  const w = wards.find((x) => String(x.code) === String(e.target.value));
+              <select
+                value={ward?.code || ""}
+                onChange={(e) => {
+                  const w = wards.find(
+                    (x) => String(x.code) === String(e.target.value)
+                  );
                   setWard(w || null);
-                }} disabled={!district} className="theciu-select theciu-input-pill">
+                }}
+                disabled={!district}
+                className="theciu-select theciu-input-pill"
+              >
                 <option value="">Chọn phường/xã</option>
-                {wards.map((w) => <option key={w.code} value={w.code}>{w.name}</option>)}
+                {wards.map((w) => (
+                  <option key={w.code} value={w.code}>
+                    {w.name}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
         </div>
 
-        {err && <div className="form-error" style={{ marginTop: 8 }}>{err}</div>}
+        {err && (
+          <div className="form-error" style={{ marginTop: 8 }}>
+            {err}
+          </div>
+        )}
 
-        <button className="theciu-btn-primary theciu-btn-full" disabled={!canSave || loading}
-          onClick={handleSave}>{loading ? "Đang lưu..." : "Cập nhật thông tin"}</button>
+        <button
+          className="theciu-btn-primary theciu-btn-full"
+          disabled={!canSave || loading}
+          onClick={handleSave}
+        >
+          {loading ? "Đang lưu..." : "Cập nhật thông tin"}
+        </button>
       </div>
     </div>
   );
@@ -285,24 +391,44 @@ function AddressForm({ defaultName, defaultPhone, onSaved, authFetch, profileId 
 
 /** Sidebar tóm tắt */
 function OrderSummary({
-  items, shippingFee, total, onCheckout, canCheckout, note, onNoteChange, isPaying, selectedDiscountTotal,
+  items,
+  shippingFee,
+  total,
+  onCheckout,
+  canCheckout,
+  note,
+  onNoteChange,
+  isPaying,
+  selectedDiscountTotal,
 }) {
-  const subtotal = useMemo(() => items.reduce((s, it) => s + it.price * it.qty, 0), [items]);
+  const subtotal = useMemo(
+    () => items.reduce((s, it) => s + it.price * it.qty, 0),
+    [items]
+  );
 
   return (
     <div className="theciu-card theciu-sticky">
-      <div className="theciu-card-header"><h3>Đơn hàng của bạn</h3></div>
+      <div className="theciu-card-header">
+        <h3>Đơn hàng của bạn</h3>
+      </div>
       <div className="theciu-order-summary">
-        <div className="theciu-muted">Có {items.length} sản phẩm trong giỏ hàng</div>
+        <div className="theciu-muted">
+          Có {items.length} sản phẩm trong giỏ hàng
+        </div>
         <div className="theciu-divider" />
         <div className="theciu-products in-summary">
           {items.map((item) => (
-            <div className="theciu-product-item" key={item.id || item.productId}>
+            <div
+              className="theciu-product-item"
+              key={item.id || item.productId}
+            >
               <img
                 src={getItemImage(item)}
                 alt={item.title}
                 className="theciu-product-image"
-                onError={(e) => (e.currentTarget.src = "https://placehold.co/150x150")}
+                onError={(e) =>
+                  (e.currentTarget.src = "https://placehold.co/150x150")
+                }
                 loading="lazy"
               />
               <div className="theciu-product-info">
@@ -316,7 +442,9 @@ function OrderSummary({
 
                 <div className="theciu-product-meta">
                   <span className="theciu-product-qty">x{item.qty}</span>
-                  <span className="theciu-product-price">{fmtVND(item.price)}</span>
+                  <span className="theciu-product-price">
+                    {fmtVND(item.price)}
+                  </span>
                 </div>
               </div>
             </div>
@@ -325,12 +453,22 @@ function OrderSummary({
 
         <div className="theciu-divider" />
         <div className="theciu-price-breakdown">
-          <div className="theciu-price-row"><span>Tổng giá</span><span>{fmtVND(subtotal)}</span></div>
-          <div className="theciu-price-row"><span>Phí vận chuyển</span><span>{fmtVND(shippingFee)}</span></div>
+          <div className="theciu-price-row">
+            <span>Tổng giá</span>
+            <span>{fmtVND(subtotal)}</span>
+          </div>
+          <div className="theciu-price-row">
+            <span>Phí vận chuyển</span>
+            <span>{fmtVND(shippingFee)}</span>
+          </div>
           <div className="theciu-price-row">
             <span>Giảm từ voucher</span>
-            <span className={selectedDiscountTotal > 0 ? "theciu-discount" : ""}>
-              {selectedDiscountTotal > 0 ? `-${fmt(selectedDiscountTotal)} đ` : `${fmt(0)} đ`}
+            <span
+              className={selectedDiscountTotal > 0 ? "theciu-discount" : ""}
+            >
+              {selectedDiscountTotal > 0
+                ? `-${fmt(selectedDiscountTotal)} đ`
+                : `${fmt(0)} đ`}
             </span>
           </div>
         </div>
@@ -355,19 +493,41 @@ function OrderSummary({
           />
         </div>
 
-        <button className={`theciu-btn-checkout ${isPaying ? "is-loading" : ""}`}
-          disabled={!canCheckout || isPaying} onClick={onCheckout}>
-          {isPaying ? <>Đang thanh toán<span className="theciu-loading-dots"><span>•</span><span>•</span><span>•</span></span></> : "Đặt hàng"}
+        <button
+          className={`theciu-btn-checkout ${isPaying ? "is-loading" : ""}`}
+          disabled={!canCheckout || isPaying}
+          onClick={onCheckout}
+        >
+          {isPaying ? (
+            <>
+              Đang thanh toán
+              <span className="theciu-loading-dots">
+                <span>•</span>
+                <span>•</span>
+                <span>•</span>
+              </span>
+            </>
+          ) : (
+            "Đặt hàng"
+          )}
         </button>
 
         <div className="theciu-terms">
           <label className="theciu-terms-label">
             <input type="checkbox" className="theciu-terms-checkbox" />
-            <span>Tôi đã đọc và đồng ý với <a href="#" className="theciu-terms-link">điều khoản và điều kiện</a></span>
+            <span>
+              Tôi đã đọc và đồng ý với{" "}
+              <a href="#" className="theciu-terms-link">
+                điều khoản và điều kiện
+              </a>
+            </span>
           </label>
         </div>
 
-        <p className="theciu-note small">*Số tiền sẽ được quy đổi sang VND theo tỷ giá tại thời điểm thanh toán.</p>
+        <p className="theciu-note small">
+          *Số tiền sẽ được quy đổi sang VND theo tỷ giá tại thời điểm thanh
+          toán.
+        </p>
       </div>
     </div>
   );
@@ -451,7 +611,9 @@ export default function CheckoutPage() {
           try {
             setAddress(JSON.parse(cachedAddr));
           } catch {
-            const list = Array.isArray(result.addresses) ? result.addresses : [];
+            const list = Array.isArray(result.addresses)
+              ? result.addresses
+              : [];
             const def = pickDefaultAddress(list);
             if (def) {
               setAddress(def);
@@ -481,13 +643,26 @@ export default function CheckoutPage() {
     setAddress({ address: addrObj.address, is_default: !!addrObj.is_default });
     setRecipientName(addrObj.fullName || recipientName);
     setRecipientPhone(addrObj.phone || recipientPhone);
-    sessionStorage.setItem("checkout_address", JSON.stringify({ address: addrObj.address, is_default: !!addrObj.is_default }));
+    sessionStorage.setItem(
+      "checkout_address",
+      JSON.stringify({
+        address: addrObj.address,
+        is_default: !!addrObj.is_default,
+      })
+    );
   };
 
   const hasAddress = !!address;
-  const canCheckout = hasAddress && items.length > 0 && recipientName.trim() && recipientPhone.trim();
+  const canCheckout =
+    hasAddress &&
+    items.length > 0 &&
+    recipientName.trim() &&
+    recipientPhone.trim();
 
-  const shippingFee = useMemo(() => (shipping === "fast" ? 45000 : SHIPPING_BASE_FEE), [shipping]);
+  const shippingFee = useMemo(
+    () => (shipping === "fast" ? 45000 : SHIPPING_BASE_FEE),
+    [shipping]
+  );
 
   const sellerGroups = useMemo(() => {
     const map = new Map();
@@ -502,24 +677,37 @@ export default function CheckoutPage() {
       map.get(sellerId).items.push(it);
       map.get(sellerId).amount += (it.price || 0) * (it.qty || 0);
     }
-    return Array.from(map.entries()).map(([sellerId, data]) => ({ sellerId, ...data }));
+    return Array.from(map.entries()).map(([sellerId, data]) => ({
+      sellerId,
+      ...data,
+    }));
   }, [items]);
 
-  const subtotal = useMemo(() => items.reduce((s, it) => s + it.price * it.qty, 0), [items]);
+  const subtotal = useMemo(
+    () => items.reduce((s, it) => s + it.price * it.qty, 0),
+    [items]
+  );
 
   const selectedDiscountTotal = useMemo(
-    () => Object.values(selectedBySeller).reduce((s, v) => s + (Number(v?.discountAmount) || 0), 0),
+    () =>
+      Object.values(selectedBySeller).reduce(
+        (s, v) => s + (Number(v?.discountAmount) || 0),
+        0
+      ),
     [selectedBySeller]
   );
 
   const total = Math.max(0, subtotal + shippingFee - selectedDiscountTotal);
-  const toPaymentEnum = (p) => (p === "cod" ? "CASH_ON_DELIVERY" : "BANK_TRANSFER");
+  const toPaymentEnum = (p) =>
+    p === "cod" ? "CASH_ON_DELIVERY" : "BANK_TRANSFER";
 
   // === FETCH shop names ===
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const ids = Array.from(new Set(sellerGroups.map((g) => g.sellerId))).filter(Boolean);
+      const ids = Array.from(
+        new Set(sellerGroups.map((g) => g.sellerId))
+      ).filter(Boolean);
       const toFetch = ids.filter((id) => !(id in sellerNameMap));
       if (toFetch.length === 0) return;
 
@@ -527,9 +715,16 @@ export default function CheckoutPage() {
       for (const sid of toFetch) {
         try {
           const url = apiUrl(API_CONFIG.endpoints.searchSellerBySellerId(sid));
-          const res = await authFetch(url, { method: "GET", headers: { Accept: "application/json" } });
+          const res = await authFetch(url, {
+            method: "GET",
+            headers: { Accept: "application/json" },
+          });
           const data = await res.json().catch(() => ({}));
-          const name = data?.result?.shop_name || data?.result?.shopName || data?.result?.name || sid;
+          const name =
+            data?.result?.shop_name ||
+            data?.result?.shopName ||
+            data?.result?.name ||
+            sid;
           next[sid] = name;
         } catch {
           next[sid] = sid;
@@ -537,7 +732,9 @@ export default function CheckoutPage() {
       }
       if (!cancelled) setSellerNameMap((m) => ({ ...m, ...next }));
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [authFetch, sellerGroups, sellerNameMap]);
 
   // === FETCH usable vouchers per seller ===
@@ -559,7 +756,9 @@ export default function CheckoutPage() {
         for (const g of sellerGroups) {
           const orderAmount = Math.round(g.amount || 0);
           const url = apiUrl(
-            `/voucher/usable-vouchers?userId=${encodeURIComponent(profileId)}&sellerId=${encodeURIComponent(
+            `/voucher/usable-vouchers?userId=${encodeURIComponent(
+              profileId
+            )}&sellerId=${encodeURIComponent(
               g.sellerId
             )}&orderAmount=${encodeURIComponent(orderAmount)}`
           );
@@ -571,11 +770,18 @@ export default function CheckoutPage() {
               signal: aborter.signal,
             });
             const data = await res.json().catch(() => ({}));
-            const arr = Array.isArray(data?.result) ? data.result : Array.isArray(data) ? data : [];
+            const arr = Array.isArray(data?.result)
+              ? data.result
+              : Array.isArray(data)
+              ? data
+              : [];
             next[g.sellerId] = arr;
           } catch (e) {
             next[g.sellerId] = [];
-            if (!cancelled) setVoucherErr((old) => old || "Không tải được voucher một số shop.");
+            if (!cancelled)
+              setVoucherErr(
+                (old) => old || "Không tải được voucher một số shop."
+              );
           }
         }
 
@@ -592,7 +798,10 @@ export default function CheckoutPage() {
   }, [authFetch, profileId, sellerGroups]);
 
   const handleSelectVoucher = async (sellerId, voucher) => {
-    if (!profileId) { alert("Vui lòng đăng nhập."); return; }
+    if (!profileId) {
+      alert("Vui lòng đăng nhập.");
+      return;
+    }
     const group = sellerGroups.find((g) => g.sellerId === sellerId);
     const orderAmount = Math.round(group?.amount || 0);
 
@@ -601,7 +810,10 @@ export default function CheckoutPage() {
     try {
       const res = await authFetch(apiUrl("/voucher/validate"), {
         method: "POST",
-        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           voucherCode: voucher.code,
           userId: profileId,
@@ -612,7 +824,9 @@ export default function CheckoutPage() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || data?.code !== 200 || !data?.result?.valid) {
-        throw new Error(data?.message || data?.result?.message || "Không hợp lệ");
+        throw new Error(
+          data?.message || data?.result?.message || "Không hợp lệ"
+        );
       }
       const info = data.result.voucherInfo;
       setSelectedBySeller((m) => ({
@@ -639,7 +853,14 @@ export default function CheckoutPage() {
 
   // === Build payload per seller (dùng cho COD; luồng bank tạo ở OrderSuccess.jsx)
   const toPaymentPayloadGroups = ({
-    items, address, recipientName, recipientPhone, payment, note, userId, paymentRef,
+    items,
+    address,
+    recipientName,
+    recipientPhone,
+    payment,
+    note,
+    userId,
+    paymentRef,
   }) => {
     const map = new Map();
     for (const it of items) {
@@ -667,7 +888,8 @@ export default function CheckoutPage() {
         sellerId: String(sellerId).trim(),
         items: normItems,
         paymentStatus: toPaymentEnum(payment),
-        shippingAddress: (typeof address === "string" ? address : address?.address) || "",
+        shippingAddress:
+          (typeof address === "string" ? address : address?.address) || "",
         phoneNumber: (recipientPhone || "").trim(),
         recipientName: (recipientName || "").trim(),
         subtotal: sellerSubtotal,
@@ -677,7 +899,8 @@ export default function CheckoutPage() {
       };
 
       if (note?.trim()) payload.notes = note.trim();
-      if (selectedBySeller[sellerId]?.code) payload.couponCode = selectedBySeller[sellerId].code;
+      if (selectedBySeller[sellerId]?.code)
+        payload.couponCode = selectedBySeller[sellerId].code;
 
       if (toPaymentEnum(payment) === "BANK_TRANSFER") {
         if (paymentRef) payload.paymentRef = paymentRef; // chỉ đính ref nếu cần
@@ -690,16 +913,25 @@ export default function CheckoutPage() {
     const results = [];
     for (let i = 0; i < orderPayloads.length; i++) {
       const payload = orderPayloads[i];
-      const res = await authFetch("http://localhost:8888/shopping/api/order/createOrder", {
+      const res = await authFetch(apiUrl("/order/createOrder"), {
         method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
         body: JSON.stringify(payload),
       });
       const responseText = await res.text();
       let data = {};
-      try { data = JSON.parse(responseText); }
-      catch { throw new Error(`Server returned invalid JSON: ${responseText}`); }
-      if (!res.ok) throw new Error(data.message || data.error || `Tạo đơn thất bại (HTTP ${res.status})`);
+      try {
+        data = JSON.parse(responseText);
+      } catch {
+        throw new Error(`Server returned invalid JSON: ${responseText}`);
+      }
+      if (!res.ok)
+        throw new Error(
+          data.message || data.error || `Tạo đơn thất bại (HTTP ${res.status})`
+        );
       results.push(data);
     }
     return results;
@@ -709,9 +941,15 @@ export default function CheckoutPage() {
   const redirectToVnPay = async ({ userId, amount, orderId }) => {
     if (!userId) throw new Error("userId is required for VNPay payment");
     try {
-      const balanceRes = await authFetch(apiUrl(API_CONFIG.endpoints.walletBalance(userId)), { method: "GET" });
+      const balanceRes = await authFetch(
+        apiUrl(API_CONFIG.endpoints.walletBalance(userId)),
+        { method: "GET" }
+      );
       if (!balanceRes.ok) {
-        const createRes = await authFetch(apiUrl(API_CONFIG.endpoints.walletCreate(userId)), { method: "POST" });
+        const createRes = await authFetch(
+          apiUrl(API_CONFIG.endpoints.walletCreate(userId)),
+          { method: "POST" }
+        );
         if (!createRes.ok) throw new Error("Không thể tạo ví thanh toán");
       }
     } catch (walletErr) {
@@ -719,12 +957,21 @@ export default function CheckoutPage() {
     }
 
     const bankCode = "NCB";
-    const url = apiUrl(API_CONFIG.endpoints.vnPayUrl({ amount, userId, bankCode, orderId }));
-    const res = await authFetch(url, { method: "GET", headers: { Accept: "application/json" } });
+    const url = apiUrl(
+      API_CONFIG.endpoints.vnPayUrl({ amount, userId, bankCode, orderId })
+    );
+    const res = await authFetch(url, {
+      method: "GET",
+      headers: { Accept: "application/json" },
+    });
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data?.message || `Lấy URL thanh toán thất bại (HTTP ${res.status})`);
+    if (!res.ok)
+      throw new Error(
+        data?.message || `Lấy URL thanh toán thất bại (HTTP ${res.status})`
+      );
     const payUrl = data?.result;
-    if (typeof payUrl !== "string" || !payUrl.startsWith("http")) throw new Error("URL thanh toán VNPay không hợp lệ");
+    if (typeof payUrl !== "string" || !payUrl.startsWith("http"))
+      throw new Error("URL thanh toán VNPay không hợp lệ");
     window.location.href = payUrl;
   };
 
@@ -749,7 +996,10 @@ export default function CheckoutPage() {
         };
         const res = await authFetch(apiUrl(VOUCHER_APPLY_PATH), {
           method: "POST",
-          headers: { Accept: "application/json", "Content-Type": "application/json" },
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify(body),
         });
         const data = await res.json().catch(() => ({}));
@@ -778,15 +1028,23 @@ export default function CheckoutPage() {
   const completeVoucherUsage = async (userVoucherId) => {
     try {
       if (!userVoucherId) return;
-      const url = apiUrl(`${VOUCHER_COMPLETE_PATH}/${encodeURIComponent(userVoucherId)}`);
-      const res = await authFetch(url, { method: "GET", headers: { Accept: "application/json" } });
+      const url = apiUrl(
+        `${VOUCHER_COMPLETE_PATH}/${encodeURIComponent(userVoucherId)}`
+      );
+      const res = await authFetch(url, {
+        method: "GET",
+        headers: { Accept: "application/json" },
+      });
       await res.json().catch(() => ({}));
     } catch (e) {
       console.warn("Complete voucher usage lỗi:", e);
     }
   };
 
-  const sendOrderCreatedNotification = async (authFetch, { userId, orderId, totalAmount }) => {
+  const sendOrderCreatedNotification = async (
+    authFetch,
+    { userId, orderId, totalAmount }
+  ) => {
     try {
       const content = {
         text: `Đơn hàng ${orderId} của bạn đã được tạo thành công.`,
@@ -807,7 +1065,10 @@ export default function CheckoutPage() {
     setIsPaying(true);
     try {
       // Lấy userId với các fallback
-      let userId = sessionStorage.getItem("user_id") || location.state?.userId || profileId;
+      let userId =
+        sessionStorage.getItem("user_id") ||
+        location.state?.userId ||
+        profileId;
 
       if (!userId) {
         const storedUser = localStorage.getItem("user");
@@ -840,7 +1101,8 @@ export default function CheckoutPage() {
         const draft = {
           userId,
           items,
-          address: typeof address === "string" ? address : address?.address || "",
+          address:
+            typeof address === "string" ? address : address?.address || "",
           recipientName,
           recipientPhone,
           note: (note || "").trim(),
@@ -895,7 +1157,8 @@ export default function CheckoutPage() {
       // XÓA GIỎ: theo options (đúng biến thể)
       try {
         const toRemove = items.map((i) => ({
-          sellerId: i.sellerId || (typeof i.id === "string" ? i.id.split("-")[0] : ""),
+          sellerId:
+            i.sellerId || (typeof i.id === "string" ? i.id.split("-")[0] : ""),
           productId: i.productId,
           options: buildOptionsForPayload(i),
         }));
@@ -904,7 +1167,9 @@ export default function CheckoutPage() {
         console.warn("Xoá giỏ sau đặt hàng lỗi:", e);
       }
 
-      const orderIds = (created || []).map((r) => r?.result?.id).filter(Boolean);
+      const orderIds = (created || [])
+        .map((r) => r?.result?.id)
+        .filter(Boolean);
       const sumFromBE = (created || [])
         .map((r) => Number(r?.result?.totalAmount))
         .filter((n) => Number.isFinite(n) && n >= 0)
@@ -914,7 +1179,8 @@ export default function CheckoutPage() {
       const EPS = 1;
       let totalForSuccess;
       if (Number.isFinite(sumFromBE) && sumFromBE > 0) {
-        if (hadVouchers && sumFromBE - total > EPS) totalForSuccess = Math.round(total);
+        if (hadVouchers && sumFromBE - total > EPS)
+          totalForSuccess = Math.round(total);
         else totalForSuccess = Math.round(sumFromBE);
       } else totalForSuccess = Math.round(total);
 
@@ -926,18 +1192,27 @@ export default function CheckoutPage() {
         address: typeof address === "string" ? address : address?.address || "",
         phone: recipientPhone,
         itemsCount: items.length,
-        etaText: shipping === "fast" ? "5–10 ngày làm việc" : "7–20 ngày làm việc",
+        etaText:
+          shipping === "fast" ? "5–10 ngày làm việc" : "7–20 ngày làm việc",
         subtotal: Math.round(subtotal),
         discount: Math.round(selectedDiscountTotal),
         shippingFee,
       };
-      sessionStorage.setItem("last_order_success", JSON.stringify(orderSuccess));
+      sessionStorage.setItem(
+        "last_order_success",
+        JSON.stringify(orderSuccess)
+      );
 
       try {
         for (const oid of orderIds) {
           const found = (created || []).find((r) => r?.result?.id === oid);
-          const totalAmountForThis = found?.result?.totalAmount ?? totalForSuccess;
-          await sendOrderCreatedNotification(authFetch, { userId, orderId: oid, totalAmount: totalAmountForThis });
+          const totalAmountForThis =
+            found?.result?.totalAmount ?? totalForSuccess;
+          await sendOrderCreatedNotification(authFetch, {
+            userId,
+            orderId: oid,
+            totalAmount: totalAmountForThis,
+          });
         }
       } catch {}
 
@@ -956,7 +1231,9 @@ export default function CheckoutPage() {
         <div className="theciu-header">
           <h1>Thanh toán</h1>
           <nav className="theciu-breadcrumb">
-            <a href="/cart">Giỏ hàng</a><span>›</span><span>Thanh toán</span>
+            <a href="/cart">Giỏ hàng</a>
+            <span>›</span>
+            <span>Thanh toán</span>
           </nav>
         </div>
 
@@ -967,20 +1244,43 @@ export default function CheckoutPage() {
                 <div className="theciu-card-header">
                   <h3>Địa chỉ giao hàng</h3>
                   <div className="theciu-card-actions">
-                    <button className="theciu-btn-secondary" onClick={() => setShowRecipientModal(true)}>Sửa người nhận</button>
-                    <button className="theciu-btn-secondary" onClick={() => setShowAddrModal(true)} style={{ fontWeight: 600 }}>Thay đổi</button>
+                    <button
+                      className="theciu-btn-secondary"
+                      onClick={() => setShowRecipientModal(true)}
+                    >
+                      Sửa người nhận
+                    </button>
+                    <button
+                      className="theciu-btn-secondary"
+                      onClick={() => setShowAddrModal(true)}
+                      style={{ fontWeight: 600 }}
+                    >
+                      Thay đổi
+                    </button>
                   </div>
                 </div>
 
                 <div className="theciu-address-display">
                   <div className="theciu-display-row">
-                    <div className="theciu-display-field"><strong>{recipientName || "Người nhận"}</strong></div>
-                    <div className="theciu-display-field" style={{ fontWeight: 380 }}>{recipientPhone || "SĐT"}</div>
+                    <div className="theciu-display-field">
+                      <strong>{recipientName || "Người nhận"}</strong>
+                    </div>
+                    <div
+                      className="theciu-display-field"
+                      style={{ fontWeight: 380 }}
+                    >
+                      {recipientPhone || "SĐT"}
+                    </div>
                   </div>
-                  <div className="theciu-display-field" style={{ width: "100%", fontWeight: 380 }}>
+                  <div
+                    className="theciu-display-field"
+                    style={{ width: "100%", fontWeight: 380 }}
+                  >
                     {address?.address || address}
                   </div>
-                  {address?.is_default && <span className="theciu-tag">Mặc định</span>}
+                  {address?.is_default && (
+                    <span className="theciu-tag">Mặc định</span>
+                  )}
                 </div>
               </div>
             ) : (
@@ -999,48 +1299,82 @@ export default function CheckoutPage() {
                 <div className="theciu-card-header">
                   <h3>Voucher áp dụng</h3>
                   <div style={{ fontSize: 13, color: "#666" }}>
-                    {voucherLoading ? "Đang tải voucher…" : "Chọn 1 voucher cho mỗi shop (nếu đủ điều kiện)"}
+                    {voucherLoading
+                      ? "Đang tải voucher…"
+                      : "Chọn 1 voucher cho mỗi shop (nếu đủ điều kiện)"}
                   </div>
                 </div>
 
                 <div className="theciu-voucher-section">
-                  {voucherErr && <div className="theciu-voucher-error">⚠ {voucherErr}</div>}
+                  {voucherErr && (
+                    <div className="theciu-voucher-error">⚠ {voucherErr}</div>
+                  )}
                   {sellerGroups.map((g) => {
                     const list = usableBySeller[g.sellerId] || [];
                     const selected = selectedBySeller[g.sellerId];
                     return (
                       <div className="theciu-voucher-group" key={g.sellerId}>
                         <div className="theciu-voucher-head">
-                          <div className="theciu-voucher-shop">Shop: <b>{sellerNameMap[g.sellerId] || g.sellerId}</b></div>
-                          <div className="theciu-voucher-amount">Tạm tính: {fmtVND(g.amount)}</div>
+                          <div className="theciu-voucher-shop">
+                            Shop:{" "}
+                            <b>{sellerNameMap[g.sellerId] || g.sellerId}</b>
+                          </div>
+                          <div className="theciu-voucher-amount">
+                            Tạm tính: {fmtVND(g.amount)}
+                          </div>
                         </div>
 
                         {list.length === 0 ? (
-                          <div className="theciu-voucher-empty">Không có voucher khả dụng.</div>
+                          <div className="theciu-voucher-empty">
+                            Không có voucher khả dụng.
+                          </div>
                         ) : (
                           <div className="theciu-voucher-list">
                             {list.map((v) => {
-                              const enough = g.amount >= Number(v.minOrderAmount || 0);
-                              const isSelected = !!selected && selected.code === v.code;
+                              const enough =
+                                g.amount >= Number(v.minOrderAmount || 0);
+                              const isSelected =
+                                !!selected && selected.code === v.code;
                               const label =
                                 v.type === "PERCENTAGE"
                                   ? `Giảm ${v.discountValue}%${
-                                      Number(v.maxDiscountAmount || 0) > 0 ? ` (tối đa ${fmt(v.maxDiscountAmount)} đ)` : ""
+                                      Number(v.maxDiscountAmount || 0) > 0
+                                        ? ` (tối đa ${fmt(
+                                            v.maxDiscountAmount
+                                          )} đ)`
+                                        : ""
                                     }`
                                   : v.type === "FREE_SHIPPING"
-                                  ? "Miễn phí vận chuyển (−" + fmt(SHIPPING_BASE_FEE) + " đ)"
+                                  ? "Miễn phí vận chuyển (−" +
+                                    fmt(SHIPPING_BASE_FEE) +
+                                    " đ)"
                                   : `Giảm ${fmt(v.discountValue)} đ`;
                               return (
                                 <button
                                   key={v.voucherId || v.id || v.code}
-                                  className={`theciu-voucher-pill ${!enough ? "is-disabled" : ""} ${isSelected ? "is-selected" : ""}`}
-                                  title={!enough ? `Cần tối thiểu ${fmtVND(v.minOrderAmount)}` : label}
-                                  onClick={() => (isSelected ? handleUnselectVoucher(g.sellerId) : enough && handleSelectVoucher(g.sellerId, v))}
+                                  className={`theciu-voucher-pill ${
+                                    !enough ? "is-disabled" : ""
+                                  } ${isSelected ? "is-selected" : ""}`}
+                                  title={
+                                    !enough
+                                      ? `Cần tối thiểu ${fmtVND(
+                                          v.minOrderAmount
+                                        )}`
+                                      : label
+                                  }
+                                  onClick={() =>
+                                    isSelected
+                                      ? handleUnselectVoucher(g.sellerId)
+                                      : enough &&
+                                        handleSelectVoucher(g.sellerId, v)
+                                  }
                                   disabled={!enough}
                                 >
                                   <span className="code">{v.code}</span>
                                   <span className="label">{label}</span>
-                                  <span className="min">Đơn tối thiểu {fmtVND(v.minOrderAmount)}</span>
+                                  <span className="min">
+                                    Đơn tối thiểu {fmtVND(v.minOrderAmount)}
+                                  </span>
                                 </button>
                               );
                             })}
@@ -1049,8 +1383,14 @@ export default function CheckoutPage() {
 
                         {selected && (
                           <div className="theciu-voucher-picked">
-                            Đã chọn: <b>{selected.code}</b> • Giảm <b>{fmtVND(selected.discountAmount)}</b>{" "}
-                            <button className="theciu-voucher-remove" onClick={() => handleUnselectVoucher(g.sellerId)}>Bỏ chọn</button>
+                            Đã chọn: <b>{selected.code}</b> • Giảm{" "}
+                            <b>{fmtVND(selected.discountAmount)}</b>{" "}
+                            <button
+                              className="theciu-voucher-remove"
+                              onClick={() => handleUnselectVoucher(g.sellerId)}
+                            >
+                              Bỏ chọn
+                            </button>
                           </div>
                         )}
                       </div>
@@ -1062,10 +1402,24 @@ export default function CheckoutPage() {
 
             {/* Shipping */}
             <div className="theciu-card">
-              <div className="theciu-card-header"><h3>Phương thức vận chuyển</h3></div>
+              <div className="theciu-card-header">
+                <h3>Phương thức vận chuyển</h3>
+              </div>
               <div className="theciu-shipping-options">
-                {[{ id: "standard", name: "Giao hàng tiêu chuẩn", desc: "7 - 20 ngày làm việc", fee: 30000 }].map((option) => (
-                  <label key={option.id} className={`theciu-radio-option ${shipping === option.id ? "selected" : ""}`}>
+                {[
+                  {
+                    id: "standard",
+                    name: "Giao hàng tiêu chuẩn",
+                    desc: "7 - 20 ngày làm việc",
+                    fee: 30000,
+                  },
+                ].map((option) => (
+                  <label
+                    key={option.id}
+                    className={`theciu-radio-option ${
+                      shipping === option.id ? "selected" : ""
+                    }`}
+                  >
                     <input
                       type="radio"
                       name="shipping"
@@ -1079,7 +1433,9 @@ export default function CheckoutPage() {
                         <div className="theciu-radio-title">{option.name}</div>
                         <div className="theciu-radio-desc">{option.desc}</div>
                       </div>
-                      <div className="theciu-radio-price">{fmtVND(option.fee)}</div>
+                      <div className="theciu-radio-price">
+                        {fmtVND(option.fee)}
+                      </div>
                     </div>
                   </label>
                 ))}
@@ -1088,11 +1444,24 @@ export default function CheckoutPage() {
 
             {/* Payment */}
             <div className="theciu-card">
-              <div className="theciu-card-header"><h3>Phương thức thanh toán</h3></div>
+              <div className="theciu-card-header">
+                <h3>Phương thức thanh toán</h3>
+              </div>
               <div className="theciu-payment-options">
-                {[{ id: "bank", name: "Chuyển khoản ngân hàng", icon: "🏦" },
-                  { id: "cod", name: "Thanh toán khi nhận hàng (COD)", icon: "💰" }].map((opt) => (
-                  <label key={opt.id} className={`theciu-payment-option ${payment === opt.id ? "selected" : ""}`}>
+                {[
+                  { id: "bank", name: "Chuyển khoản ngân hàng", icon: "🏦" },
+                  {
+                    id: "cod",
+                    name: "Thanh toán khi nhận hàng (COD)",
+                    icon: "💰",
+                  },
+                ].map((opt) => (
+                  <label
+                    key={opt.id}
+                    className={`theciu-payment-option ${
+                      payment === opt.id ? "selected" : ""
+                    }`}
+                  >
                     <input
                       type="radio"
                       name="payment"
@@ -1127,7 +1496,11 @@ export default function CheckoutPage() {
         </div>
       </div>
 
-      <AddressPickerModal open={showAddrModal} onClose={() => setShowAddrModal(false)} onPicked={handlePickedAddress} />
+      <AddressPickerModal
+        open={showAddrModal}
+        onClose={() => setShowAddrModal(false)}
+        onPicked={handlePickedAddress}
+      />
       <RecipientEditModal
         open={showRecipientModal}
         defaultName={recipientName}
@@ -1136,7 +1509,10 @@ export default function CheckoutPage() {
         onSave={({ name, phone }) => {
           setRecipientName(name);
           setRecipientPhone(phone);
-          sessionStorage.setItem("checkout_contact", JSON.stringify({ name, phone }));
+          sessionStorage.setItem(
+            "checkout_contact",
+            JSON.stringify({ name, phone })
+          );
         }}
       />
     </div>

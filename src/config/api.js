@@ -1,6 +1,6 @@
 // src/config/api.js
 export const API_CONFIG = {
-  baseUrl: "http://localhost:8888/shopping/api",
+  baseUrl: import.meta.env.VITE_API_BASE_URL || "http://localhost:8888/shopping/api",
   endpoints: {
     // Auth
     register: "/authentication/register",

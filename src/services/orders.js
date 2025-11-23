@@ -91,13 +91,7 @@ export async function fetchOrdersByUser(authFetch, userId, status) {
   return normalized;
 }
 
-/**
- * Hủy đơn hàng
- * - authFetch: từ AuthContext (tự gắn Bearer + credentials)
- * - params: { orderId, userId, reason }
- * Endpoint: POST http://localhost:8888/shopping/api/order/cancelOrder
- * Body: { orderId, userId, reason }
- */
+
 export async function cancelOrder(authFetch, { orderId, userId, reason }) {
   if (!authFetch) throw new Error("authFetch is required");
   if (!orderId) throw new Error("orderId is required");

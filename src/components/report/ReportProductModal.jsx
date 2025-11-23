@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { apiUrl } from "../../config/api";
 
 /**
  * Modal báo cáo sản phẩm
@@ -61,7 +62,8 @@ export default function ReportProductModal({
     try {
       setSubmitting(true);
 
-      const REPORT_URL = "http://localhost:8888/shopping/api/feedback/report/create";
+      // ❌ Bỏ localhost, dùng baseUrl từ env (dev/prod)
+      const REPORT_URL = apiUrl("/feedback/report/create");
       const body = { productId, userId, reason: finalReason };
 
       const res = await authFetch(REPORT_URL, {

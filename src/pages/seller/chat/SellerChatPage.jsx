@@ -79,9 +79,7 @@ export default function SellerChatPage() {
     }
     try {
       const res = await fetch(
-        `http://localhost:8888/shopping/api/info/profiles/${encodeURIComponent(
-          userId
-        )}`,
+        apiUrl(`/info/profiles/${encodeURIComponent(userId)}`),
         {
           headers: {
             Accept: "application/json",
@@ -89,6 +87,7 @@ export default function SellerChatPage() {
           },
         }
       );
+
       const data = await res.json().catch(() => ({}));
       if (!res.ok || data?.code !== 0) throw new Error();
 
@@ -241,9 +240,7 @@ export default function SellerChatPage() {
             c.id === cid
               ? {
                   ...c,
-                  last: product
-                    ? `Sản phẩm: ${product.name || "?"}`
-                    : text,
+                  last: product ? `Sản phẩm: ${product.name || "?"}` : text,
                   time: formatTime(createdAt || new Date()),
                 }
               : c
@@ -372,7 +369,11 @@ export default function SellerChatPage() {
             role: m.fromSelf ? "me" : "them",
             text: baseText,
             product,
-            files: hasFiles ? m.fileUrls : product?.image ? [product.image] : [],
+            files: hasFiles
+              ? m.fileUrls
+              : product?.image
+              ? [product.image]
+              : [],
             createdAt: m.createdAt,
           };
         });
@@ -712,9 +713,7 @@ export default function SellerChatPage() {
                     </div>
                   )}
 
-                  {m.text && (
-                    <div className="cs-message-text">{m.text}</div>
-                  )}
+                  {m.text && <div className="cs-message-text">{m.text}</div>}
 
                   {renderFiles(m)}
                 </div>

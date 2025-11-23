@@ -6,11 +6,6 @@ import "../../../styles/account-profile.css";
 import { AuthContext } from "../../../contexts/AuthContext";
 import { API_CONFIG, apiUrl } from "../../../config/api";
 
-const PROFILE_BASE = "http://localhost:8888/shopping/api";
-
-/* ----------------------- Helpers ----------------------- */
-
-// Ưu tiên email: user → data.account.email → data.email → ...
 const pickBestEmail = (user, data = {}, prev = "") => {
   const fromUser =
     user?.email ||
@@ -170,7 +165,7 @@ const AccountProfile = () => {
       try {
         // 1) Lấy profile
         const res = await authFetch(
-          `${PROFILE_BASE}${API_CONFIG.endpoints.getMyProfile}`,
+          apiUrl(API_CONFIG.endpoints.getMyProfile),   // ✅ dùng apiUrl
           { method: "GET", headers: { Accept: "application/json" }, signal }
         );
         const text = await res.text();
@@ -282,7 +277,7 @@ const AccountProfile = () => {
       form.append("files", file);      // ✅ field name 'files'
 
       const res = await authFetch(
-        `${PROFILE_BASE}${API_CONFIG.endpoints.updateAvatar}`,
+        apiUrl(API_CONFIG.endpoints.updateAvatar),   // ✅ dùng apiUrl
         { method: "POST", body: form } // KHÔNG set Content-Type
       );
 
@@ -346,14 +341,17 @@ const AccountProfile = () => {
 
   // Update profile (họ tên, ngày sinh, ảnh, địa chỉ)
   const postVariant = async (body) => {
-    const res = await authFetch(`${PROFILE_BASE}${API_CONFIG.endpoints.updateProfile}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify(body),
-    });
+    const res = await authFetch(
+      apiUrl(API_CONFIG.endpoints.updateProfile),     // ✅ dùng apiUrl
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(body),
+      }
+    );
 
     const text = await res.text();
     let json = {};
@@ -442,14 +440,17 @@ const AccountProfile = () => {
     let lastErr = null;
     for (let i = 0; i < variants.length; i++) {
       try {
-        const res = await authFetch(`${PROFILE_BASE}${API_CONFIG.endpoints.updateProfile}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify(variants[i]),
-        });
+        const res = await authFetch(
+          apiUrl(API_CONFIG.endpoints.updateProfile), // ✅ dùng apiUrl
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify(variants[i]),
+          }
+        );
 
         const text = await res.text();
         let json = {};

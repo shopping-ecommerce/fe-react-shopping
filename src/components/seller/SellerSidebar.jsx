@@ -143,17 +143,6 @@ export default function SellerSidebar({
           },
         ],
       },
-
-      // 4) Kho & hàng tồn (⛔ lock khi SUSPENDED)
-      {
-        type: "group",
-        label: "Kho & hàng tồn",
-        icon: faWarehouse,
-        key: "inventory",
-        locked: isSuspended,
-        children: [{ label: "Tồn kho", to: "/seller/inventory" }],
-      },
-
       // 5) Chat khách hàng
       {
         type: "item",
@@ -206,11 +195,6 @@ export default function SellerSidebar({
           {
             label: "Hiệu quả kinh doanh",
             to: "/seller/business-efficiency",
-            icon: faChartLine,
-          },
-          {
-            label: "Chỉ số lượt truy cập",
-            to: "/seller/traffic",
             icon: faChartLine,
           },
         ],

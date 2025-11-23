@@ -93,19 +93,22 @@ const formatTime = (iso) => {
 async function fetchBuyerMeta(userId, token) {
   if (!userId) return { name: "Khách", avatar: "/img/default-user.png" };
   try {
-    const res = await fetch(
-      `http://localhost:8888/shopping/api/info/profiles/${encodeURIComponent(
-        userId
-      )}`,
-      {
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${token || getToken()}`,
-        },
-      }
-    );
+    // 🔁 Dùng baseUrl từ config (dev/prod) thay vì hard-code localhost
+    const path = API_CONFIG?.endpoints?.getPublicProfileByUserId
+      ? API_CONFIG.endpoints.getPublicProfileByUserId(userId)
+      : `/info/profiles/${encodeURIComponent(userId)}`;
+
+    const res = await fetch(apiUrl(path), {
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${token || getToken()}`,
+      },
+    });
+
     const data = await res.json().catch(() => ({}));
+    // Giữ nguyên logic code === 0 như cũ
     if (!res.ok || data?.code !== 0) throw new Error();
+
     const r = data.result || {};
     const name = `${r.first_name || ""} ${r.last_name || ""}`.trim() || "Khách";
     const avatar = r.public_id || "/img/default-user.png";

@@ -114,15 +114,16 @@ export default function ChatAIWidget({
     bodyRef.current.scrollTop = bodyRef.current.scrollHeight;
   }, [messages, open, sending]);
 
-  // Endpoint text chat (qua gateway 8888)
+  // Endpoint text chat (qua gateway, qua API gateway)
   const chatUrl = useMemo(() => {
     const path = API_CONFIG?.endpoints?.chat || "/chat";
     return apiUrl(path);
   }, []);
 
-  // ✅ Endpoint image chat (qua gateway 8888) & method POST
-  const chatWithImageUrl =
-    "http://localhost:8888/shopping/api/chat-ai/chat-with-image";
+  // ✅ Endpoint image chat (qua API gateway) – dùng chung baseUrl từ env
+  const chatWithImageUrl = useMemo(() => {
+    return apiUrl("/chat-ai/chat-with-image");
+  }, []);
 
   const toProductHref = (item) => {
     if (!item) return "#";
