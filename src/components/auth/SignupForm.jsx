@@ -6,6 +6,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { register as registerApi } from "../../services/auth";
 import styles from "../../styles/signup.module.css";
 import BackButton from "./BackButton";
+import { showToast } from "../../components/common/ChatToaster";
 
 function SignupForm() {
   const [email, setEmail] = useState("");
@@ -22,25 +23,47 @@ function SignupForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
     if (password !== confirmPassword) {
-      setError("Mật khẩu và mật khẩu xác nhận không khớp!");
+      const msg = "Mật khẩu và mật khẩu xác nhận không khớp!";
+      setError(msg);
+      showToast({
+        title: "Mật khẩu không khớp",
+        message: msg,
+        type: "warning",
+      });
       return;
     }
+
     const payload = {
       email: email.trim(),
       password,
       first_name: firstName.trim(),
       last_name: lastName.trim(),
     };
+
     try {
       setLoading(true);
       await registerApi(payload);
+
       sessionStorage.setItem("signup-payload", JSON.stringify(payload));
       localStorage.setItem("signup-payload", JSON.stringify(payload));
-      alert("Đăng ký thành công! Mã OTP đã được gửi.");
+
+      showToast({
+        title: "Đăng ký thành công",
+        message: "Mã xác thực đã được gửi đến email của bạn.",
+        type: "success",
+      });
+
       navigate("/otp-verification", { state: { email } });
     } catch (err) {
-      setError(err?.message || "Đăng ký thất bại. Vui lòng thử lại!");
+      const msg = "Đăng ký thất bại. Vui lòng thử lại sau!";
+      setError(msg);
+      showToast({
+        title: "Đăng ký thất bại",
+        message: msg,
+        type: "error",
+      });
     } finally {
       setLoading(false);
     }
@@ -197,7 +220,9 @@ function SignupForm() {
                   <span className={styles.inputIcon}>🔒</span>
                   <span
                     className={styles.passwordToggle}
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    onClick={() =>
+                      setShowConfirmPassword(!showConfirmPassword)
+                    }
                     aria-label="Hiện/ẩn mật khẩu xác nhận"
                   >
                     {showConfirmPassword ? "👁️" : "👁️‍🗨️"}
