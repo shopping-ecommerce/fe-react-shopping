@@ -105,7 +105,7 @@ const sendOrderCreatedNotification = async (authFetch, { userId, orderId, totalA
       totalAmount: Number(totalAmount || 0),
       link: `/orders/${orderId}`,
     };
-    await createNotification(authFetch, { userId, type: "MESSAGE", content });
+    await createNotification(authFetch, { userId, type: "NOTIFY", content });
   } catch (e) {
     console.warn("createNotification failed:", e?.message || e);
   }

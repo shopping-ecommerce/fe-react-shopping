@@ -8,10 +8,7 @@ import { API_CONFIG, apiUrl } from "../../../config/api";
 
 const pickBestEmail = (user, data = {}, prev = "") => {
   const fromUser =
-    user?.email ||
-    user?.user_email ||
-    user?.preferred_username ||
-    "";
+    user?.email || user?.user_email || user?.preferred_username || "";
   const fromData =
     data?.account?.email ||
     data?.email ||
@@ -23,7 +20,8 @@ const pickBestEmail = (user, data = {}, prev = "") => {
 };
 
 // UUID v4 (thả lỏng)
-const looksLikeUUID = (s) => typeof s === "string" && /^[0-9a-fA-F-]{32,}$/.test(s);
+const looksLikeUUID = (s) =>
+  typeof s === "string" && /^[0-9a-fA-F-]{32,}$/.test(s);
 
 // Chọn accountId từ token/profile
 const pickAccountId = (user, profile = {}) => {
@@ -44,7 +42,8 @@ const pickAccountId = (user, profile = {}) => {
 const normalizeAvatarUrl = (val) => {
   if (!val) return "";
   if (/^https?:\/\//i.test(val)) return val;
-  const CDN_BASE = "https://shopping-iuh-application.s3.ap-southeast-1.amazonaws.com/";
+  const CDN_BASE =
+    "https://shopping-iuh-application.s3.ap-southeast-1.amazonaws.com/";
   return CDN_BASE + String(val).replace(/^\/+/, "");
 };
 
@@ -136,8 +135,8 @@ const AccountProfile = () => {
 
   // Avatar
   const [avatarImage, setAvatarImage] = useState(null); // preview tạm khi chọn file
-  const [avatarUrl, setAvatarUrl] = useState("");       // URL thật từ BE (public_id)
-  const [avatarBust, setAvatarBust] = useState("");     // cache-busting
+  const [avatarUrl, setAvatarUrl] = useState(""); // URL thật từ BE (public_id)
+  const [avatarBust, setAvatarBust] = useState(""); // cache-busting
 
   // Nếu email chưa có, lấy từ token trước
   useEffect(() => {
@@ -165,7 +164,7 @@ const AccountProfile = () => {
       try {
         // 1) Lấy profile
         const res = await authFetch(
-          apiUrl(API_CONFIG.endpoints.getMyProfile),   // ✅ dùng apiUrl
+          apiUrl(API_CONFIG.endpoints.getMyProfile), // ✅ dùng apiUrl
           { method: "GET", headers: { Accept: "application/json" }, signal }
         );
         const text = await res.text();
@@ -179,8 +178,7 @@ const AccountProfile = () => {
 
         // 2) accountId (nếu cần gọi API lấy email theo account)
         const accId =
-          pickAccountId(user, data) ||
-          "8cfb8be3-b1ca-45ab-a673-ff372d85c4c7"; // fallback nếu cần
+          pickAccountId(user, data) || "8cfb8be3-b1ca-45ab-a673-ff372d85c4c7"; // fallback nếu cần
         setAccountId(accId);
 
         // 3) Email theo accountId
@@ -202,7 +200,10 @@ const AccountProfile = () => {
                 ud?.contact_email ||
                 "";
             } else {
-              console.warn("⚠️ getUserByAccountId lỗi:", uJson?.message || uRes.status);
+              console.warn(
+                "⚠️ getUserByAccountId lỗi:",
+                uJson?.message || uRes.status
+              );
             }
           }
         } catch (e) {
@@ -210,7 +211,11 @@ const AccountProfile = () => {
         }
 
         // 4) Chọn email tốt nhất
-        const email = pickBestEmail(user, { email: emailFromAccount, ...data }, formData.email);
+        const email = pickBestEmail(
+          user,
+          { email: emailFromAccount, ...data },
+          formData.email
+        );
 
         // 5) Avatar từ public_id
         const fromApiAvatar = normalizeAvatarUrl(data.public_id);
@@ -218,8 +223,8 @@ const AccountProfile = () => {
         setAvatarBust(String(Date.now())); // tránh cache lần đầu
 
         // 6) Set UI + IDs
-        setProfileId(data.id ?? null);     // profileId cho updateProfile (nếu BE cần)
-        setAvatarUserId(data.id);          // ✅ userId cho updateAvatar lấy từ getMyProfile
+        setProfileId(data.id ?? null); // profileId cho updateProfile (nếu BE cần)
+        setAvatarUserId(data.id); // ✅ userId cho updateAvatar lấy từ getMyProfile
 
         setFormData((prev) => ({
           ...prev,
@@ -249,7 +254,9 @@ const AccountProfile = () => {
           const email = pickBestEmail(user, {}, prev.email);
           return { ...prev, email };
         });
-        setMsg("⚠️ Không tải được hồ sơ. Bạn vẫn có thể cập nhật họ tên/ngày sinh.");
+        setMsg(
+          "⚠️ Không tải được hồ sơ. Bạn vẫn có thể cập nhật họ tên/ngày sinh."
+        );
       }
     };
 
@@ -268,16 +275,18 @@ const AccountProfile = () => {
       return;
     }
     if (!avatarUserId) {
-      setMsg("⚠️ Chưa có userId (id cho updateAvatar). Hãy reload hồ sơ hoặc kiểm tra AuthContext.");
+      setMsg(
+        "⚠️ Chưa có userId (id cho updateAvatar). Hãy reload hồ sơ hoặc kiểm tra AuthContext."
+      );
       return;
     }
     try {
       const form = new FormData();
       form.append("id", avatarUserId); // ✅ id = result.id từ getMyProfile
-      form.append("files", file);      // ✅ field name 'files'
+      form.append("files", file); // ✅ field name 'files'
 
       const res = await authFetch(
-        apiUrl(API_CONFIG.endpoints.updateAvatar),   // ✅ dùng apiUrl
+        apiUrl(API_CONFIG.endpoints.updateAvatar), // ✅ dùng apiUrl
         { method: "POST", body: form } // KHÔNG set Content-Type
       );
 
@@ -342,7 +351,7 @@ const AccountProfile = () => {
   // Update profile (họ tên, ngày sinh, ảnh, địa chỉ)
   const postVariant = async (body) => {
     const res = await authFetch(
-      apiUrl(API_CONFIG.endpoints.updateProfile),     // ✅ dùng apiUrl
+      apiUrl(API_CONFIG.endpoints.updateProfile), // ✅ dùng apiUrl
       {
         method: "POST",
         headers: {
@@ -383,24 +392,40 @@ const AccountProfile = () => {
     const phoneNorm = normalizePhone(formData.phone);
 
     const variants = [
-      { id: profileId, first_name: fn, last_name: ln, birthdate, phone: phoneNorm },
       {
         id: profileId,
         first_name: fn,
         last_name: ln,
         birthdate,
         phone: phoneNorm,
-        addresses: [{ address: formData.address || "622 cong hoa", is_default: true }],
+      },
+      {
+        id: profileId,
+        first_name: fn,
+        last_name: ln,
+        birthdate,
+        phone: phoneNorm,
+        addresses: [
+          { address: formData.address || "622 cong hoa", is_default: true },
+        ],
       },
       { first_name: fn, last_name: ln, birthdate, phone: phoneNorm },
-      { id: profileId, firstName: fn, lastName: ln, birthdate, phone: phoneNorm },
+      {
+        id: profileId,
+        firstName: fn,
+        lastName: ln,
+        birthdate,
+        phone: phoneNorm,
+      },
       {
         id: profileId,
         first_name: fn,
         last_name: ln,
         birthdate,
         phone: phoneNorm,
-        addresses: [{ address: formData.address || "622 cong hoa", is_default: true }],
+        addresses: [
+          { address: formData.address || "622 cong hoa", is_default: true },
+        ],
         status: "AVAILABLE",
       },
     ];
@@ -412,7 +437,11 @@ const AccountProfile = () => {
         return result;
       } catch (e) {
         lastErr = e;
-        if (!/invalid|bad|request body|unknown|unsupported|validation/i.test(e.message)) {
+        if (
+          !/invalid|bad|request body|unknown|unsupported|validation/i.test(
+            e.message
+          )
+        ) {
           throw e;
         }
       }
@@ -421,6 +450,7 @@ const AccountProfile = () => {
   };
 
   // Update phone number
+  // Update phone number: GỬI FULL PROFILE giống tryUpdateProfile
   const tryUpdatePhone = async () => {
     if (!profileId) {
       throw new Error("Chưa xác định được ID hồ sơ. Vui lòng tải lại trang.");
@@ -428,51 +458,84 @@ const AccountProfile = () => {
 
     const phoneNorm = normalizePhone(formData.phone);
     if (!phoneNorm || !isValidVNPhone(phoneNorm)) {
-      throw new Error("Số điện thoại không hợp lệ. Vui lòng nhập 10 số, bắt đầu bằng 0.");
+      throw new Error(
+        "Số điện thoại không hợp lệ. Vui lòng nhập 10 số, bắt đầu bằng 0."
+      );
     }
 
+    const birthdate = buildDob({
+      year: formData.year,
+      month: formData.month,
+      day: formData.day,
+    });
+
+    const fn = (formData.firstName || "").trim();
+    const ln = (formData.lastName || "").trim();
+    const address = formData.address || "622 cong hoa";
+
+    // 👉 DÙNG CHUNG ĐỊNH DẠNG VARIANTS VỚI tryUpdateProfile
     const variants = [
-      { id: profileId, phone: phoneNorm },
-      { phone: phoneNorm },
-      { id: profileId, phone_number: phoneNorm }, // thêm variant nếu BE dùng phone_number
+      {
+        id: profileId,
+        first_name: fn,
+        last_name: ln,
+        birthdate,
+        phone: phoneNorm,
+      },
+      {
+        id: profileId,
+        first_name: fn,
+        last_name: ln,
+        birthdate,
+        phone: phoneNorm,
+        addresses: [{ address, is_default: true }],
+      },
+      {
+        first_name: fn,
+        last_name: ln,
+        birthdate,
+        phone: phoneNorm,
+      },
+      {
+        id: profileId,
+        firstName: fn,
+        lastName: ln,
+        birthdate,
+        phone: phoneNorm,
+      },
+      {
+        id: profileId,
+        first_name: fn,
+        last_name: ln,
+        birthdate,
+        phone: phoneNorm,
+        addresses: [{ address, is_default: true }],
+        status: "AVAILABLE",
+      },
     ];
 
     let lastErr = null;
     for (let i = 0; i < variants.length; i++) {
       try {
-        const res = await authFetch(
-          apiUrl(API_CONFIG.endpoints.updateProfile), // ✅ dùng apiUrl
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
-            },
-            body: JSON.stringify(variants[i]),
-          }
-        );
-
-        const text = await res.text();
-        let json = {};
-        try {
-          json = text ? JSON.parse(text) : {};
-        } catch (parseError) {
-          console.error("❌ Lỗi parse JSON:", parseError);
-        }
-
-        if (!res.ok) {
-          const msg = json.message || `HTTP ${res.status}`;
-          throw new Error(msg);
-        }
-        return json.result ?? json;
+        const result = await postVariant(variants[i]); // dùng lại helper chung
+        return result;
       } catch (e) {
         lastErr = e;
-        if (!/invalid|bad|request body|unknown|unsupported|validation/i.test(e.message)) {
+        if (
+          !/invalid|bad|request body|unknown|unsupported|validation/i.test(
+            e.message
+          )
+        ) {
+          // nếu lỗi "lạ" thì dừng luôn
           throw e;
         }
       }
     }
-    throw lastErr || new Error("Tất cả các format đều thất bại");
+
+    throw (
+      lastErr ||
+      new Error("Tất cả các format cập nhật số điện thoại đều thất bại")
+    );
   };
 
   const handlePrimaryButton = async () => {
@@ -487,7 +550,9 @@ const AccountProfile = () => {
     }
 
     if (formData.phone && !isValidVNPhone(formData.phone)) {
-      setMsg("❌ Số điện thoại không hợp lệ. Vui lòng nhập 10 số, bắt đầu bằng 0.");
+      setMsg(
+        "❌ Số điện thoại không hợp lệ. Vui lòng nhập 10 số, bắt đầu bằng 0."
+      );
       return;
     }
 
@@ -501,7 +566,9 @@ const AccountProfile = () => {
         localStorage.setItem("profile:last_name", ln);
       } catch {}
 
-      window.dispatchEvent(new CustomEvent("profile:nameChanged", { detail: { lastName: ln } }));
+      window.dispatchEvent(
+        new CustomEvent("profile:nameChanged", { detail: { lastName: ln } })
+      );
 
       setMsg("✅ Cập nhật hồ sơ thành công!");
       setEditing(false);
@@ -563,14 +630,22 @@ const AccountProfile = () => {
           <div className="profile-avatar-section">
             <div className={`avatar-container ${isDisabled ? "locked" : ""}`}>
               <div className="avatar-placeholder">
-                {(avatarUrl || avatarImage) ? (
+                {avatarUrl || avatarImage ? (
                   <img
-                    src={(avatarUrl ? `${avatarUrl}?t=${avatarBust}` : avatarImage) || "/placeholder.svg"}
+                    src={
+                      (avatarUrl
+                        ? `${avatarUrl}?t=${avatarBust}`
+                        : avatarImage) || "/placeholder.svg"
+                    }
                     alt="Avatar"
                     className="avatar-image"
                   />
                 ) : (
-                  <svg className="avatar-icon" viewBox="0 0 24 24" fill="currentColor">
+                  <svg
+                    className="avatar-icon"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
                     <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
                   </svg>
                 )}
@@ -579,7 +654,11 @@ const AccountProfile = () => {
                 className={`edit-avatar-btn ${isDisabled ? "disabled" : ""}`}
                 onClick={handleEditAvatar}
                 disabled={isDisabled}
-                title={isDisabled ? "Bấm ‘Cập nhật’ để chỉnh sửa ảnh" : "Đổi ảnh đại diện"}
+                title={
+                  isDisabled
+                    ? "Bấm ‘Cập nhật’ để chỉnh sửa ảnh"
+                    : "Đổi ảnh đại diện"
+                }
               >
                 <svg viewBox="0 0 24 24" fill="currentColor">
                   <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
@@ -627,7 +706,12 @@ const AccountProfile = () => {
           <div className="field-group">
             <label>Ngày sinh</label>
             <div className="date-selectors">
-              <select name="day" value={formData.day} onChange={handleInputChange} disabled={isDisabled}>
+              <select
+                name="day"
+                value={formData.day}
+                onChange={handleInputChange}
+                disabled={isDisabled}
+              >
                 <option value="">Ngày</option>
                 {Array.from({ length: 31 }, (_, i) => (
                   <option key={i + 1} value={i + 1}>
@@ -635,7 +719,12 @@ const AccountProfile = () => {
                   </option>
                 ))}
               </select>
-              <select name="month" value={formData.month} onChange={handleInputChange} disabled={isDisabled}>
+              <select
+                name="month"
+                value={formData.month}
+                onChange={handleInputChange}
+                disabled={isDisabled}
+              >
                 <option value="">Tháng</option>
                 {Array.from({ length: 12 }, (_, i) => (
                   <option key={i + 1} value={i + 1}>
@@ -643,7 +732,12 @@ const AccountProfile = () => {
                   </option>
                 ))}
               </select>
-              <select name="year" value={formData.year} onChange={handleInputChange} disabled={isDisabled}>
+              <select
+                name="year"
+                value={formData.year}
+                onChange={handleInputChange}
+                disabled={isDisabled}
+              >
                 <option value="">Năm</option>
                 {Array.from({ length: 100 }, (_, i) => {
                   const y = new Date().getFullYear() - i;
@@ -657,7 +751,11 @@ const AccountProfile = () => {
             </div>
           </div>
 
-          <button className="save-btn" onClick={handlePrimaryButton} disabled={saving}>
+          <button
+            className="save-btn"
+            onClick={handlePrimaryButton}
+            disabled={saving}
+          >
             {editing ? (saving ? "Đang lưu…" : "Lưu thay đổi") : "Cập nhật"}
           </button>
         </div>
@@ -695,9 +793,15 @@ const AccountProfile = () => {
               className="update-btn"
               onClick={handlePhoneUpdate}
               disabled={saving}
-              title={editingPhone ? "Lưu số điện thoại" : "Chỉnh sửa số điện thoại"}
+              title={
+                editingPhone ? "Lưu số điện thoại" : "Chỉnh sửa số điện thoại"
+              }
             >
-              {editingPhone ? (saving ? "Đang lưu…" : "Lưu thay đổi") : "Cập nhật"}
+              {editingPhone
+                ? saving
+                  ? "Đang lưu…"
+                  : "Lưu thay đổi"
+                : "Cập nhật"}
             </button>
           </div>
 
@@ -710,51 +814,14 @@ const AccountProfile = () => {
             </div>
             <div className="contact-info">
               <div className="contact-label">Địa chỉ email</div>
-              <div className="contact-value">{formData.email?.trim() || "—"}</div>
+              <div className="contact-value">
+                {formData.email?.trim() || "—"}
+              </div>
             </div>
           </div>
         </div>
 
         {/* Bảo mật */}
-        <div className="profile-section">
-          <h2 className="section-title">Bảo mật</h2>
-
-          {/* Đổi mật khẩu */}
-          <div className="security-item">
-            <div className="security-icon">
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h1.9c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
-              </svg>
-            </div>
-            <div className="security-info">
-              <div className="security-label">Đổi mật khẩu</div>
-            </div>
-            <button
-              className="update-btn"
-              onClick={() => alert("Tuỳ bạn triển khai")}
-            >
-              Cập nhật
-            </button>
-          </div>
-
-          {/* Yêu cầu xóa tài khoản */}
-          <div className="security-item danger">
-            <div className="security-icon">
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
-              </svg>
-            </div>
-            <div className="security-info">
-              <div className="security-label">Yêu cầu xóa tài khoản</div>
-            </div>
-            <button
-              className="update-btn danger"
-              onClick={() => alert("Tuỳ bạn triển khai")}
-            >
-              Cập nhật
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   );

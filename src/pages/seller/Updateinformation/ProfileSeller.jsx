@@ -268,7 +268,6 @@ export default function ProfileSeller() {
         </div>
         <div className="sp-head-row">
           <h1 className="sp-title">Hồ sơ nhà bán</h1>
-          <button className="sp-btn ghost">⏱ Lịch sử bật tắt gian hàng</button>
         </div>
       </div>
 

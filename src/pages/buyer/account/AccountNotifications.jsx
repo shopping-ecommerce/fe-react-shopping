@@ -5,7 +5,10 @@ import React, { useEffect, useMemo, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../../contexts/AuthContext";
 import { API_CONFIG, apiUrl } from "../../../config/api";
-import { initSocket as initRealtime, getSocket } from "../../../services/realtime";
+import {
+  initSocket as initRealtime,
+  getSocket,
+} from "../../../services/realtime";
 import {
   fetchNotificationsByUser,
   fetchUnreadCount,
@@ -103,8 +106,15 @@ export default function AccountNotifications() {
   const [unreadOrder, setUnreadOrder] = useState(0);
 
   // 🔹 Phân trang cho thông báo đơn hàng
-  const [pageOrder, setPageOrder] = useState(0);   // 0-based
-  const [sizeOrder, setSizeOrder] = useState(10);  // số item mỗi trang
+  const [pageOrder, setPageOrder] = useState(0); // 0-based
+  const [sizeOrder, setSizeOrder] = useState(10); // số item mỗi trang
+
+  const getOrderTitle = (type) => {
+    const t = String(type || "").toUpperCase();
+    if (t === "MESSAGE" || t === "NOTIFY") return "Thông báo đơn hàng";
+    // nếu sau này có thêm loại khác thì map tiếp ở đây
+    return type || "Thông báo đơn hàng";
+  };
 
   // B1: lấy userId & mySellerId
   useEffect(() => {
@@ -158,7 +168,8 @@ export default function AccountNotifications() {
           (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
         );
         // ❌ Lọc bỏ thông báo chat tự gửi (sellerId === mySellerId)
-        if (mySellerId) loaded = loaded.filter((x) => x.sellerId !== mySellerId);
+        if (mySellerId)
+          loaded = loaded.filter((x) => x.sellerId !== mySellerId);
         if (!cancelled) {
           setItemsChat(loaded);
           setLoadingChat(false);
@@ -556,8 +567,9 @@ export default function AccountNotifications() {
                   >
                     <div>
                       <div style={{ fontWeight: 700, marginBottom: 4 }}>
-                        {it.type === "MESSAGE" ? "Thông báo đơn hàng" : it.type}
+                        {getOrderTitle(it.type)}
                       </div>
+
                       <div style={{ color: "#374151", marginBottom: 6 }}>
                         {it?.content?.text || "Bạn có thông báo mới"}
                       </div>
@@ -566,9 +578,7 @@ export default function AccountNotifications() {
                         {it?.content?.orderId && (
                           <span style={{ marginLeft: 8, color: "#9CA3AF" }}>
                             • Mã đơn:{" "}
-                            {String(it.content.orderId)
-                              .slice(-8)
-                              .toUpperCase()}
+                            {String(it.content.orderId).slice(-8).toUpperCase()}
                           </span>
                         )}
                         {it.status !== "READ" && (
@@ -594,9 +604,7 @@ export default function AccountNotifications() {
                               );
                               setUnreadOrder((c) => Math.max(0, c - 1));
                             } catch (er) {
-                              alert(
-                                er?.message || "Đánh dấu đã đọc thất bại"
-                              );
+                              alert(er?.message || "Đánh dấu đã đọc thất bại");
                             }
                           }}
                         >
@@ -614,9 +622,7 @@ export default function AccountNotifications() {
                   <button
                     className="notif-pg-btn"
                     disabled={pageOrder <= 0}
-                    onClick={() =>
-                      setPageOrder((p) => Math.max(0, p - 1))
-                    }
+                    onClick={() => setPageOrder((p) => Math.max(0, p - 1))}
                   >
                     ← Trước
                   </button>
@@ -635,8 +641,7 @@ export default function AccountNotifications() {
                   <button
                     className="notif-pg-btn"
                     disabled={
-                      totalPagesOrder === 0 ||
-                      pageOrder >= totalPagesOrder - 1
+                      totalPagesOrder === 0 || pageOrder >= totalPagesOrder - 1
                     }
                     onClick={() =>
                       setPageOrder((p) =>

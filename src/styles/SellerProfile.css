@@ -58,7 +58,7 @@
 .sp-alert .left{display:flex;align-items:center;gap:8px}
 
 /* ===============================
-   SHOP CARD / HERO ✨ CẢI TIẾN
+   SHOP CARD / HERO
    =============================== */
 .sp-card{
   background:#fff;border:1px solid #e5e7eb;padding:20px;
@@ -73,14 +73,17 @@
   to{opacity:1; transform:none}
 }
 
+/* ⭐ HERO card: cùng chiều rộng với 2 section bên dưới */
 .shop-hero { 
   align-items: center;
-  max-width: 1100px;
-  margin: 16px auto;
-  border-radius: 16px;
+  width: 100%;
+  max-width: 1100px;            /* = max-width của .sp-body */
+  margin: 16px auto;            /* canh giữa giống 2 ô dưới */
+  border-radius: 12px;
   box-shadow: 0 10px 40px rgba(17,24,39,.08);
   padding: 24px 28px;
 }
+
 .shop-hero:hover{
   box-shadow: 0 12px 48px rgba(17,24,39,.12);
 }
@@ -90,7 +93,6 @@
   align-items:center; 
   gap:20px; 
 }
-
 
 /* 📝 Info block */
 .hero-info{ 
@@ -156,7 +158,60 @@
   transform: translateY(-1px);
 }
 
-/* 🟡 Badge đẹp với nền vàng gradient */
+/* Địa chỉ dưới email */
+.hero-address{
+  color:#6b7280;
+  font-size: 14px;
+  max-width: 560px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: -2px;
+}
+
+/* Avatar tròn to + click chọn ảnh */
+.hero-avatar{
+  width: 132px;
+  height: 132px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #fff;
+  position: relative;
+  box-shadow: 0 4px 16px rgba(0,0,0,.08);
+}
+.hero-avatar.editable{ cursor: pointer; }
+.hero-avatar.locked{ cursor: default; }
+
+.hero-avatar-img--cover{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  background: #fff;
+}
+
+/* Dấu + giữa hình tròn (khi editing) */
+.hero-plus{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(0,0,0,.55);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1;
+  box-shadow: 0 6px 16px rgba(0,0,0,.25);
+  pointer-events: none;
+}
+
+/* 🟡 Badge */
 .shop-meta{
   display:flex;
   gap:14px;
@@ -230,14 +285,14 @@
   margin-right: auto;
 }
 
-/* Sidebar trái (sticky + highlight active) */
+/* Sidebar trái */
 .sp-side{
   width:320px;
   min-width:280px;
   background:#fff;
   height:fit-content;
   position:sticky;
-  margin-top: -270px;
+  top: 100px;
   align-self:flex-start;
   border:1px solid #e5e7eb;
   padding: 16px 0;
@@ -374,7 +429,7 @@
 }
 .sp-table .value{flex:1}
 
-/* 🆔 ID Badge đẹp */
+/* 🆔 ID Badge */
 .id-badge{
   display: inline-block;
   background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
@@ -544,8 +599,11 @@
   .sp-side{width:280px}
   .sp-table .label{flex-basis:42%}
 }
+
 @media (max-width: 768px){
-  .sp-body{flex-direction:column}
+  .sp-body{
+    flex-direction:column;
+  }
   .sp-side{
     width:100%;
     position:relative;
@@ -557,10 +615,12 @@
     gap:8px;
   }
   .sp-table .label{flex-basis:auto}
+
   .shop-hero{
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
+    padding: 20px;
   }
   .shop-hero-left{
     flex-direction: column;
@@ -580,203 +640,86 @@
     align-items: center;
     width: 100%;
   }
+
+  .hero-avatar{ 
+    width: 110px;
+    height: 110px;
+  }
+  .hero-plus{ 
+    width: 36px; 
+    height: 36px; 
+    font-size: 22px; 
+  }
 }
-/* === Flush trái cho khối shop-hero-left === */
-.shop-hero{
-  /* giảm padding trái để khối bên trái “sát” hơn */
-  padding-left: 12px; /* trước là 28px */
-}
-.shop-hero-left{
-  margin-left: 0 !important; /* đảm bảo không bị lệch do rule khác */
+/* === THU GỌN CARD .sp-card.fade-in.shop-hero === */
+.sp-card.fade-in.shop-hero {
+  /* giữ cùng chiều rộng như hiện tại */
+  width: 100%;
+  max-width: 1100px;
+  margin: 16px auto;
+
+  /* giảm padding cho thấp lại */
+  padding: 14px 20px;
+
+  /* không ép chiều cao cố định → card tự co theo nội dung */
+  height: auto;
+  min-height: auto;
+  max-height: none;
+
+  align-items: center;
 }
 
-/* Responsive: vẫn to hơn nhưng gọn trên mobile */
-@media (max-width: 768px){
-  .shop-hero{ padding-left: 10px; }
-  .hero-avatar{ width: 96px; height: 96px; }
-  .hero-avatar.locked{ border-radius: 50% !important; }
-}
-/* Đẩy card về sát bên phải */
-.sp-card.fade-in.shop-hero{
-  margin: 16px 0 16px auto !important; /* left:auto → dính phải */
-}
-
-/* Nếu có rule khác set margin:auto; trên .shop-hero thì khóa luôn */
-.shop-hero{
-  margin-right: 0 !important;
-  margin-left: auto !important;
-}
-/* Kích thước cố định cho thẻ: sp-card fade-in shop-hero */
-.sp-card.fade-in.shop-hero{
-  width: 562px;
-  height: 150px;
-  max-width: 562px;   /* chặn rule max-width cũ */
-  min-width: 562px;
-  padding: 16px;      /* thu bớt padding cho vừa nội dung */
-  overflow: hidden;   /* tránh tràn khi nội dung dài */
-  flex-wrap: wrap;    /* cho phần right xuống dòng nếu chật */
-}
-
-/* Tối ưu layout trong khung hẹp */
-.sp-card.fade-in.shop-hero .shop-hero-left{
+/* Bên trái: avatar + info sát nhau hơn */
+.shop-hero-left {
   gap: 12px;
 }
-.sp-card.fade-in.shop-hero .hero-info{
-  min-width: 0;       /* cho phép co hẹp */
-}
-.sp-card.fade-in.shop-hero .hero-name{
-  font-size: 18px;
-}
-.sp-card.fade-in.shop-hero .hero-email{
-  font-size: 13px;
+
+/* Avatar nhỏ lại cho đỡ chiếm chiều cao */
+.hero-avatar {
+  width: 120px;
+  height: 120px;
 }
 
-/* Avatar hơi gọn để vừa khung */
-.sp-card.fade-in.shop-hero .hero-avatar{
-  width: 88px;
-  height: 88px;
+/* Info gọn hơn */
+.hero-info {
+  gap: 4px;
 }
 
-/* Nút bên phải xuống dòng khi chật */
-.sp-card.fade-in.shop-hero .shop-hero-right{
-  width: 100%;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 8px;
-}
-/* === Card hero cố định kích thước + không co khi zoom === */
-.sp-card.fade-in.shop-hero{
-  /* giữ dính mép phải như bạn đang dùng */
-  margin: 16px 0 16px auto !important;
-
-  /* KHÓA kích thước giống một panel riêng */
-  width: 562px;
-  min-width: 562px;
-  max-width: 562px;
-
-  height: 250px;
-  min-height: 250px;
-  max-height: 250px;
-
-  /* Không cho flex layout ép nhỏ */
-  flex: 0 0 562px;
-  flex-shrink: 0;
-
-  /* Vượt qua max-width cũ và các rule trước */
-  max-width: none !important;
-  box-sizing: border-box;
-  overflow: hidden;          /* tránh tràn layout khi nội dung dài */
-  align-items: center;       /* canh giữa theo trục dọc trong khung 180px */
-  flex-wrap: wrap;           /* cho phần right xuống dòng nếu thiếu chỗ */
-  padding: 12px 16px;        /* gọn padding để không tràn */
+.hero-name {
+  font-size: 20px;
+  margin-bottom: 4px;
 }
 
-/* Giữ layout nằm ngang, bỏ đổi cột ở mobile (để card không tự “co”) */
-@media (max-width: 768px){
-  .shop-hero{ 
-    flex-direction: row !important; 
-    align-items: center !important;
-  }
-  .sp-card.fade-in.shop-hero{
-    width: 562px !important;
-    min-width: 562px !important;
-    max-width: 562px !important;
-    height: 250px !important;
-    min-height: 250px !important;
-    max-height: 250px !important;
-  }
-}
-
-/* Chỉnh nội dung gọn trong khung cố định */
-.sp-card.fade-in.shop-hero .shop-hero-left{ gap: 10px; }
-.sp-card.fade-in.shop-hero .hero-info{ min-width: 0; }
-.sp-card.fade-in.shop-hero .hero-name{ font-size: 18px; line-height: 1.2; }
-.sp-card.fade-in.shop-hero .hero-email{ font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.sp-card.fade-in.shop-hero .shop-hero-right{ width: 100%; justify-content: flex-end; gap: 8px; margin-top: 6px; }
-/* Bỏ border-radius cho thẻ sp-card.fade-in.shop-hero */
-.sp-card.fade-in.shop-hero{
-  border-radius: 0 !important;
-}
-
-/* .shop-hero trước đó set 16px → khóa về 0 */
-.shop-hero{
-  border-radius: 0 !important;
-}
-/* ==== Avatar tròn to + click chọn ảnh ==== */
-.hero-avatar{
-  width: 132px !important;
-  height: 132px !important;
-  border-radius: 50% !important;
-  overflow: hidden !important;
-  background: #fff;
-  position: relative;
-  box-shadow: 0 4px 16px rgba(0,0,0,.08);
-}
-.hero-avatar.editable{ cursor: pointer; }
-.hero-avatar.locked{ cursor: default; }
-
-/* Ảnh fill full hình tròn */
-.hero-avatar-img--cover{
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;   /* <— fill full */
-  object-position: center !important;
-  display: block;
-  background: #fff;
-}
-
-/* Dấu + nằm giữa hình tròn (chỉ khi editing) */
-.hero-plus{
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: rgba(0,0,0,.55);
-  color: #fff;
-  display: grid;
-  place-items: center;
-  font-size: 24px;
-  font-weight: 800;
-  line-height: 1;
-  box-shadow: 0 6px 16px rgba(0,0,0,.25);
-  pointer-events: none; /* không chặn click */
-}
-
-/* Ẩn mọi style cũ của nút edit nếu còn sót */
-.hero-edit{ display: none !important; }
-
-/* Mobile: cân đối lại kích thước */
-@media (max-width: 768px){
-  .hero-avatar{ width: 110px !important; height: 110px !important; }
-  .hero-plus{ width: 36px; height: 36px; font-size: 22px; }
-}
-/* Địa chỉ dưới email (mới) */
-.hero-address{
-  color:#6b7280;
+.hero-email {
   font-size: 14px;
-  max-width: 560px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-top: -2px;  /* khít với email */
+  margin-bottom: 2px;
 }
 
-/* Đặt meta bên trái, nút bên phải trên cùng một hàng */
-.shop-hero-right{
-  display:flex;
-  align-items:center;
-  gap:14px;
+.hero-address {
+  font-size: 13px;
+  margin-top: 0;
 }
 
-.shop-hero-right .shop-meta{
-  margin-right:auto;           /* đẩy nút sang phải */
-  display:flex;
-  align-items:center;
-  gap:14px;
+/* Bên phải: meta + nút canh trên, đỡ tạo khoảng trống dưới */
+.shop-hero-right {
+  align-self: flex-start;
+  gap: 10px;
+  margin-top: 40px;
+  margin-left: 250px;
 }
 
-/* Giảm margin-top cũ của meta để khít hàng khi ở bên phải */
-.shop-meta{ margin-top: 0; }
+/* Mobile vẫn gọn, không bị cao quá */
+@media (max-width: 768px) {
+  .sp-card.fade-in.shop-hero {
+    padding: 12px 16px;
+  }
+
+  .hero-avatar {
+    width: 88px;
+    height: 88px;
+  }
+
+  .hero-name {
+    font-size: 18px;
+  }
+}

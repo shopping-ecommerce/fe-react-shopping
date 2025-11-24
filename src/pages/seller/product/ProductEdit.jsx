@@ -1,11 +1,5 @@
 // src/pages/seller/products/ProductEdit.jsx
-import React, {
-  useEffect,
-  useState,
-  useContext,
-  useMemo,
-  useRef,
-} from "react";
+import React, { useEffect, useState, useContext, useMemo, useRef } from "react";
 import {
   Upload,
   Plus,
@@ -159,7 +153,8 @@ const fileToDataURL = (file) =>
   });
 
 /* ===== Modal chọn ảnh (dùng Portal như Create) ===== */
-function ImagePickerModal({ open, onClose, images, previews, onPick }) {
+/* ===== Modal chọn ảnh (dùng Portal như Create) ===== */
+function ImagePickerModal({ open, onClose, items = [], onPick }) {
   React.useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
@@ -186,29 +181,31 @@ function ImagePickerModal({ open, onClose, images, previews, onPick }) {
             </button>
           </div>
 
-          {images?.length ? (
+          {items?.length ? (
             <div className="pc-modal-grid">
-              {images.map((_, i) => (
+              {items.map((it) => (
                 <button
-                  key={i}
+                  key={it.id}
                   type="button"
                   className="pc-modal-thumb"
                   onClick={() => {
-                    onPick(i);
+                    onPick?.(it);
                     onClose();
                   }}
-                  title={`Chọn ảnh #${i + 1}`}
+                  title={`Chọn ảnh: ${it.name}`}
                 >
-                  <img
-                    src={previews[i]?.url}
-                    alt={previews[i]?.name || "img"}
-                  />
-                  <div className="pc-modal-thumb-name">{previews[i]?.name}</div>
+                  <img src={it.url} alt={it.name || "img"} />
+                  <div className="pc-modal-thumb-name">
+                    {it.kind === "old" ? "Cũ - " : "Mới - "}
+                    {it.name}
+                  </div>
                 </button>
               ))}
             </div>
           ) : (
-            <div className="pc-empty">Chưa có ảnh. Hãy tải ảnh ở phần “Ảnh”.</div>
+            <div className="pc-empty">
+              Chưa có ảnh. Hãy tải ảnh ở phần “Ảnh”.
+            </div>
           )}
         </div>
       </div>
@@ -702,7 +699,10 @@ export default function ProductEdit() {
         size: f.size,
         type: f.type,
       }));
-      setProductData((prev) => ({ ...prev, images: [...(prev.images || []), ...valid] }));
+      setProductData((prev) => ({
+        ...prev,
+        images: [...(prev.images || []), ...valid],
+      }));
       setImgPreviews((prev) => [...prev, ...previews]);
     }
     if (invalid.length) {
@@ -725,7 +725,9 @@ export default function ProductEdit() {
     const removedUrl = oldImages[idx];
     setProductData((prev) => ({
       ...prev,
-      mediaByOption: (prev.mediaByOption || []).filter((m) => m.image !== removedUrl),
+      mediaByOption: (prev.mediaByOption || []).filter(
+        (m) => m.image !== removedUrl
+      ),
     }));
   };
 
@@ -735,10 +737,7 @@ export default function ProductEdit() {
       images: (prev.images || []).filter((_, i) => i !== idx),
       mediaByOption: (prev.mediaByOption || [])
         .filter(
-          (m) =>
-            !(
-              String(m.image).match(/^\d+$/) && Number(m.image) === idx
-            )
+          (m) => !(String(m.image).match(/^\d+$/) && Number(m.image) === idx)
         )
         .map((m) => {
           if (String(m.image).match(/^\d+$/)) {
@@ -757,23 +756,27 @@ export default function ProductEdit() {
   };
 
   /* ===== Media map (giống Create) ===== */
-  const setMediaImageFor = (optName, optValue, imgIndexStr) => {
+  const setMediaImageFor = (optName, optValue, imgRef) => {
     const list = [...(productData.mediaByOption || [])];
     const idx = list.findIndex(
       (m) => m.optionName === optName && m.optionValue === optValue
     );
+    const imageValue =
+      typeof imgRef === "string" || typeof imgRef === "number"
+        ? String(imgRef) // có thể là "0","1"... HOẶC URL
+        : "";
+
     const item = {
       optionName: optName,
       optionValue: optValue,
-      image:
-        typeof imgIndexStr === "string" || typeof imgIndexStr === "number"
-          ? String(imgIndexStr)
-          : "",
+      image: imageValue,
     };
+
     if (idx >= 0) list[idx] = item;
     else list.push(item);
     setProductData((prev) => ({ ...prev, mediaByOption: list }));
   };
+
   const getMediaImageIndexFor = (optName, optValue) => {
     const m = (productData.mediaByOption || []).find(
       (x) => x.optionName === optName && x.optionValue === optValue
@@ -795,7 +798,9 @@ export default function ProductEdit() {
     if (!raw) return;
     const lower = raw.toLowerCase();
 
-    const idx = (productData.optionDefs || []).findIndex((o) => o.name === optName);
+    const idx = (productData.optionDefs || []).findIndex(
+      (o) => o.name === optName
+    );
     if (idx < 0) return;
 
     const current = productData.optionDefs[idx].values || [];
@@ -819,7 +824,9 @@ export default function ProductEdit() {
   const renameOptionValueByName = (optName, oldVal, newVal) => {
     const trimmed = (newVal || "").slice(0, OPTION_VALUE_CHAR_LIMIT).trim();
     if (!trimmed) return;
-    const idx = (productData.optionDefs || []).findIndex((o) => o.name === optName);
+    const idx = (productData.optionDefs || []).findIndex(
+      (o) => o.name === optName
+    );
     if (idx < 0) return;
 
     const lower = trimmed.toLowerCase();
@@ -860,7 +867,9 @@ export default function ProductEdit() {
   };
 
   const removeOptionValueByName = (optName, value) => {
-    const idx = (productData.optionDefs || []).findIndex((o) => o.name === optName);
+    const idx = (productData.optionDefs || []).findIndex(
+      (o) => o.name === optName
+    );
     if (idx < 0) return;
     const opts = [...productData.optionDefs];
     opts[idx] = {
@@ -1175,7 +1184,7 @@ export default function ProductEdit() {
       mediaByOption: (productData.mediaByOption || []).filter(
         (m) => m.optionName && m.optionValue && (m.image || m.image === "0")
       ),
-      removeImage: Array.from(markedRemoveOld),
+      removeImage: Array.from(markedRemoveOld).map((idx) => idx + 1),
     };
     if (includeStatus) return { ...base, status: "AVAILABLE" };
     return base;
@@ -1185,7 +1194,11 @@ export default function ProductEdit() {
     if (!validateBeforeSubmit()) return;
     try {
       setSubmitting(true);
-      await updateProduct(authFetch, buildCommonPayload(true), productData.images);
+      await updateProduct(
+        authFetch,
+        buildCommonPayload(true),
+        productData.images
+      );
       showToast?.({
         title: "Cập nhật sản phẩm",
         text: "Cập nhật sản phẩm thành công!",
@@ -1204,7 +1217,11 @@ export default function ProductEdit() {
     if (!validateBeforeSubmit()) return;
     try {
       setSubmitting(true);
-      await reregisterProduct(authFetch, buildCommonPayload(false), productData.images);
+      await reregisterProduct(
+        authFetch,
+        buildCommonPayload(false),
+        productData.images
+      );
       showToast?.({
         title: "Đã gửi duyệt lại",
         text: "Sản phẩm của bạn đã được gửi cho Admin duyệt.",
@@ -1239,16 +1256,33 @@ export default function ProductEdit() {
     );
   }
 
+  const visibleOldImages = oldImages.filter((_, i) => !markedRemoveOld.has(i));
+
   const combinedPreviewList = [
-    ...oldImages.filter((_, i) => !markedRemoveOld.has(i)).map((url, idx) => ({
+    ...visibleOldImages.map((url, idx) => ({
       url,
       name: url.split("/").pop() || `old_${idx + 1}.jpg`,
       size: 0,
       type: "image/*",
-      _old: true,
+      _kind: "old",
+      _oldIndex: idx,
     })),
-    ...imgPreviews,
+    ...imgPreviews.map((p, idx) => ({
+      ...p,
+      _kind: "new",
+      _newIndex: idx,
+    })),
   ];
+
+  // Items cho modal chọn ảnh
+  const pickerItems = combinedPreviewList.map((it, i) => ({
+    id: i,
+    url: it.url,
+    name: it.name,
+    kind: it._kind, // "old" hoặc "new"
+    // imageValue: nếu "old" -> URL, nếu "new" -> index ảnh mới
+    imageValue: it._kind === "old" ? it.url : String(it._newIndex ?? 0),
+  }));
 
   return (
     <div className="pc-onepage">
@@ -1297,7 +1331,9 @@ export default function ProductEdit() {
             ) : (
               <select
                 value={productData.categoryId}
-                onChange={(e) => handleInputChange("categoryId", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("categoryId", e.target.value)
+                }
                 className="pc-form-select pc-input-compact"
               >
                 <option value="">-- Chọn danh mục --</option>
@@ -1312,7 +1348,8 @@ export default function ProductEdit() {
 
           <div className="pc-form-group pc-full-width">
             <label className="pc-form-label">
-              Tên sản phẩm (≤ {MAX_NAME_WORDS} từ, mỗi từ ≤ {MAX_WORD_LEN} ký tự) *
+              Tên sản phẩm (≤ {MAX_NAME_WORDS} từ, mỗi từ ≤ {MAX_WORD_LEN} ký
+              tự) *
             </label>
             <input
               type="text"
@@ -1443,7 +1480,8 @@ export default function ProductEdit() {
                                 justifyContent: "center",
                                 boxShadow: "0 2px 8px rgba(0,0,0,.2)",
                               }}
-                            >x
+                            >
+                              x
                               <X size={16} />
                             </button>
                           </div>
@@ -1662,11 +1700,11 @@ export default function ProductEdit() {
                       chosenIdx >= 0
                         ? imgPreviews[chosenIdx]
                         : // nếu ánh xạ tới ảnh cũ (URL), vẫn hiện được
-                          (isMediaOption &&
+                        isMediaOption &&
                           typeof chosen === "string" &&
                           /^https?:\/\//i.test(chosen)
-                            ? { url: chosen, name: chosen.split("/").pop() }
-                            : null);
+                        ? { url: chosen, name: chosen.split("/").pop() }
+                        : null;
 
                     return (
                       <div
@@ -1776,7 +1814,10 @@ export default function ProductEdit() {
               placeholder="Giá*"
               value={bulkAll.price}
               onChange={(e) =>
-                setBulkAll((p) => ({ ...p, price: formatWithComma(e.target.value) }))
+                setBulkAll((p) => ({
+                  ...p,
+                  price: formatWithComma(e.target.value),
+                }))
               }
             />
             <input
@@ -1785,7 +1826,10 @@ export default function ProductEdit() {
               placeholder="Giá so sánh"
               value={bulkAll.compare}
               onChange={(e) =>
-                setBulkAll((p) => ({ ...p, compare: formatWithComma(e.target.value) }))
+                setBulkAll((p) => ({
+                  ...p,
+                  compare: formatWithComma(e.target.value),
+                }))
               }
             />
             <input
@@ -1794,7 +1838,10 @@ export default function ProductEdit() {
               placeholder="SL"
               value={bulkAll.qty}
               onChange={(e) =>
-                setBulkAll((p) => ({ ...p, qty: formatWithComma(e.target.value) }))
+                setBulkAll((p) => ({
+                  ...p,
+                  qty: formatWithComma(e.target.value),
+                }))
               }
             />
 
@@ -2165,8 +2212,9 @@ export default function ProductEdit() {
             <div className="pc-summary-item">
               <span className="pc-summary-label">Danh mục</span>
               <span className="pc-summary-value">
-                {labelCategoryVN(findCategoryById(productData.categoryId)?.name) ||
-                  "—"}
+                {labelCategoryVN(
+                  findCategoryById(productData.categoryId)?.name
+                ) || "—"}
               </span>
             </div>
             <div className="pc-summary-item">
@@ -2220,9 +2268,7 @@ export default function ProductEdit() {
                 submitting || !step1Valid ? " pc-disabled" : ""
               }`}
               disabled={submitting || !step1Valid}
-              title={
-                !step1Valid ? "Vui lòng điền Danh mục & Tên sản phẩm" : ""
-              }
+              title={!step1Valid ? "Vui lòng điền Danh mục & Tên sản phẩm" : ""}
             >
               <Upload /> {submitting ? "Đang lưu..." : "Lưu thay đổi"}
             </button>
@@ -2234,18 +2280,17 @@ export default function ProductEdit() {
       <ImagePickerModal
         open={pickerOpen}
         onClose={() => setPickerOpen(false)}
-        images={productData.images}
-        previews={imgPreviews}
-        onPick={(idx) => {
+        items={pickerItems}
+        onPick={(item) => {
           if (pickerBind?.optionName && pickerBind?.optionValue != null) {
+            // item.imageValue: "0","1"... (ảnh mới) hoặc URL (ảnh cũ)
             setMediaImageFor(
               pickerBind.optionName,
               pickerBind.optionValue,
-              String(idx)
+              item.imageValue
             );
           }
         }}
-        position={pickerPos}
       />
     </div>
   );

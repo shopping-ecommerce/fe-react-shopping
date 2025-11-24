@@ -511,19 +511,6 @@ function OrderSummary({
             "Đặt hàng"
           )}
         </button>
-
-        <div className="theciu-terms">
-          <label className="theciu-terms-label">
-            <input type="checkbox" className="theciu-terms-checkbox" />
-            <span>
-              Tôi đã đọc và đồng ý với{" "}
-              <a href="#" className="theciu-terms-link">
-                điều khoản và điều kiện
-              </a>
-            </span>
-          </label>
-        </div>
-
         <p className="theciu-note small">
           *Số tiền sẽ được quy đổi sang VND theo tỷ giá tại thời điểm thanh
           toán.
@@ -1052,7 +1039,7 @@ export default function CheckoutPage() {
         totalAmount: Number(totalAmount || 0),
         link: `/orders/${orderId}`,
       };
-      await createNotification(authFetch, { userId, type: "MESSAGE", content });
+      await createNotification(authFetch, { userId, type: "NOTIFY", content });
     } catch (e) {
       console.warn("createNotification failed:", e?.message || e);
     }
@@ -1255,7 +1242,7 @@ export default function CheckoutPage() {
                       onClick={() => setShowAddrModal(true)}
                       style={{ fontWeight: 600 }}
                     >
-                      Thay đổi
+                      Thay đổi địa chỉ
                     </button>
                   </div>
                 </div>
