@@ -59,10 +59,18 @@
   padding: 10px 12px;
   border-radius: 10px;
   cursor: pointer;
+
+  /* 👇 thêm cho giống .h-link */
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color .15s ease, opacity .15s ease;
 }
+
 .h-lang:hover {
   background: rgba(255, 255, 255, 0.08);
 }
+
 
 .h-right {
   display: flex;

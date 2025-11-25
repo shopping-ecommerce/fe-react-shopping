@@ -19,6 +19,11 @@ import ProductRatingSummary from "../../../components/reviews/ProductRatingSumma
 import { showToast } from "../../../utils/toast";
 import ReportProductModal from "../../../components/report/ReportProductModal";
 import ProductDescription from "../../../components/tiptap/ProductDescription";
+import {
+  getMyProfile,
+  addFavorite,
+  removeFavorite,
+} from "../../../services/favorites";
 
 /* ========================= Helpers ========================= */
 const pickImageUrl = (images = []) =>
@@ -403,12 +408,16 @@ export default function ProductDetail() {
   const [thumbStart, setThumbStart] = useState(0);
   const [qty, setQty] = useState(1);
 
-  const [liked, setLiked] = useState(false);
+  // const [liked, setLiked] = useState(false); // ❌ bỏ dùng
 
   const [currentUserId, setCurrentUserId] = useState(null);
   const [currentSellerId, setCurrentSellerId] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
   const [isBuying, setIsBuying] = useState(false);
+
+  // ⭐️ Thêm mới:
+  const [favorites, setFavorites] = useState(() => new Set());
+  const [favInflight, setFavInflight] = useState(() => new Set());
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalIndex, setModalIndex] = useState(0);
@@ -451,6 +460,108 @@ export default function ProductDetail() {
   const isOwnerOfSeller = (sid) =>
     !!currentSellerId && String(currentSellerId) === String(sid);
 
+  const handleToggleFavorite = async (ev) => {
+    if (!authReady || !currentUserId) {
+      showToast({
+        title: "Cần đăng nhập",
+        text: "Vui lòng đăng nhập để sử dụng Yêu thích.",
+        type: "warning",
+      });
+      navigate(`/login`, { state: { from: `/products/${id}` } });
+      return;
+    }
+
+    const sid = product?.sellerId || product?.seller_id;
+    if (sid && isOwnerOfSeller(sid)) {
+      showToast({
+        title: "Không thể yêu thích",
+        text: "Bạn là chủ shop — không thể yêu thích sản phẩm của chính mình.",
+        type: "warning",
+      });
+      return;
+    }
+
+    const productId = product.id;
+    const currentlyFav = favorites.has(productId);
+
+    // Đã có request đang chạy cho sản phẩm này → bỏ qua
+    if (favInflight.has(productId)) return;
+
+    // Optimistic UI
+    setFavorites((prev) => {
+      const next = new Set(prev);
+      if (currentlyFav) next.delete(productId);
+      else next.add(productId);
+      return next;
+    });
+    setFavInflight((s) => {
+      const n = new Set(s);
+      n.add(productId);
+      return n;
+    });
+
+    try {
+      const favs = currentlyFav
+        ? await removeFavorite(authFetch, {
+            userId: currentUserId,
+            productId,
+          })
+        : await addFavorite(authFetch, {
+            userId: currentUserId,
+            productId,
+          });
+
+      // Cập nhật lại từ server
+      setFavorites(new Set(favs));
+
+      if (currentlyFav) {
+        showToast({
+          title: "Đã bỏ khỏi Yêu thích",
+          text: "Sản phẩm đã được xóa khỏi danh sách yêu thích.",
+          type: "info",
+        });
+      } else {
+        showToast({
+          title: "Đã thêm vào Yêu thích",
+          text: "Bạn có thể xem lại trong danh sách yêu thích.",
+          type: "success",
+        });
+      }
+    } catch (err) {
+      console.error("Toggle favorite failed:", err);
+
+      // revert optimistic
+      setFavorites((prev) => {
+        const next = new Set(prev);
+        if (currentlyFav) next.add(productId);
+        else next.delete(productId);
+        return next;
+      });
+
+      if (err?.status === 401 || err?.status === 403) {
+        showToast({
+          title: "Phiên đăng nhập hết hạn",
+          text: "Vui lòng đăng nhập lại để tiếp tục.",
+          type: "warning",
+        });
+        navigate(`/login`, { state: { from: `/products/${id}` } });
+        return;
+      }
+
+      showToast({
+        title: "Không thực hiện được",
+        text: "Có lỗi khi cập nhật Yêu thích. Vui lòng thử lại.",
+        type: "error",
+      });
+    } finally {
+      setFavInflight((s) => {
+        const n = new Set(s);
+        n.delete(productId);
+        return n;
+      });
+    }
+  };
+
   /* ===== Load product + seller + profile ===== */
   useEffect(() => {
     if (!authReady) return;
@@ -465,20 +576,19 @@ export default function ProductDetail() {
 
       try {
         // (A) profile + sellerId của user hiện tại (nếu đăng nhập)
+        // (A) profile + sellerId của user hiện tại (nếu đăng nhập)
         if (isAuthenticated) {
           try {
-            const meRes = await authFetch(
-              apiUrl(API_CONFIG.endpoints.getMyProfile),
-              {
-                headers: { Accept: "application/json" },
-                signal,
-              }
-            );
-            const meData = await meRes.json();
-            if (!meRes.ok)
-              throw new Error(meData.message || `HTTP ${meRes.status}`);
-            const uid = meData?.result?.id || meData?.result?.user_id || null;
+            // dùng service giống Home
+            const me = await getMyProfile(authFetch);
+            const uid = me?.id || me?.user_id || null;
             setCurrentUserId(uid);
+
+            // ⭐️ Lấy danh sách sản phẩm yêu thích
+            const favs = Array.isArray(me?.favorite_products)
+              ? me.favorite_products
+              : [];
+            setFavorites(new Set(favs));
 
             if (uid) {
               try {
@@ -507,13 +617,16 @@ export default function ProductDetail() {
             } else {
               setCurrentSellerId(null);
             }
-          } catch {
+          } catch (e) {
+            console.error("Load profile failed:", e);
             setCurrentUserId(null);
             setCurrentSellerId(null);
+            setFavorites(new Set());
           }
         } else {
           setCurrentUserId(null);
           setCurrentSellerId(null);
+          setFavorites(new Set());
         }
 
         // (B) Lấy danh sách sản phẩm rồi find theo id (đúng API bạn gửi)
@@ -1192,21 +1305,42 @@ export default function ProductDetail() {
             </div>
 
             {/* Favorite */}
-            <button
-              className={`favorite-btn ${liked ? "active" : ""}`}
-              type="button"
-              title="Thêm vào danh sách yêu thích"
-              onClick={() => setLiked((v) => !v)}
-            >
-              <svg
-                className="favorite-icon"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path d="M12.001 20.727c-.2 0-.401-.06-.573-.18C9.3 19.07 3 14.74 3 9.41 3 7.03 4.882 5 7.23 5c1.42 0 2.79.68 3.77 1.84A5.04 5.04 0 0 1 14.77 5c2.35 0 4.23 2.03 4.23 4.41 0 5.33-6.3 9.66-8.428 11.137a1.01 1.01 0 0 1-.571.18Z" />
-              </svg>
-              Thêm vào danh sách yêu thích
-            </button>
+            {/* Favorite */}
+            {(() => {
+              const sid = product?.sellerId || product?.seller_id;
+              const isOwnerProduct = sid && isOwnerOfSeller(sid);
+              const isFav =
+                currentUserId && favorites instanceof Set
+                  ? favorites.has(product.id)
+                  : false;
+
+              return (
+                <button
+                  className={`favorite-btn ${isFav ? "active" : ""} ${
+                    isOwnerProduct ? "is-owner" : ""
+                  }`}
+                  type="button"
+                  title={
+                    isOwnerProduct
+                      ? "Bạn là chủ shop — không thể yêu thích sản phẩm của mình."
+                      : isFav
+                      ? "Bỏ khỏi danh sách yêu thích"
+                      : "Thêm vào danh sách yêu thích"
+                  }
+                  disabled={favInflight.has(product.id) || isOwnerProduct}
+                  onClick={handleToggleFavorite}
+                >
+                  <svg
+                    className="favorite-icon"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path d="M12.001 20.727c-.2 0-.401-.06-.573-.18C9.3 19.07 3 14.74 3 9.41 3 7.03 4.882 5 7.23 5c1.42 0 2.79.68 3.77 1.84A5.04 5.04 0 0 1 14.77 5c2.35 0 4.23 2.03 4.23 4.41 0 5.33-6.3 9.66-8.428 11.137a1.01 1.01 0 0 1-.571.18Z" />
+                  </svg>
+                  Thêm vào danh sách yêu thích
+                </button>
+              );
+            })()}
           </div>
 
           {/* THUMBS: 3 ảnh + mũi tên */}

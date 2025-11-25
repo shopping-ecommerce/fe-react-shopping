@@ -5,6 +5,11 @@ import { useNavigate } from "react-router-dom";
 import "../../../styles/ProductQuickView.css";
 import { API_CONFIG, apiUrl } from "../../../config/api";
 import { createAuthFetch } from "../../../services/auth";
+import {
+  getMyProfile,
+  addFavorite,
+  removeFavorite,
+} from "../../../services/favorites";
 
 /* =========================
    Helpers chung
@@ -34,39 +39,41 @@ const isColorGroupName = (name) => {
 // Bản đồ tên màu tiếng Việt phổ biến -> CSS
 const VN_COLOR_MAP = new Map(
   Object.entries({
-    "đen": "#000000",
-    "trắng": "#ffffff",
-    "đỏ": "#ff0000",
+    đen: "#000000",
+    trắng: "#ffffff",
+    đỏ: "#ff0000",
     "xanh dương": "#1e90ff",
     "xanh biển": "#1e90ff",
     "xanh nước biển": "#1e90ff",
     "xanh lá": "#28a745",
-    "lục": "#28a745",
-    "vàng": "#ffd700",
-    "xám": "#808080",
-    "ghi": "#808080",
-    "nâu": "#8b4513",
-    "hồng": "#ff69b4",
-    "tím": "#800080",
-    "be": "#F5F5DC",
-    "kem": "#fffdd0",
-    "bạc": "silver",
+    lục: "#28a745",
+    vàng: "#ffd700",
+    xám: "#808080",
+    ghi: "#808080",
+    nâu: "#8b4513",
+    hồng: "#ff69b4",
+    tím: "#800080",
+    be: "#F5F5DC",
+    kem: "#fffdd0",
+    bạc: "silver",
     "vàng đồng": "#b8860b",
-    "đồng": "#b87333",
+    đồng: "#b87333",
     "xanh đen": "#001a2b",
     "xanh navy": "#001f3f",
     "xanh ngọc": "#40e0d0",
     "xanh pastel": "#a7c7e7",
     "kem sữa": "#fff8e1",
-    "rêu": "#556b2f",
-    "than": "#36454f",
-    "xanh" : "#2cc9d4ff",
+    rêu: "#556b2f",
+    than: "#36454f",
+    xanh: "#2cc9d4ff",
   })
 );
 
 const HEX_RE = /^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
-const RGB_RE = /^rgba?\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}(?:\s*,\s*(0|1|0?\.\d+))?\s*\)$/i;
-const HSL_RE = /^hsla?\(\s*\d{1,3}\s*,\s*(\d{1,3}%){1}\s*,\s*(\d{1,3}%){1}(?:\s*,\s*(0|1|0?\.\d+))?\s*\)$/i;
+const RGB_RE =
+  /^rgba?\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}(?:\s*,\s*(0|1|0?\.\d+))?\s*\)$/i;
+const HSL_RE =
+  /^hsla?\(\s*\d{1,3}\s*,\s*(\d{1,3}%){1}\s*,\s*(\d{1,3}%){1}(?:\s*,\s*(0|1|0?\.\d+))?\s*\)$/i;
 
 const resolveCssColor = (raw) => {
   const v = nkey(raw);
@@ -74,9 +81,32 @@ const resolveCssColor = (raw) => {
   if (VN_COLOR_MAP.has(v)) return VN_COLOR_MAP.get(v);
   if (HEX_RE.test(v) || RGB_RE.test(v) || HSL_RE.test(v)) return raw;
   const COMMON_EN = new Set([
-    "black","white","red","blue","green","yellow","gray","grey","brown",
-    "pink","purple","beige","silver","gold","navy","teal","olive","maroon",
-    "orange","cyan","magenta","indigo","violet","turquoise","salmon","khaki",
+    "black",
+    "white",
+    "red",
+    "blue",
+    "green",
+    "yellow",
+    "gray",
+    "grey",
+    "brown",
+    "pink",
+    "purple",
+    "beige",
+    "silver",
+    "gold",
+    "navy",
+    "teal",
+    "olive",
+    "maroon",
+    "orange",
+    "cyan",
+    "magenta",
+    "indigo",
+    "violet",
+    "turquoise",
+    "salmon",
+    "khaki",
   ]);
   if (COMMON_EN.has(v)) return v;
   return null;
@@ -203,8 +233,10 @@ const normalizeOptionKeysForBE = (opts) => {
   const out = {};
   for (const [kRaw, v] of Object.entries(opts)) {
     const k = nkey(kRaw);
-    if (k === "size" || k === "kích cỡ" || k === "kích thước") out["Kích cỡ"] = v;
-    else if (k === "color" || k === "màu" || k === "màu sắc") out["Màu sắc"] = v;
+    if (k === "size" || k === "kích cỡ" || k === "kích thước")
+      out["Kích cỡ"] = v;
+    else if (k === "color" || k === "màu" || k === "màu sắc")
+      out["Màu sắc"] = v;
     else out[kRaw] = v;
   }
   return Object.keys(out).length ? out : null;
@@ -215,7 +247,12 @@ const normalizeOptionKeysForBE = (opts) => {
    ========================= */
 const filterVariantsBySelection = (variants = [], selection = {}) => {
   if (!Array.isArray(variants)) return [];
-  const keys = Object.keys(selection || {}).filter((k) => selection[k] !== undefined && selection[k] !== null && selection[k] !== "");
+  const keys = Object.keys(selection || {}).filter(
+    (k) =>
+      selection[k] !== undefined &&
+      selection[k] !== null &&
+      selection[k] !== ""
+  );
   if (!keys.length) return variants.slice();
   return variants.filter((v) => {
     const ops = v?.options || {};
@@ -224,7 +261,8 @@ const filterVariantsBySelection = (variants = [], selection = {}) => {
 };
 
 const computePriceState = (product, selectedOptions, selectedSizeLegacy) => {
-  const hasVariants = Array.isArray(product?.variants) && product.variants.length > 0;
+  const hasVariants =
+    Array.isArray(product?.variants) && product.variants.length > 0;
   const sizeListLegacy = Array.isArray(product?.sizes) ? product.sizes : [];
 
   if (hasVariants) {
@@ -249,7 +287,9 @@ const computePriceState = (product, selectedOptions, selectedSizeLegacy) => {
     }
 
     const pool = filterVariantsBySelection(product.variants, selectedOptions);
-    const prices = pool.map((v) => Number(v?.price)).filter((n) => Number.isFinite(n));
+    const prices = pool
+      .map((v) => Number(v?.price))
+      .filter((n) => Number.isFinite(n));
     if (prices.length) {
       const min = Math.min(...prices);
       const max = Math.max(...prices);
@@ -271,7 +311,9 @@ const computePriceState = (product, selectedOptions, selectedSizeLegacy) => {
 
   if (!hasVariants && sizeListLegacy.length) {
     if (selectedSizeLegacy) {
-      const s = sizeListLegacy.find((it) => nkey(it?.size) === nkey(selectedSizeLegacy));
+      const s = sizeListLegacy.find(
+        (it) => nkey(it?.size) === nkey(selectedSizeLegacy)
+      );
       const p = Number(s?.price);
       const c = Number(s?.compareAtPrice);
       if (Number.isFinite(p)) {
@@ -283,7 +325,9 @@ const computePriceState = (product, selectedOptions, selectedSizeLegacy) => {
       }
     }
 
-    const prices = sizeListLegacy.map((s) => Number(s?.price)).filter((n) => Number.isFinite(n));
+    const prices = sizeListLegacy
+      .map((s) => Number(s?.price))
+      .filter((n) => Number.isFinite(n));
     if (prices.length) {
       const min = Math.min(...prices);
       const max = Math.max(...prices);
@@ -346,21 +390,33 @@ export default function ProductQuickView({
 
   const authFetch = useMemo(() => createAuthFetch(), []);
   const [userId, setUserId] = useState(null);
+  const [favorites, setFavorites] = useState(() => new Set());
+  const [favInflight, setFavInflight] = useState(() => new Set());
 
+  // Lấy profile + favorite_products
   useEffect(() => {
     let mounted = true;
     (async () => {
       try {
-        const res = await authFetch(apiUrl(API_CONFIG.endpoints.getMyProfile), {
-          method: "GET",
-          headers: { Accept: "application/json" },
-        });
-        const data = await res.json().catch(() => ({}));
-        if (mounted && res.ok) {
-          const uid = data?.result?.id || data?.id || null;
-          if (uid) setUserId(uid);
+        const me = await getMyProfile(authFetch);
+        if (!mounted || !me) return;
+
+        const uid = me?.id || me?.user_id || me?.result?.id || null;
+        if (uid) setUserId(uid);
+
+        const favs = Array.isArray(me?.favorite_products)
+          ? me.favorite_products
+          : Array.isArray(me?.result?.favorite_products)
+          ? me.result.favorite_products
+          : [];
+        setFavorites(new Set(favs));
+      } catch (err) {
+        if (mounted) {
+          console.warn("QuickView load profile failed:", err);
+          setUserId(null);
+          setFavorites(new Set());
         }
-      } catch (_) {}
+      }
     })();
     return () => {
       mounted = false;
@@ -369,14 +425,21 @@ export default function ProductQuickView({
 
   // ============= CHỌN BIẾN THỂ =============
   const sizeListLegacy = Array.isArray(product?.sizes) ? product.sizes : [];
-  const hasVariants = Array.isArray(product?.variants) && product.variants.length > 0;
+  const hasVariants =
+    Array.isArray(product?.variants) && product.variants.length > 0;
 
   const optionGroups = useMemo(
-    () => (hasVariants ? buildOptionGroups(product.variants, product?.optionDefs) : []),
+    () =>
+      hasVariants
+        ? buildOptionGroups(product.variants, product?.optionDefs)
+        : [],
     [hasVariants, product?.variants, product?.optionDefs]
   );
 
-  const mediaMap = useMemo(() => buildMediaMap(product?.mediaByOption), [product?.mediaByOption]);
+  const mediaMap = useMemo(
+    () => buildMediaMap(product?.mediaByOption),
+    [product?.mediaByOption]
+  );
 
   const [selectedOptions, setSelectedOptions] = useState({});
   const [selectedSizeLegacy, setSelectedSizeLegacy] = useState(null);
@@ -396,14 +459,18 @@ export default function ProductQuickView({
   const isVariantValueAvailable = (groupName, value) => {
     if (!hasVariants || !Array.isArray(product?.variants)) return true;
     const want = normalize(value);
-    const keepKeys = Object.keys(selectedOptions).filter((k) => k !== groupName);
+    const keepKeys = Object.keys(selectedOptions).filter(
+      (k) => k !== groupName
+    );
     for (const v of product.variants) {
       if (v?.available === false) continue;
       const qty = Number(v?.quantity) || 0;
       if (qty <= 0) continue;
       const ops = v?.options || {};
       if (normalize(ops[groupName]) !== want) continue;
-      const ok = keepKeys.every((k) => normalize(ops[k]) === normalize(selectedOptions[k]));
+      const ok = keepKeys.every(
+        (k) => normalize(ops[k]) === normalize(selectedOptions[k])
+      );
       if (ok) return true;
     }
     return false;
@@ -427,17 +494,21 @@ export default function ProductQuickView({
     return null;
   }, [selectedOptions, mediaMap]);
 
-  const mainUrl = activeImageUrlFromSelection || gallery[activeIndex]?.url || "/img/default.png";
+  const mainUrl =
+    activeImageUrlFromSelection || gallery[activeIndex]?.url || "/img/default.png";
 
   useEffect(() => {
     const W = 3;
     if (activeIndex < thumbStart) setThumbStart(activeIndex);
-    else if (activeIndex >= thumbStart + W) setThumbStart(activeIndex - (W - 1));
+    else if (activeIndex >= thumbStart + W)
+      setThumbStart(activeIndex - (W - 1));
   }, [activeIndex, thumbStart]);
 
   const visibleThumbs = gallery.slice(thumbStart, thumbStart + 3);
-  const onThumbArrowDown = () => setActiveIndex((i) => (i + 1) % gallery.length);
-  const onThumbArrowUp = () => setActiveIndex((i) => (i - 1 + gallery.length) % gallery.length);
+  const onThumbArrowDown = () =>
+    setActiveIndex((i) => (i + 1) % gallery.length);
+  const onThumbArrowUp = () =>
+    setActiveIndex((i) => (i - 1 + gallery.length) % gallery.length);
 
   // ============= GIÁ & TỒN KHO =============
   const selectedVariant = useMemo(() => {
@@ -446,7 +517,10 @@ export default function ProductQuickView({
     if (!keys.length) return null;
     const pick = product.variants.find((v) => {
       const ops = v?.options || {};
-      return keys.length === Object.keys(ops).length && keys.every((k) => nkey(ops[k]) === nkey(selectedOptions[k]));
+      return (
+        keys.length === Object.keys(ops).length &&
+        keys.every((k) => nkey(ops[k]) === nkey(selectedOptions[k]))
+      );
     });
     return pick || null;
   }, [hasVariants, product?.variants, selectedOptions]);
@@ -462,12 +536,19 @@ export default function ProductQuickView({
       return Number.isFinite(q) ? q : Infinity;
     }
     if (!hasVariants && sizeListLegacy.length) {
-      const s = sizeListLegacy.find((it) => nkey(it?.size) === nkey(selectedSizeLegacy));
+      const s = sizeListLegacy.find(
+        (it) => nkey(it?.size) === nkey(selectedSizeLegacy)
+      );
       const q = Number(s?.quantity);
       return Number.isFinite(q) ? q : Infinity;
     }
     return Infinity;
-  }, [hasVariants, selectedVariant?.quantity, sizeListLegacy, selectedSizeLegacy]);
+  }, [
+    hasVariants,
+    selectedVariant?.quantity,
+    sizeListLegacy,
+    selectedSizeLegacy,
+  ]);
 
   useEffect(() => {
     if (!Number.isFinite(maxQty)) return;
@@ -475,7 +556,6 @@ export default function ProductQuickView({
   }, [maxQty]);
 
   // ============= OPEN/CLOSE & SCROLL LOCK =============
-  const [liked, setLiked] = useState(false);
   const [addLoading, setAddLoading] = useState(false);
   const [buyLoading, setBuyLoading] = useState(false);
   const overlayRef = useRef(null);
@@ -518,7 +598,6 @@ export default function ProductQuickView({
 
   useEffect(() => {
     if (isOpen) {
-      setLiked(false);
       setAddLoading(false);
       setBuyLoading(false);
       lockScroll();
@@ -539,32 +618,58 @@ export default function ProductQuickView({
     };
   }, [isOpen, onClose]);
 
-  // ============= GUARDS =============
+  // ============= GUARDS & OWNER =============
+  const isOwnerOfSeller = (sid) =>
+    !!currentSellerId && !!sid && String(currentSellerId) === String(sid);
+
   const isOwnerTryingToBuy = () => {
     const sid = product?.sellerId || product?.seller_id;
     if (!sid || !currentSellerId) return false;
     return String(sid) === String(currentSellerId);
   };
   const notifyOwnerBlocked = () => {
-    toast({ title: "Không thể thao tác", text: "Bạn là chủ shop — không được phép mua sản phẩm.", type: "warning" });
+    toast({
+      title: "Không thể thao tác",
+      text: "Bạn là chủ shop — không được phép mua sản phẩm.",
+      type: "warning",
+    });
   };
 
   const missingGroups = useMemo(() => {
     if (hasVariants) {
-      return optionGroups.filter((g) => !normalize(selectedOptions[g.name])).map((g) => g.name);
+      return optionGroups
+        .filter((g) => !normalize(selectedOptions[g.name]))
+        .map((g) => g.name);
     }
-    if (!hasVariants && sizeListLegacy.length > 0 && !normalize(selectedSizeLegacy)) {
+    if (
+      !hasVariants &&
+      sizeListLegacy.length > 0 &&
+      !normalize(selectedSizeLegacy)
+    ) {
       return ["Size"];
     }
     return [];
-  }, [hasVariants, optionGroups, selectedOptions, sizeListLegacy, selectedSizeLegacy]);
+  }, [
+    hasVariants,
+    optionGroups,
+    selectedOptions,
+    sizeListLegacy,
+    selectedSizeLegacy,
+  ]);
 
   const guardSelection = () => {
     if (missingGroups.length > 0) {
       setSelectionTouched(true);
-      toast({ title: "Thiếu thông tin", text: `Vui lòng chọn: ${missingGroups.join(", ")}.`, type: "warning" });
+      toast({
+        title: "Thiếu thông tin",
+        text: `Vui lòng chọn: ${missingGroups.join(", ")}.`,
+        type: "warning",
+      });
       try {
-        document.querySelector(".qv-variant")?.scrollIntoView({ behavior: "smooth", block: "center" });
+        document.querySelector(".qv-variant")?.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
       } catch {}
       return false;
     }
@@ -604,10 +709,13 @@ export default function ProductQuickView({
 
       let uid = userId;
       if (!uid) {
-        const resMe = await authFetch(apiUrl(API_CONFIG.endpoints.getMyProfile), {
-          method: "GET",
-          headers: { Accept: "application/json" },
-        });
+        const resMe = await authFetch(
+          apiUrl(API_CONFIG.endpoints.getMyProfile),
+          {
+            method: "GET",
+            headers: { Accept: "application/json" },
+          }
+        );
         const me = await resMe.json().catch(() => ({}));
         uid = me?.result?.id || me?.id || null;
       }
@@ -625,7 +733,9 @@ export default function ProductQuickView({
       if (!body.productId) throw new Error("Thiếu productId.");
       if (!body.sellerId) throw new Error("Thiếu sellerId.");
 
-      const addUrl = API_CONFIG?.endpoints?.cartAdd ? apiUrl(API_CONFIG.endpoints.cartAdd) : apiUrl("/cart/add");
+      const addUrl = API_CONFIG?.endpoints?.cartAdd
+        ? apiUrl(API_CONFIG.endpoints.cartAdd)
+        : apiUrl("/cart/add");
 
       const res = await authFetch(addUrl, {
         method: "POST",
@@ -640,17 +750,26 @@ export default function ProductQuickView({
       } catch {}
 
       if (!res.ok) {
-        const msg = data?.message || data?.error || data?.msg || text || `HTTP ${res.status}`;
+        const msg =
+          data?.message || data?.error || data?.msg || text || `HTTP ${res.status}`;
         throw new Error(msg);
       }
       if (data?.code && data.code !== 200) {
         throw new Error(data?.message || `API code=${data.code}`);
       }
 
-      toast({ title: "Thành công", text: "Đã thêm vào giỏ hàng", type: "success" });
+      toast({
+        title: "Thành công",
+        text: "Đã thêm vào giỏ hàng",
+        type: "success",
+      });
       onAddToCart?.({ product, options: optionsForBE, qty });
     } catch (err) {
-      toast({ title: "Lỗi", text: err?.message || "Thêm vào giỏ thất bại", type: "danger" });
+      toast({
+        title: "Lỗi",
+        text: err?.message || "Thêm vào giỏ thất bại",
+        type: "danger",
+      });
       console.warn("Add to cart error:", err);
     } finally {
       setAddLoading(false);
@@ -674,10 +793,13 @@ export default function ProductQuickView({
       const authFetchLocal = createAuthFetch();
       let uid = userId;
       if (!uid) {
-        const resMe = await authFetchLocal(apiUrl(API_CONFIG.endpoints.getMyProfile), {
-          method: "GET",
-          headers: { Accept: "application/json" },
-        });
+        const resMe = await authFetchLocal(
+          apiUrl(API_CONFIG.endpoints.getMyProfile),
+          {
+            method: "GET",
+            headers: { Accept: "application/json" },
+          }
+        );
         const me = await resMe.json().catch(() => ({}));
         uid = me?.result?.id || me?.id || null;
       }
@@ -695,7 +817,9 @@ export default function ProductQuickView({
         throw new Error("Thiếu dữ liệu bắt buộc.");
       }
 
-      const addUrl = API_CONFIG?.endpoints?.cartAdd ? apiUrl(API_CONFIG.endpoints.cartAdd) : apiUrl("/cart/add");
+      const addUrl = API_CONFIG?.endpoints?.cartAdd
+        ? apiUrl(API_CONFIG.endpoints.cartAdd)
+        : apiUrl("/cart/add");
       const res = await authFetchLocal(addUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
@@ -714,9 +838,15 @@ export default function ProductQuickView({
       let effectivePrice = 0;
       if (priceState.mode === "exact" && Number.isFinite(priceState.price)) {
         effectivePrice = Number(priceState.price);
-      } else if (priceState.mode === "single" && Number.isFinite(priceState.price)) {
+      } else if (
+        priceState.mode === "single" &&
+        Number.isFinite(priceState.price)
+      ) {
         effectivePrice = Number(priceState.price);
-      } else if (priceState.mode === "range" && Number.isFinite(priceState.priceMin)) {
+      } else if (
+        priceState.mode === "range" &&
+        Number.isFinite(priceState.priceMin)
+      ) {
         effectivePrice = Number(priceState.priceMin);
       }
 
@@ -753,24 +883,145 @@ export default function ProductQuickView({
       };
 
       try {
-        sessionStorage.setItem("checkout_items", JSON.stringify([checkoutItem]));
+        sessionStorage.setItem(
+          "checkout_items",
+          JSON.stringify([checkoutItem])
+        );
       } catch {}
 
-      toast({ title: "Đi tới thanh toán", text: "Đã thêm vào giỏ. Chuyển tới trang thanh toán...", type: "success" });
+      toast({
+        title: "Đi tới thanh toán",
+        text: "Đã thêm vào giỏ. Chuyển tới trang thanh toán...",
+        type: "success",
+      });
 
       onClose?.();
-      navigate("/checkout", { state: { from: "buy_now", items: [checkoutItem], userId: uid } });
+      navigate("/checkout", {
+        state: { from: "buy_now", items: [checkoutItem], userId: uid },
+      });
     } catch (e) {
-      toast({ title: "Không thể mua ngay", text: "Vui lòng thử lại sau.", type: "danger" });
+      toast({
+        title: "Không thể mua ngay",
+        text: "Vui lòng thử lại sau.",
+        type: "danger",
+      });
     } finally {
       setBuyLoading(false);
     }
   };
 
+  // ============= FAVORITE HANDLER =============
+  const pid = product?.id || product?._id;
+  const sellerId = product?.sellerId || product?.seller_id;
+  const isOwnerProduct = isOwnerOfSeller(sellerId);
+  const isFav = pid && favorites instanceof Set ? favorites.has(pid) : false;
+
+  const handleToggleFavorite = async () => {
+    if (!pid) return;
+
+    if (isOwnerProduct) {
+      toast({
+        title: "Không thể yêu thích",
+        text: "Bạn là chủ shop — không thể yêu thích sản phẩm của chính mình.",
+        type: "warning",
+      });
+      return;
+    }
+
+    if (!userId) {
+      toast({
+        title: "Cần đăng nhập",
+        text: "Vui lòng đăng nhập để sử dụng Yêu thích.",
+        type: "warning",
+      });
+      navigate("/login");
+      return;
+    }
+
+    if (favInflight.has(pid)) return;
+
+    const currentlyFav = favorites.has(pid);
+
+    // Optimistic UI
+    setFavorites((prev) => {
+      const next = new Set(prev);
+      if (currentlyFav) next.delete(pid);
+      else next.add(pid);
+      return next;
+    });
+    setFavInflight((s) => {
+      const n = new Set(s);
+      n.add(pid);
+      return n;
+    });
+
+    try {
+      const favs = currentlyFav
+        ? await removeFavorite(authFetch, { userId, productId: pid })
+        : await addFavorite(authFetch, { userId, productId: pid });
+
+      setFavorites(new Set(favs));
+
+      toast({
+        title: currentlyFav
+          ? "Đã bỏ khỏi Yêu thích"
+          : "Đã thêm vào Yêu thích",
+        text: currentlyFav
+          ? "Sản phẩm đã được xóa khỏi danh sách yêu thích."
+          : "Bạn có thể xem lại trong danh sách yêu thích.",
+        type: currentlyFav ? "info" : "success",
+      });
+    } catch (err) {
+      console.error("QuickView toggle favorite failed:", err);
+      // Revert
+      setFavorites((prev) => {
+        const next = new Set(prev);
+        if (currentlyFav) next.add(pid);
+        else next.delete(pid);
+        return next;
+      });
+
+      if (err?.status === 401 || err?.status === 403) {
+        toast({
+          title: "Phiên đăng nhập hết hạn",
+          text: "Vui lòng đăng nhập lại để tiếp tục.",
+          type: "warning",
+        });
+        navigate("/login");
+      } else {
+        toast({
+          title: "Không thực hiện được",
+          text: "Có lỗi khi cập nhật Yêu thích. Vui lòng thử lại.",
+          type: "error",
+        });
+      }
+    } finally {
+      setFavInflight((s) => {
+        const n = new Set(s);
+        n.delete(pid);
+        return n;
+      });
+    }
+  };
+
   // ============= RENDER =============
   const overlay = (
-    <div className="qv-overlay qv-overlay--transparent" onClick={onClose} role="dialog" aria-modal="true" ref={overlayRef} data-qv-overlay>
-      <div className="qv-dialog" onClick={(e) => e.stopPropagation()} ref={dialogRef} tabIndex={-1} aria-label="Quick view product" data-qv-dialog>
+    <div
+      className="qv-overlay qv-overlay--transparent"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      ref={overlayRef}
+      data-qv-overlay
+    >
+      <div
+        className="qv-dialog"
+        onClick={(e) => e.stopPropagation()}
+        ref={dialogRef}
+        tabIndex={-1}
+        aria-label="Quick view product"
+        data-qv-dialog
+      >
         <div className="qv-body">
           <button className="qv-close" aria-label="Đóng" onClick={onClose}>
             ×
@@ -784,7 +1035,21 @@ export default function ProductQuickView({
                   <img src={mainUrl} alt={product.name} />
                 </div>
 
-                <button className={`qv-fav ${liked ? "active" : ""}`} onClick={() => setLiked((v) => !v)} type="button">
+                <button
+                  className={`qv-fav ${isFav ? "active" : ""} ${
+                    isOwnerProduct ? "is-owner" : ""
+                  }`}
+                  onClick={handleToggleFavorite}
+                  type="button"
+                  disabled={favInflight.has(pid) || isOwnerProduct}
+                  title={
+                    isOwnerProduct
+                      ? "Bạn là chủ shop — không thể yêu thích sản phẩm của mình."
+                      : isFav
+                      ? "Bỏ khỏi danh sách yêu thích"
+                      : "Thêm vào danh sách yêu thích"
+                  }
+                >
                   <svg viewBox="0 0 24 24" className="qv-fav-ic">
                     <path d="M12.001 20.727c-.2 0-.401-.06-.573-.18C9.3 19.07 3 14.74 3 9.41 3 7.03 4.882 5 7.23 5c1.42 0 2.79.68 3.77 1.84A5.04 5.04 0 0 1 14.77 5c2.35 0 4.23 2.03 4.23 4.41 0 5.33-6.3 9.66-8.428 11.137a1.01 1.01 0 0 1-.571.18Z" />
                   </svg>
@@ -794,7 +1059,11 @@ export default function ProductQuickView({
 
               <div className="qv-thumbs-vertical">
                 {thumbStart > 0 && (
-                  <button className="qv-thumb-up" onClick={onThumbArrowUp} title="Ảnh trước">
+                  <button
+                    className="qv-thumb-up"
+                    onClick={onThumbArrowUp}
+                    title="Ảnh trước"
+                  >
                     ▴
                   </button>
                 )}
@@ -803,14 +1072,25 @@ export default function ProductQuickView({
                   {visibleThumbs.map((img, i) => {
                     const realIndex = thumbStart + i;
                     return (
-                      <button key={`thumb-${realIndex}`} className={`qv-thumb ${realIndex === activeIndex ? "active" : ""}`} onClick={() => setActiveIndex(realIndex)} aria-label={`Ảnh ${realIndex + 1}`}>
+                      <button
+                        key={`thumb-${realIndex}`}
+                        className={`qv-thumb ${
+                          realIndex === activeIndex ? "active" : ""
+                        }`}
+                        onClick={() => setActiveIndex(realIndex)}
+                        aria-label={`Ảnh ${realIndex + 1}`}
+                      >
                         <img src={img.url} alt={`thumb-${realIndex}`} />
                       </button>
                     );
                   })}
                 </div>
 
-                <button className="qv-thumb-down" onClick={onThumbArrowDown} title="Ảnh tiếp theo">
+                <button
+                  className="qv-thumb-down"
+                  onClick={onThumbArrowDown}
+                  title="Ảnh tiếp theo"
+                >
                   ▾
                 </button>
               </div>
@@ -822,7 +1102,9 @@ export default function ProductQuickView({
 
               <div className="qv-meta">
                 <span className="qv-rating">5.0 ★★★★★</span>
-                <span className="qv-sold">Đã bán {product.soldCount ?? product.sold ?? 35}</span>
+                <span className="qv-sold">
+                  Đã bán {product.soldCount ?? product.sold ?? 35}
+                </span>
               </div>
 
               {/* Giá 1 hàng: exact | single | range */}
@@ -830,25 +1112,35 @@ export default function ProductQuickView({
                 {priceState.mode === "exact" && (
                   <>
                     <span className="qv-price">{fmt(priceState.price)}</span>
-                    {Number.isFinite(priceState.compare) && priceState.compare > priceState.price && (
-                      <span className="qv-compare">{fmt(priceState.compare)}</span>
-                    )}
+                    {Number.isFinite(priceState.compare) &&
+                      priceState.compare > priceState.price && (
+                        <span className="qv-compare">
+                          {fmt(priceState.compare)}
+                        </span>
+                      )}
                   </>
                 )}
                 {priceState.mode === "single" && (
                   <>
                     <span className="qv-price">{fmt(priceState.price)}</span>
-                    {Number.isFinite(priceState.compare) && priceState.compare > priceState.price && (
-                      <span className="qv-compare">{fmt(priceState.compare)}</span>
-                    )}
+                    {Number.isFinite(priceState.compare) &&
+                      priceState.compare > priceState.price && (
+                        <span className="qv-compare">
+                          {fmt(priceState.compare)}
+                        </span>
+                      )}
                   </>
                 )}
                 {priceState.mode === "range" && (
                   <>
-                    <span className="qv-price">{fmt(priceState.priceMin)} – {fmt(priceState.priceMax)}</span>
+                    <span className="qv-price">
+                      {fmt(priceState.priceMin)} – {fmt(priceState.priceMax)}
+                    </span>
                   </>
                 )}
-                {priceState.mode === "none" && <span className="qv-price">-đ</span>}
+                {priceState.mode === "none" && (
+                  <span className="qv-price">-đ</span>
+                )}
               </div>
 
               {/* ====== VARIANT UI (gộp trùng tên) — KHÔNG auto-chọn ====== */}
@@ -857,26 +1149,42 @@ export default function ProductQuickView({
                   {optionGroups.map((grp, idx) => {
                     const gName = grp.name;
                     const isColorGroup = isColorGroupName(gName);
-                    const missing = selectionTouched && !selectedOptions[gName];
+                    const missing =
+                      selectionTouched && !selectedOptions[gName];
 
                     return (
-                      <div key={`opt-${idx}-${gName}`} className={`qv-variant ${missing ? "qv-variant--error" : ""}`}>
+                      <div
+                        key={`opt-${idx}-${gName}`}
+                        className={`qv-variant ${
+                          missing ? "qv-variant--error" : ""
+                        }`}
+                      >
                         <div className="qv-variant-label">{gName}</div>
                         <div className="qv-variant-options">
                           {grp.values.map((val, vi) => {
-                            const active = nkey(selectedOptions[gName]) === nkey(val);
-                            const disabled = !isVariantValueAvailable(gName, val);
-                            const mediaKey = `${normalize(gName)}::${normalize(val)}`;
+                            const active =
+                              nkey(selectedOptions[gName]) === nkey(val);
+                            const disabled = !isVariantValueAvailable(
+                              gName,
+                              val
+                            );
+                            const mediaKey = `${normalize(
+                              gName
+                            )}::${normalize(val)}`;
                             const thumb = mediaMap[mediaKey];
 
                             // màu chấm (nếu là nhóm Màu)
-                            const colorCss = isColorGroup ? resolveCssColor(val) : null;
+                            const colorCss = isColorGroup
+                              ? resolveCssColor(val)
+                              : null;
 
                             return (
                               <button
                                 key={`optv-${idx}-${vi}-${val}`}
                                 type="button"
-                                className={`qv-chip ${active ? "active" : ""} ${disabled ? "disabled" : ""}`}
+                                className={`qv-chip ${
+                                  active ? "active" : ""
+                                } ${disabled ? "disabled" : ""}`}
                                 onClick={() => {
                                   if (disabled) return;
                                   setSelectionTouched(true);
@@ -888,16 +1196,27 @@ export default function ProductQuickView({
                                 title={
                                   isColorGroup
                                     ? `${disabled ? "Hết hàng" : ""}`.trim()
-                                    : String(val) + (disabled ? " (Hết hàng với lựa chọn hiện tại)" : "")
+                                    : String(val) +
+                                      (disabled
+                                        ? " (Hết hàng với lựa chọn hiện tại)"
+                                        : "")
                                 }
                               >
                                 {/* ẢNH THUMB (luôn giữ nếu có) */}
                                 {thumb ? (
-                                  <span className="qv-chip-thumb" style={{ marginRight: 6 }}>
+                                  <span
+                                    className="qv-chip-thumb"
+                                    style={{ marginRight: 6 }}
+                                  >
                                     <img
                                       src={thumb}
                                       alt={isColorGroup ? "" : String(val)}
-                                      style={{ width: 18, height: 18, objectFit: "cover", borderRadius: 3 }}
+                                      style={{
+                                        width: 18,
+                                        height: 18,
+                                        objectFit: "cover",
+                                        borderRadius: 3,
+                                      }}
                                     />
                                   </span>
                                 ) : null}
@@ -920,12 +1239,20 @@ export default function ProductQuickView({
                                 ) : null}
 
                                 {/* NHÓM MÀU: KHÔNG HIỂN THỊ CHỮ */}
-                                {!isColorGroup && <span style={{ marginLeft: thumb ? 6 : 0 }}>{String(val)}</span>}
+                                {!isColorGroup && (
+                                  <span style={{ marginLeft: thumb ? 6 : 0 }}>
+                                    {String(val)}
+                                  </span>
+                                )}
                               </button>
                             );
                           })}
                         </div>
-                        {missing && <div className="qv-size-error">Vui lòng chọn {gName.toLowerCase()}.</div>}
+                        {missing && (
+                          <div className="qv-size-error">
+                            Vui lòng chọn {gName.toLowerCase()}.
+                          </div>
+                        )}
                       </div>
                     );
                   })}
@@ -934,23 +1261,34 @@ export default function ProductQuickView({
 
               {/* ====== LEGACY SIZE UI (fallback) — KHÔNG auto-chọn ====== */}
               {!hasVariants && sizeListLegacy.length > 0 && (
-                <div className={`qv-variant ${selectionTouched && !selectedSizeLegacy ? "qv-variant--error" : ""}`}>
+                <div
+                  className={`qv-variant ${
+                    selectionTouched && !selectedSizeLegacy
+                      ? "qv-variant--error"
+                      : ""
+                  }`}
+                >
                   <div className="qv-variant-label">Size</div>
                   <div className="qv-variant-options">
                     {sizeListLegacy.map((s, i) => {
                       const val = nkey(s?.size);
-                      const label = (normalize(s?.size) || "FREE").toUpperCase();
+                      const label =
+                        (normalize(s?.size) || "FREE").toUpperCase();
                       const active = nkey(selectedSizeLegacy) === val;
                       const disabled = !(Number(s?.quantity) > 0);
                       return (
                         <button
                           key={`legacy-${i}-${val || "FREE"}`}
                           type="button"
-                          className={`qv-chip ${active ? "active" : ""} ${disabled ? "disabled" : ""}`}
+                          className={`qv-chip ${
+                            active ? "active" : ""
+                          } ${disabled ? "disabled" : ""}`}
                           onClick={() => {
                             if (disabled) return;
                             setSelectionTouched(true);
-                            setSelectedSizeLegacy((prev) => (nkey(prev) === val ? null : s?.size));
+                            setSelectedSizeLegacy((prev) =>
+                              nkey(prev) === val ? null : s?.size
+                            );
                           }}
                           aria-pressed={active}
                           aria-disabled={disabled}
@@ -962,27 +1300,38 @@ export default function ProductQuickView({
                       );
                     })}
                   </div>
-                  {selectionTouched && !selectedSizeLegacy && <div className="qv-size-error">Vui lòng chọn size trước khi tiếp tục.</div>}
+                  {selectionTouched && !selectedSizeLegacy && (
+                    <div className="qv-size-error">
+                      Vui lòng chọn size trước khi tiếp tục.
+                    </div>
+                  )}
                 </div>
               )}
 
               <div className="qv-stock">
                 <span className="qv-stock-label">Tồn kho:</span>
-                <span className="qv-stock-num">{Number.isFinite(maxQty) ? maxQty : "∞"}</span>
+                <span className="qv-stock-num">
+                  {Number.isFinite(maxQty) ? maxQty : "∞"}
+                </span>
               </div>
 
               <div className="qv-qty-stock-row">
                 <div className="qv-qty-label">Số lượng</div>
                 <div className="qv-qty-value">
                   <div className="qv-qty-control">
-                    <button type="button" onClick={() => setQty((q) => Math.max(1, q - 1))}>
+                    <button
+                      type="button"
+                      onClick={() => setQty((q) => Math.max(1, q - 1))}
+                    >
                       −
                     </button>
                     <input
                       value={qty}
                       onChange={(e) => {
                         const val = Math.max(1, Number(e.target.value) || 1);
-                        setQty(Number.isFinite(maxQty) ? Math.min(val, maxQty) : val);
+                        setQty(
+                          Number.isFinite(maxQty) ? Math.min(val, maxQty) : val
+                        );
                       }}
                       inputMode="numeric"
                       aria-label="Số lượng"
@@ -992,7 +1341,9 @@ export default function ProductQuickView({
                       onClick={() =>
                         setQty((q) => {
                           const v = q + 1;
-                          return Number.isFinite(maxQty) ? Math.min(v, maxQty) : v;
+                          return Number.isFinite(maxQty)
+                            ? Math.min(v, maxQty)
+                            : v;
                         })
                       }
                     >
@@ -1003,7 +1354,14 @@ export default function ProductQuickView({
               </div>
 
               <div className="qv-actions">
-                <button className={`qv-btn outline ${addLoading ? "is-loading" : ""}`} onClick={handleAdd} disabled={addLoading || buyLoading} type="button">
+                <button
+                  className={`qv-btn outline ${
+                    addLoading ? "is-loading" : ""
+                  }`}
+                  onClick={handleAdd}
+                  disabled={addLoading || buyLoading}
+                  type="button"
+                >
                   {addLoading ? (
                     <>
                       Đang thêm <Dots />
@@ -1013,7 +1371,14 @@ export default function ProductQuickView({
                   )}
                 </button>
 
-                <button className={`qv-btn primary ${buyLoading ? "is-loading" : ""}`} onClick={handleBuyNow} disabled={buyLoading || addLoading} type="button">
+                <button
+                  className={`qv-btn primary ${
+                    buyLoading ? "is-loading" : ""
+                  }`}
+                  onClick={handleBuyNow}
+                  disabled={buyLoading || addLoading}
+                  type="button"
+                >
                   {buyLoading ? (
                     <>
                       Mua ngay <Dots />

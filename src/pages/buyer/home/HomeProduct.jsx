@@ -97,6 +97,11 @@ const priceFromVariants = (variants = []) => {
 
 function Home() {
   const navigate = useNavigate();
+
+  const navigateToEvents = () => {
+    navigate("/events");
+  };
+
   const location = useLocation();
   const { authFetch } = useContext(AuthContext);
 
@@ -205,9 +210,9 @@ function Home() {
   const slideInterval = useRef();
   const totalSlides = 3;
   const slides = [
-    { left: "/img/cart1.png", right: "/img/cart.jpg" },
-    { left: "/img/cart.jpg", right: "/img/cart1.png" },
-    { left: "/img/cart1.png", right: "/img/cart.jpg" },
+    { left: "/img/cartBaner1.jpg", right: "/img/cartBaner2.png" },
+    { left: "/img/cartbaner3.png", right: "/img/cartbaner4.png" },
+    { left: "/img/cartbaner5.png", right: "/img/cartbaner6.png" },
   ];
 
   // categories
@@ -754,7 +759,12 @@ function Home() {
             style={{ transform: `translateX(${translateValue}%)` }}
           >
             {slides.map((slide, index) => (
-              <div key={index} className="banner-slide">
+              <div
+                key={index}
+                className="banner-slide"
+                onClick={navigateToEvents}
+                style={{ cursor: "pointer" }}
+              >
                 <div className="banner-content">
                   <div className="banner-left">
                     <img src={slide.left} alt="Banner Left" />
@@ -766,6 +776,7 @@ function Home() {
               </div>
             ))}
           </div>
+
           <button
             className="prev-slide"
             onClick={() =>

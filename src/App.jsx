@@ -90,6 +90,8 @@ import AccountPolicies from "./pages/buyer/account/AccountPolicies";
 
 import ResetPassword from "./pages/auth/ResetPassword";
 
+import EventsPage from "./components/common/EventsPage";
+
 /** Layout không header/footer/sidebar: dùng cho các trang auth */
 function AuthLayout() {
   const location = useLocation();
@@ -234,6 +236,7 @@ function App() {
                 "/shop",
                 "/order-success",
                 "/chat-shop",
+                "/events"
               ] /* ẩn sidebar các trang */
             }
           />
@@ -245,6 +248,8 @@ function App() {
         <Route path="/products/:id" element={<ProductDetail />} />
         {/* 👇 Route trang shop */}
         <Route path="/shop/:sellerId" element={<SellersProducts />} />
+
+        <Route path="/events" element={<EventsPage />} />
 
         <Route
           path="/cart"

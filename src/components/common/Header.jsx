@@ -628,7 +628,11 @@ function Header({ alwaysVisible = false }) {
               to="/seller"
               className="h-link"
               onClick={onClickSellerChannel}
-              title={isSuspended ? "Tài khoản đang bị tạm ngưng — một số chức năng sẽ bị khoá" : undefined}
+              title={
+                isSuspended
+                  ? "Tài khoản đang bị tạm ngưng — một số chức năng sẽ bị khoá"
+                  : undefined
+              }
             >
               Kênh người bán{isSuspended}
             </Link>
@@ -662,9 +666,21 @@ function Header({ alwaysVisible = false }) {
             Thông báo
           </Link>
 
-          <div className="h-lang" role="button" tabIndex={0} title="Ngôn ngữ">
+          <div
+            className="h-lang"
+            role="button"
+            tabIndex={0}
+            title="Chính sách"
+            onClick={() => navigate("/account/policies")}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                navigate("/account/policies");
+              }
+            }}
+          >
             <FontAwesomeIcon icon={faGlobe} className="h-link-ico" />
-            Tiếng Việt
+            Chính sách
           </div>
 
           <button
