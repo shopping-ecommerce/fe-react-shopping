@@ -5,7 +5,7 @@ import {
   faUser,
   faBell,
   faClipboardList,
-  faHeart,
+  faHeart, 
   faLocationDot,
   faRightFromBracket,
   faWallet,
